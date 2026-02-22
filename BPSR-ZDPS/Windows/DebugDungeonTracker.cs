@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Zproto;
@@ -40,8 +41,18 @@ namespace BPSR_ZDPS.Windows
             var io = ImGui.GetIO();
             var main_viewport = ImGui.GetMainViewport();
 
-            //ImGui.SetNextWindowPos(new Vector2(io.DisplaySize.X, io.DisplaySize.Y), ImGuiCond.Appearing);
-            ImGui.SetNextWindowSize(new Vector2(550, 550), ImGuiCond.FirstUseEver);
+            bool useFullViewport = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+
+            if (useFullViewport)
+            {
+                ImGui.SetNextWindowPos(main_viewport.WorkPos, ImGuiCond.Always);
+                ImGui.SetNextWindowSize(main_viewport.WorkSize, ImGuiCond.Appearing);
+            }
+            else
+            {
+                //ImGui.SetNextWindowPos(new Vector2(io.DisplaySize.X, io.DisplaySize.Y), ImGuiCond.Appearing);
+                ImGui.SetNextWindowSize(new Vector2(550, 550), ImGuiCond.FirstUseEver);
+            }
 
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 

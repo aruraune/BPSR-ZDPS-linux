@@ -2,6 +2,8 @@
 
 namespace BPSR_ZDPS;
 
+// Windows-only P/Invoke declarations
+// On Linux, these functions will return no-op stubs
 public class User32
 {
     public static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
@@ -80,6 +82,7 @@ public class User32
 
     public delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
 
+#if WINDOWS || NET_WINDOWS
     [DllImport("user32.dll", SetLastError = true)]
     public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
     
@@ -107,29 +110,11 @@ public class User32
     [DllImport("user32.dll")]
     public static extern bool IsIconic(IntPtr hWnd);
 
-    public static IntPtr GetWindowLong(IntPtr hWnd, int nIndex)
-    {
-        if (IntPtr.Size == 4)
-        {
-            return GetWindowLong32(hWnd, nIndex);
-        }
-        return GetWindowLongPtr64(hWnd, nIndex);
-    }
-
     [DllImport("user32.dll", EntryPoint = "GetWindowLong", CharSet = CharSet.Auto)]
     private static extern IntPtr GetWindowLong32(IntPtr hWnd, int nIndex);
 
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr", CharSet = CharSet.Auto)]
     private static extern IntPtr GetWindowLongPtr64(IntPtr hWnd, int nIndex);
-
-    public static IntPtr SetWindowLong(IntPtr hWnd, int nIndex, IntPtr dwNewLong)
-    {
-        if (IntPtr.Size == 4)
-        {
-            return new IntPtr(SetWindowLong32(hWnd, nIndex, dwNewLong.ToInt32()));
-        }
-        return SetWindowLongPtr64(hWnd, nIndex, dwNewLong);
-    }
 
     [DllImport("user32.dll", EntryPoint = "SetWindowLong", SetLastError = true)]
     private static extern int SetWindowLong32(IntPtr hWnd, int nIndex, int dwNewLong);
@@ -139,4 +124,39 @@ public class User32
 
     [DllImport("user32.dll")]
     public static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
+#else
+    // Linux stubs - no-op implementations
+    public static bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags) => false;
+    public static bool SetForegroundWindow(IntPtr hWnd) => false;
+    public static bool ShowWindow(IntPtr hWnd, int nCmdShow) => false;
+    public static IntPtr SetWindowsHookEx(int hookType, HookProc lpfn, IntPtr hMod, uint dwThreadId) => IntPtr.Zero;
+    public static bool UnhookWindowsHookEx(IntPtr hhk) => false;
+    public static IntPtr GetModuleHandle(string lpModuleName) => IntPtr.Zero;
+    public static IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam) => IntPtr.Zero;
+    public static bool GetWindowRect(IntPtr hWnd, ref RECT Rect) => false;
+    public static bool IsIconic(IntPtr hWnd) => false;
+    private static IntPtr GetWindowLong32(IntPtr hWnd, int nIndex) => IntPtr.Zero;
+    private static IntPtr GetWindowLongPtr64(IntPtr hWnd, int nIndex) => IntPtr.Zero;
+    private static int SetWindowLong32(IntPtr hWnd, int nIndex, int dwNewLong) => 0;
+    private static IntPtr SetWindowLongPtr64(IntPtr hWnd, int nIndex, IntPtr dwNewLong) => IntPtr.Zero;
+    public static bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags) => false;
+#endif
+
+    public static IntPtr GetWindowLong(IntPtr hWnd, int nIndex)
+    {
+        if (IntPtr.Size == 4)
+        {
+            return GetWindowLong32(hWnd, nIndex);
+        }
+        return GetWindowLongPtr64(hWnd, nIndex);
+    }
+
+    public static IntPtr SetWindowLong(IntPtr hWnd, int nIndex, IntPtr dwNewLong)
+    {
+        if (IntPtr.Size == 4)
+        {
+            return new IntPtr(SetWindowLong32(hWnd, nIndex, dwNewLong.ToInt32()));
+        }
+        return SetWindowLongPtr64(hWnd, nIndex, dwNewLong);
+    }
 }

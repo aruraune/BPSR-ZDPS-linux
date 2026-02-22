@@ -1,7 +1,5 @@
 ﻿using BPSR_ZDPSLib;
 using BPSR_ZDPS.DataTypes;
-using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
 using Serilog;
 using System;
 using System.Collections.Generic;

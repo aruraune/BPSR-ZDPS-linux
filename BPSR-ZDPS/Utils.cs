@@ -1,5 +1,7 @@
 ﻿using BPSR_ZDPS.DataTypes;
+#if WINDOWS
 using Silk.NET.Direct3D11;
+#endif
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +31,7 @@ namespace BPSR_ZDPS
 
         public static Version AppVersion { get; set; } = typeof(Utils).Assembly.GetName().Version;
 
+#if WINDOWS
         internal static string? GetDebugName(void* target)
         {
             ID3D11DeviceChild* child = (ID3D11DeviceChild*)target;
@@ -72,6 +75,7 @@ namespace BPSR_ZDPS
                 child->SetPrivateData(&guid, 0, null);
             }
         }
+#endif
 
         public static Guid* Guid(Guid guid)
         {
@@ -321,36 +325,48 @@ namespace BPSR_ZDPS
         
         public static void BringWindowToFront(ImGuiViewportPtr? viewport = null)
         {
+#if WINDOWS
             viewport = viewport ?? ImGui.GetWindowViewport();
             User32.SetForegroundWindow((IntPtr)viewport.Value.PlatformHandleRaw);
+#endif
         }
         
         public static void MinimizeWindow(ImGuiViewportPtr? viewport = null)
         {
+#if WINDOWS
             viewport = viewport ?? ImGui.GetWindowViewport();
             User32.ShowWindow((IntPtr)viewport.Value.PlatformHandleRaw, User32.SW_MINIMIZE);
+#endif
         }
 
         public static void RestoreWindow(ImGuiViewportPtr? viewport = null)
         {
+#if WINDOWS
             viewport = viewport ?? ImGui.GetWindowViewport();
             User32.ShowWindow((IntPtr)viewport.Value.PlatformHandleRaw, User32.SW_RESTORE);
+#endif
         }
 
         public static void SetWindowTopmost(IntPtr hWnd)
         {
+#if WINDOWS
             User32.SetWindowPos(hWnd, User32.HWND_TOPMOST, 0, 0, 0, 0, User32.SWP_NOMOVE | User32.SWP_NOSIZE);
+#endif
         }
     
         public static void UnsetWindowTopmost(IntPtr hWnd)
         {
+#if WINDOWS
             User32.SetWindowPos(hWnd, User32.HWND_NOTOPMOST, 0, 0, 0, 0, User32.SWP_NOMOVE | User32.SWP_NOSIZE);
+#endif
         }
 
         public static void SetWindowLong(int nIndex, IntPtr dwNewLong, ImGuiViewportPtr? viewport = null)
         {
+#if WINDOWS
             viewport = viewport ?? ImGui.GetWindowViewport();
             User32.SetWindowLong((IntPtr)viewport.Value.PlatformHandleRaw, nIndex, dwNewLong);
+#endif
         }
 
         public static unsafe void SetCurrentWindowIcon()

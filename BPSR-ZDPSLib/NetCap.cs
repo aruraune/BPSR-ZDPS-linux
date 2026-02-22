@@ -34,6 +34,12 @@ public class NetCap
     public ulong NumGameMessagesSeen = 0;
     public ulong NumGameMessagesDequeued = 0;
 
+    // Connection caching for performance
+    private List<TcpConnectionProvider.TcpConnection> _cachedGameConnections = [];
+    private DateTime _lastConnectionRefresh = DateTime.MinValue;
+    private readonly TimeSpan _connectionRefreshInterval = TimeSpan.FromSeconds(2);
+    private readonly object _connectionCacheLock = new();
+
     private bool IsDebugCaptureFileMode = false;
     private string DebugCaptureFile = "";//@"C:\Users\Xennma\Documents\BPSR_PacketCapture.pcap";
     private DateTime LastDebugCapturePacketTime = DateTime.MinValue;
@@ -53,7 +59,7 @@ public class NetCap
         else
         {
             CaptureDevice = GetCaptureDevice();
-            CaptureDevice.Open(DeviceModes.Promiscuous, 100);
+            CaptureDevice.Open(DeviceModes.None, 250);
         }
         
 
@@ -62,7 +68,7 @@ public class NetCap
         TcpReassempler = new TcpReassembler();
         TcpReassempler.OnNewConnection += OnNewConnection;
 
-        CaptureDevice.Filter = "tcp and not portrange 0-1000";
+        CaptureDevice.Filter = "tcp and not portrange 0-1000 and (host 43.174.233.119 or host 43.174.233.118 or host 43.174.232.118 or host 43.174.232.119)";
         CaptureDevice.OnPacketArrival += DeviceOnOnPacketArrival;
         CaptureDevice.StartCapture();
 
@@ -318,16 +324,50 @@ public class NetCap
 
     private bool IsFromGame(IPv4Packet ip, TcpPacket tcp)
     {
-        var sw = Stopwatch.StartNew();
-        var conns = Utils.GetTCPConnectionsForExe(Config.ExeNames);
-        var isGameConnection = conns.Any((x =>
-            (x.LocalAddress == ip.SourceAddress.ToString() && x.LocalPort == tcp.SourcePort) ||
-            (x.RemoteAddress == ip.SourceAddress.ToString() && x.RemotePort == tcp.SourcePort) ||
-            (x.LocalAddress == ip.DestinationAddress.ToString() && x.LocalPort == tcp.DestinationPort) ||
-            (x.RemoteAddress == ip.DestinationAddress.ToString() && x.RemotePort == tcp.DestinationPort)));
+        // Refresh connection cache if stale
+        if (DateTime.Now - _lastConnectionRefresh > _connectionRefreshInterval)
+        {
+            lock (_connectionCacheLock)
+            {
+                // Double-check after acquiring lock
+                if (DateTime.Now - _lastConnectionRefresh > _connectionRefreshInterval)
+                {
+                    var sw = Stopwatch.StartNew();
+                    _cachedGameConnections = Utils.GetTCPConnectionsForExe(Config.ExeNames);
+                    _lastConnectionRefresh = DateTime.Now;
+                    sw.Stop();
+                    Log.Information("[NetCap] Refreshed game connections cache: {count} connections (took {time}ms)", 
+                        _cachedGameConnections.Count, sw.ElapsedMilliseconds);
+                }
+            }
+        }
 
-        sw.Stop();
-        Log.Logger.Debug($"Checking {ip.SourceAddress}:{tcp.SourcePort} > {ip.DestinationAddress}:{tcp.DestinationPort} is game connection: {isGameConnection}, took {sw.ElapsedMilliseconds}ms");
+        var srcAddr = ip.SourceAddress.ToString();
+        var dstAddr = ip.DestinationAddress.ToString();
+        var srcPort = tcp.SourcePort;
+        var dstPort = tcp.DestinationPort;
+
+        // Check against cached connections (fast)
+        var isGameConnection = _cachedGameConnections.Any((x =>
+            (x.LocalAddress == srcAddr && x.LocalPort == srcPort) ||
+            (x.RemoteAddress == srcAddr && x.RemotePort == srcPort) ||
+            (x.LocalAddress == dstAddr && x.LocalPort == dstPort) ||
+            (x.RemoteAddress == dstAddr && x.RemotePort == dstPort)));
+
+        if (!isGameConnection && _cachedGameConnections.Count > 0)
+        {
+            // Log first few checks when we have connections but they don't match
+            if (NumSeenPackets < 10)
+            {
+                Log.Debug("[NetCap] Packet {src}:{srcPort} -> {dst}:{dstPort} NOT matched against {count} cached connections",
+                    srcAddr, srcPort, dstAddr, dstPort, _cachedGameConnections.Count);
+            }
+        }
+        else if (isGameConnection)
+        {
+            Log.Debug("[NetCap] ✓ Game packet: {src}:{srcPort} <-> {dst}:{dstPort}",
+                srcAddr, srcPort, dstAddr, dstPort);
+        }
         
         return isGameConnection;
     }
@@ -391,7 +431,7 @@ public class NetCap
         return device;
     }
 
-    public string GetFilterString(IEnumerable<TcpHelper.TcpRow> conns)
+    public string GetFilterString(IEnumerable<TcpConnectionProvider.TcpConnection> conns)
     {
         var connLines = conns.DistinctBy(x => x.RemoteAddress).Select(x => $"(tcp and src host {x.RemoteAddress} or dst host {x.RemoteAddress})");
         var filterStr = string.Join(" or ", connLines);

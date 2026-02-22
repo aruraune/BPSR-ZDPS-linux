@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -56,6 +57,15 @@ namespace BPSR_ZDPS.Windows
             ImGui.SetNextWindowSizeConstraints(new Vector2(680, 400), new Vector2(680, 400));
 
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
+
+            bool useFullViewport = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            var main_viewport = ImGui.GetMainViewport();
+
+            if (useFullViewport)
+            {
+                ImGui.SetNextWindowPos(main_viewport.WorkPos, ImGuiCond.Always);
+                ImGui.SetNextWindowSize(main_viewport.WorkSize, ImGuiCond.Appearing);
+            }
 
             if (ImGui.BeginPopupModal($"Database Manager{TITLE_ID}", ref IsOpened, ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoResize))
             {

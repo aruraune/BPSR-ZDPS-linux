@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using ZLinq;
@@ -94,6 +95,15 @@ namespace BPSR_ZDPS.Windows
             }
 
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
+
+            bool useFullViewport = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            var main_viewport = ImGui.GetMainViewport();
+
+            if (useFullViewport)
+            {
+                ImGui.SetNextWindowPos(main_viewport.WorkPos, ImGuiCond.Always);
+                ImGui.SetNextWindowSize(main_viewport.WorkSize, ImGuiCond.Appearing);
+            }
 
             ImGuiWindowFlags exWindowFlags = ImGuiWindowFlags.None;
             if (AppState.MousePassthrough && windowSettings.TopMost)

@@ -1,11 +1,9 @@
 ﻿using BPSR_ZDPS.Windows;
 using Hexa.NET.GLFW;
 using Hexa.NET.ImGui;
-using Hexa.NET.ImGui.Backends.D3D11;
+using Hexa.NET.ImGui.Backends.OpenGL3;
 using Hexa.NET.ImGui.Backends.GLFW;
 using Serilog;
-using Silk.NET.Core.Native;
-using Silk.NET.Direct3D11;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Reflection;
@@ -21,7 +19,7 @@ namespace BPSR_ZDPS
     {
         private static MainWindow mainWindow;
         private static GLFWwindowPtr window;
-        private static D3D11Manager manager;
+        private static OpenGLManager manager;
 
         static void Main(string[] args)
         {            
@@ -54,18 +52,35 @@ namespace BPSR_ZDPS
 
             GLFW.Init();
 
-            GLFW.WindowHint(GLFW.GLFW_CLIENT_API, GLFW.GLFW_NO_API);
+            // Set OpenGL context hints
+            GLFW.WindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
+            GLFW.WindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 3);
+            GLFW.WindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
+            
+            // Linux compatibility - required for macOS and works on Linux
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                GLFW.WindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, 1);
+            }
 
             GLFW.WindowHint(GLFW.GLFW_FOCUSED, 1);    // Make window focused on start
             GLFW.WindowHint(GLFW.GLFW_RESIZABLE, 1);  // Make window resizable
             GLFW.WindowHint(GLFW.GLFW_VISIBLE, 0); // Start window hidden so it can be nicely positioned first
-            GLFW.WindowHint(GLFW.GLFW_TRANSPARENT_FRAMEBUFFER, 1);
+            
+            // On Windows, use transparent framebuffer for overlay-style rendering
+            // On Linux, use opaque window for normal desktop app behavior
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                GLFW.WindowHint(GLFW.GLFW_TRANSPARENT_FRAMEBUFFER, 1);
+                GLFW.WindowHint(GLFW.GLFW_DECORATED, 0); // Borderless on Windows for overlay
+            }
+            // Linux gets default decorated window (normal title bar and borders)
 
             // TODO: Load these values from a settings file
-            int windowWidth = 800;
-            int windowHeight = 600;
+            int windowWidth = 1040;  // 800 * 1.30
+            int windowHeight = 780;  // 600 * 1.30
 
-            window = GLFW.CreateWindow(800, 600, "ZDPS", null, null);
+            window = GLFW.CreateWindow(windowWidth, windowHeight, "ZDPS", null, null);
             if (window.IsNull)
             {
                 Console.WriteLine("Failed to create GLFW window.");
@@ -94,10 +109,13 @@ namespace BPSR_ZDPS
                 Log.Debug($"Low Performance Mode is Enabled");
             }
 
-            // TODO: Do we even actually need this if we use only imgui windows?
-            //GLFW.ShowWindow(window);
+            // Show the main window on Linux to ensure at least one window is visible
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                GLFW.ShowWindow(window);
+            }
 
-            manager = new(window, false);
+            manager = new OpenGLManager(window, false);
 
             HelperMethods.GLFWwindow = window;
 
@@ -123,27 +141,40 @@ namespace BPSR_ZDPS
                 io.ConfigFlags |= ImGuiConfigFlags.NavEnableGamepad;  // Enable Gamepad Controls
             }
             io.ConfigFlags |= ImGuiConfigFlags.DockingEnable;         // Enable Docking
-            io.ConfigFlags |= ImGuiConfigFlags.ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+            
+            // On Linux, keep it simple - single window with docking, no separate viewports
+            // All windows will dock as tabs in the main window
+            //if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                io.ConfigFlags |= ImGuiConfigFlags.ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+            }
+            
             io.ConfigViewportsNoAutoMerge = true; // If this is false, putting an ImGui window on top of an GLFW window will dock into it even if it's not shown
             io.ConfigViewportsNoTaskBarIcon = false;
 
-            LoadFonts();
+            Log.Error("DEBUG: About to init GLFW backend...");
 
             ImGuiImplGLFW.SetCurrentContext(guiContext);
-            if (!ImGuiImplGLFW.InitForOther(Unsafe.BitCast<GLFWwindowPtr, Hexa.NET.ImGui.Backends.GLFW.GLFWwindowPtr>(window), true))
+            Log.Error("DEBUG: GLFW context set, about to init GLFW for OpenGL...");
+            if (!ImGuiImplGLFW.InitForOpenGL(Unsafe.BitCast<GLFWwindowPtr, Hexa.NET.ImGui.Backends.GLFW.GLFWwindowPtr>(window), true))
             {
                 Console.WriteLine("Failed to init ImGui Impl GLFW");
                 GLFW.Terminate();
                 return;
             }
+            Log.Error("DEBUG: GLFW backend initialized, about to init OpenGL3 backend...");
 
-            ImGuiImplD3D11.SetCurrentContext(guiContext);
-            if (!ImGuiImplD3D11.Init(Unsafe.BitCast<ComPtr<ID3D11Device1>, ID3D11DevicePtr>(manager.Device), Unsafe.BitCast<ComPtr<ID3D11DeviceContext1>, ID3D11DeviceContextPtr>(manager.DeviceContext)))
+            ImGuiImplOpenGL3.SetCurrentContext(guiContext);
+            Log.Error("DEBUG: OpenGL3 context set, about to call Init...");
+            if (!ImGuiImplOpenGL3.Init("#version 330"))
             {
-                Console.WriteLine("Failed to init ImGui Impl D3D11");
+                Console.WriteLine("Failed to init ImGui Impl OpenGL3");
                 GLFW.Terminate();
                 return;
             }
+            
+            Log.Error("DEBUG: OpenGL3 backend initialized, now loading fonts...");
+            LoadFonts();
 
             // Setup resizing.
             unsafe
@@ -164,11 +195,16 @@ namespace BPSR_ZDPS
                 }
             }
 
-            unsafe
-            {
-                OffscreenImGuiRenderer.Initialize(manager, guiContext);
-            }
+            // Initialize ImageHelper with OpenGL manager
             ImageHelper.SetDeviceManager(manager);
+            
+            // TODO: Update OffscreenImGuiRenderer for OpenGL (report generation feature)
+            // For now, commenting out D3D11-specific OffscreenImGuiRenderer
+            // unsafe
+            // {
+            //     OffscreenImGuiRenderer.Initialize(manager, guiContext);
+            // }
+            
             ImageArchive.LoadBaseImages();
 
             // Main loop
@@ -193,7 +229,7 @@ namespace BPSR_ZDPS
                     System.Threading.Thread.Sleep(10);
                 }
 
-                ImGuiImplD3D11.NewFrame();
+                ImGuiImplOpenGL3.NewFrame();
                 ImGuiImplGLFW.NewFrame();
                 ImGui.NewFrame();
 
@@ -206,9 +242,18 @@ namespace BPSR_ZDPS
 
                 manager.SetTarget();
 
-                manager.Clear(new(0, 0, 0, 0.0f));
+                // On Linux with decorated window, use solid background to prevent flashing
+                // On Windows, use transparent background for overlay mode
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    manager.Clear(new(0.15f, 0.15f, 0.15f, 1.0f)); // Solid dark gray
+                }
+                else
+                {
+                    manager.Clear(new(0, 0, 0, 0.0f)); // Transparent
+                }
 
-                ImGuiImplD3D11.RenderDrawData(ImGui.GetDrawData());
+                ImGuiImplOpenGL3.RenderDrawData(ImGui.GetDrawData());
 
                 if ((io.ConfigFlags & ImGuiConfigFlags.ViewportsEnable) != 0)
                 {
@@ -268,8 +313,8 @@ namespace BPSR_ZDPS
             }
             writingTimeout.Stop();
 
-            ImGuiImplD3D11.Shutdown();
-            ImGuiImplD3D11.SetCurrentContext(null);
+            ImGuiImplOpenGL3.Shutdown();
+            ImGuiImplOpenGL3.SetCurrentContext(null);
             ImGuiImplGLFW.Shutdown();
             ImGuiImplGLFW.SetCurrentContext(null);
             ImPlot.DestroyContext();
@@ -351,9 +396,71 @@ namespace BPSR_ZDPS
 
         static unsafe void LoadFonts()
         {
+            Log.Error("DEBUG: LoadFonts - Starting");
             var io = ImGui.GetIO();
-            var segoe = io.Fonts.AddFontFromFileTTF(@"C:\Windows\Fonts\segoeui.ttf", 18.0f);
-            HelperMethods.Fonts.Add("Segoe", segoe);
+            Log.Error("DEBUG: LoadFonts - Got ImGui IO");
+            
+            // Try to load system UI font (platform-specific)
+            ImFontPtr? segoe = null;
+            Log.Error("DEBUG: LoadFonts - About to check platform");
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                try
+                {
+                    segoe = io.Fonts.AddFontFromFileTTF(@"C:\Windows\Fonts\segoeui.ttf", 18.0f);
+                }
+                catch
+                {
+                    Log.Warning("Failed to load Segoe UI font from Windows");
+                }
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                Log.Error("DEBUG: LoadFonts - On Linux platform");
+                // Try common Linux fonts
+                string[] linuxFonts = new[]
+                {
+                    "/usr/share/fonts/TTF/segoeui.ttf",
+                };
+                Log.Error("DEBUG: LoadFonts - Searching for Linux fonts...");
+                
+                foreach (var fontPath in linuxFonts)
+                {
+                    Log.Error($"DEBUG: LoadFonts - Checking font path: {fontPath}");
+                    if (File.Exists(fontPath))
+                    {
+                        Log.Error($"DEBUG: LoadFonts - Found font, attempting to load: {fontPath}");
+                        try
+                        {
+                            segoe = io.Fonts.AddFontFromFileTTF(fontPath, 18.0f);
+                            Log.Information($"Loaded system font: {fontPath}");
+                            break;
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error(ex, $"DEBUG: LoadFonts - Failed to load font: {fontPath}");
+                            continue;
+                        }
+                    }
+                }
+            }
+            
+            Log.Error("DEBUG: LoadFonts - Finished platform-specific font loading");
+            
+            // Fallback to default if no system font loaded
+            if (segoe == null)
+            {
+                Log.Error("DEBUG: LoadFonts - No system font found on Linux, using built-in ImGui font");
+                // On Linux, just use the default font that ImGui already has loaded
+                // ImGui automatically loads a default font when the context is created
+                segoe = io.Fonts.Fonts[0]; // Get the first (default) font
+                Log.Error("DEBUG: LoadFonts - Using ImGui's built-in default font");
+            }
+            
+            Log.Error($"DEBUG: LoadFonts - About to add Segoe to HelperMethods.Fonts (segoe is null: {segoe == null})");
+            HelperMethods.Fonts.Add("Segoe", segoe.Value);
+
+            Log.Error("DEBUG: LoadFonts - Segoe font added, loading multi-language fonts...");
 
             // Merging additional fonts into Segoe for multi-language support
 
@@ -373,11 +480,31 @@ namespace BPSR_ZDPS
             res = ff.BindToImGui(18.0f, true);
             ff.Dispose();
 
+            Log.Error("DEBUG: LoadFonts - Multi-language fonts loaded, setting default font...");
+
             // Setting Segoe to be the default application font (though the other fonts will be used if their glyphs are required)
-            ImGui.AddFontDefault(HelperMethods.Fonts["Segoe"].ContainerAtlas);
+            // Note: Not calling AddFontDefault again as we already have Segoe as default
+
+            Log.Error("DEBUG: LoadFonts - Adding Segoe Bold...");
 
             // Note: Segoe-Bold will not support multi-language when it's used
-            HelperMethods.Fonts.Add("Segoe-Bold", io.Fonts.AddFontFromFileTTF(@"C:\Windows\Fonts\segoeuib.ttf", 18.0f));
+            ImFontPtr? segoeBold = null;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                try
+                {
+                    segoeBold = io.Fonts.AddFontFromFileTTF(@"C:\Windows\Fonts\segoeuib.ttf", 18.0f);
+                }
+                catch
+                {
+                    segoeBold = segoe;  // Fallback to regular font
+                }
+            }
+            else
+            {
+                segoeBold = segoe;  // On Linux, use the same font as regular
+            }
+            HelperMethods.Fonts.Add("Segoe-Bold", segoeBold.Value);
 
             ff = new FontFile("BPSR_ZDPS.Fonts.FAS.ttf", new GlyphRange(0x0021, 0xF8FF));
             res = ff.BindToImGui(18.0f);
@@ -412,6 +539,8 @@ namespace BPSR_ZDPS
             ff = new FontFile("BPSR_ZDPS.Fonts.NanumGothicCoding.ttf");
             res = ff.BindToImGui(18.0f, true);
             ff.Dispose();
+            
+            Log.Error("DEBUG: LoadFonts - Completed successfully");
         }
 
         static unsafe void SetWindowIcon(GLFWwindowPtr window, string IconFilePath)

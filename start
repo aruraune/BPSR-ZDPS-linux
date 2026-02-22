@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd BPSR-ZDPS
+./bin/Release/net9.0/BPSR-ZDPS

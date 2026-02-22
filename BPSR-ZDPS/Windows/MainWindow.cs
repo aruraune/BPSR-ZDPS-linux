@@ -14,6 +14,7 @@ using Zproto;
 using Newtonsoft.Json;
 using BPSR_ZDPS.DataTypes;
 using Hexa.NET.GLFW;
+using System.Runtime.InteropServices;
 
 namespace BPSR_ZDPS.Windows
 {
@@ -74,8 +75,21 @@ namespace BPSR_ZDPS.Windows
             var io = ImGui.GetIO();
             var main_viewport = ImGui.GetMainViewport();
 
-            //ImGui.SetNextWindowPos(new Vector2(main_viewport.WorkPos.X + 200, main_viewport.WorkPos.Y + 120), ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSize(DefaultWindowSize, ImGuiCond.FirstUseEver);
+
+                    // On Linux, use the full viewport to avoid double-window confusion
+            bool useFullViewport = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+
+            if (useFullViewport)
+            {
+                // Set window to fill the entire viewport
+                ImGui.SetNextWindowPos(main_viewport.WorkPos, ImGuiCond.Always);
+                ImGui.SetNextWindowSize(main_viewport.WorkSize, ImGuiCond.Appearing);
+            }
+            else
+            {
+                // Windows: use positioned window for overlay mode
+                ImGui.SetNextWindowSize(DefaultWindowSize, ImGuiCond.FirstUseEver);
+            }
 
             if (!Settings.Instance.AllowEncounterSavingPausingInOpenWorld)
             {
@@ -88,26 +102,29 @@ namespace BPSR_ZDPS.Windows
 
             var windowSettings = Settings.Instance.WindowSettings.MainWindow;
 
-            if (windowSettings.WindowPosition != new Vector2())
+            if (!useFullViewport)
             {
-                ImGui.SetNextWindowPos(windowSettings.WindowPosition, ImGuiCond.FirstUseEver);
-            }
+                if (windowSettings.WindowPosition != new Vector2())
+                {
+                    ImGui.SetNextWindowPos(windowSettings.WindowPosition, ImGuiCond.FirstUseEver);
+                }
 
-            if (windowSettings.WindowSize != new Vector2())
-            {
-                ImGui.SetNextWindowSize(windowSettings.WindowSize, ImGuiCond.FirstUseEver);
-            }
+                if (windowSettings.WindowSize != new Vector2())
+                {
+                    ImGui.SetNextWindowSize(windowSettings.WindowSize, ImGuiCond.FirstUseEver);
+                }
 
-            if (NextWindowPosition != new Vector2())
-            {
-                ImGui.SetNextWindowPos(NextWindowPosition * new Vector2(0.5f, 0.5f), ImGuiCond.Always, new Vector2(0.5f, 0.5f));
-                NextWindowPosition = new Vector2();
-            }
+                if (NextWindowPosition != new Vector2())
+                {
+                    ImGui.SetNextWindowPos(NextWindowPosition * new Vector2(0.5f, 0.5f), ImGuiCond.Appearing, new Vector2(0.5f, 0.5f));
+                    NextWindowPosition = new Vector2();
+                }
 
-            if (NextWindowSize != new Vector2())
-            {
-                ImGui.SetNextWindowSize(NextWindowSize, ImGuiCond.Always);
-                NextWindowSize = new Vector2();
+                if (NextWindowSize != new Vector2())
+                {
+                    ImGui.SetNextWindowSize(NextWindowSize, ImGuiCond.Appearing);
+                    NextWindowSize = new Vector2();
+                }
             }
 
             ImGuiWindowFlags exWindowFlags = ImGuiWindowFlags.None;
@@ -117,6 +134,12 @@ namespace BPSR_ZDPS.Windows
             }
 
             ImGuiWindowFlags window_flags = ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoDocking | exWindowFlags;
+            
+            // On Linux, make the window fill the viewport completely (no resize, no move)
+            if (useFullViewport)
+            {
+                window_flags |= ImGuiWindowFlags.NoBringToFrontOnFocus;
+            }
             
             if (!p_open)
             {
@@ -188,8 +211,10 @@ namespace BPSR_ZDPS.Windows
                     HelperMethods.MainWindowPlatformHandleRaw = (IntPtr)ImGui.GetWindowViewport().PlatformHandleRaw;
                 }
 
+#if WINDOWS
                 HotKeyManager.SetWndProc();
                 //HotKeyManager.SetHookProc();
+#endif
 
                 Settings.Instance.ApplyHotKeys(this);
 

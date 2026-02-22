@@ -361,3 +361,10 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+BPSR-ZDPS/Data/EntityCache.json
+BPSR-ZDPS/Data/ModulesSaveData.json
+BPSR-ZDPS/Data/Settings.json
+BPSR-ZDPS/Data/ZDatabase.db
+BPSR-ZDPS/ZDPS_log_last_run.txt
+BPSR-ZDPS/ZDPS_log.txt

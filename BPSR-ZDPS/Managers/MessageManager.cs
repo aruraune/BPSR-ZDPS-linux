@@ -10,7 +10,6 @@ using static Zproto.WorldNtfCsharp.Types;
 using Zproto;
 using Google.Protobuf.Collections;
 using System.Numerics;
-using Silk.NET.Core.Native;
 using BPSR_ZDPS.DataTypes;
 using static HexaGen.Runtime.MemoryPool;
 using System.Collections.Concurrent;

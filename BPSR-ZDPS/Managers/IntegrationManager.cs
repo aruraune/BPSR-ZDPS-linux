@@ -118,6 +118,7 @@ namespace BPSR_ZDPS
                     }
 
                     SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32>? img;
+#if WINDOWS
                     try
                     {
                         img = ReportImgGen.CreateReportImg(encounter);
@@ -132,6 +133,10 @@ namespace BPSR_ZDPS
                         Log.Error($"Unexpected error in IntegrationManager CreateReportImg:\n{ex.Message}\nStack Trace:\n{ex.StackTrace}");
                         return;
                     }
+#else
+                    Log.Warning("Report generation is only available on Windows. Skipping report.");
+                    return;
+#endif
                     
                     Task.Factory.StartNew(() =>
                     {

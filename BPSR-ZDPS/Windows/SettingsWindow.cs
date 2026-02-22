@@ -156,14 +156,20 @@ namespace BPSR_ZDPS.Windows
             var io = ImGui.GetIO();
             var main_viewport = ImGui.GetMainViewport();
 
-            // TODO: Open window at center of current active monitor
-            // Will need to use GLFW to figure out monitors/sizes/positions/etc
+            // On Linux, use full viewport to avoid double-window confusion
+            bool useFullViewport = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
 
-            //ImGui.SetNextWindowPos(new Vector2(main_viewport.WorkPos.X + 200, main_viewport.WorkPos.Y + 120), ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(550, 350), new Vector2(ImGui.GETFLTMAX()));
-            //ImGui.SetNextWindowPos(new Vector2(io.DisplaySize.X, io.DisplaySize.Y), ImGuiCond.Appearing);
+            if (useFullViewport)
+            {
+                ImGui.SetNextWindowPos(main_viewport.WorkPos, ImGuiCond.Always);
+                ImGui.SetNextWindowSize(main_viewport.WorkSize, ImGuiCond.Appearing);
+            }
+            else
+            {
+                ImGui.SetNextWindowSizeConstraints(new Vector2(550, 350), new Vector2(ImGui.GETFLTMAX()));
+                ImGui.SetNextWindowSize(new Vector2(700, 700), ImGuiCond.FirstUseEver);
+            }
 
-            ImGui.SetNextWindowSize(new Vector2(700, 700), ImGuiCond.FirstUseEver);
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 
             if (ImGui.BeginPopupModal($"Settings{TITLE_ID}"))
@@ -171,10 +177,14 @@ namespace BPSR_ZDPS.Windows
                 if (RunOnceDelayed == 0)
                 {
                     RunOnceDelayed++;
+#if WINDOWS
                     using (var identity = System.Security.Principal.WindowsIdentity.GetCurrent())
                     {
                         IsElevated = new System.Security.Principal.WindowsPrincipal(identity).IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
                     }
+#else
+                    IsElevated = false; // Linux: assume not elevated
+#endif
                 }
                 else if (RunOnceDelayed == 2)
                 {

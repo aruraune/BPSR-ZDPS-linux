@@ -1,6 +1,4 @@
 ﻿using BPSR_ZDPS.DataTypes;
-using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -14,10 +12,12 @@ namespace BPSR_ZDPS
     {
         static string DEFAULT_NOTIFICATION_AUDIO_FILE = Path.Combine(Utils.DATA_DIR_NAME, "Audio", "LetsDoThis.wav");
 
-        static AudioFileReader? NotificationAudioFileReader = null;
-        static WaveOutEvent? NotificationWaveOutEvent = null;
+        static AudioPlayer? AudioPlayerInstance = null;
         static NotificationType NotificationEventType = NotificationType.Generic;
+        static bool ShouldLoop = false;
         static bool ShouldStop = false;
+        static Task? PlaybackTask = null;
+        static CancellationTokenSource? CancellationTokenSource = null;
 
         public enum NotificationType : int
         {
@@ -46,6 +46,7 @@ namespace BPSR_ZDPS
                     }
 
                     volumeScale = Settings.Instance.MatchmakeNotificationVolume;
+                    ShouldLoop = Settings.Instance.LoopNotificationSoundOnMatchmake;
                     break;
                 case NotificationType.ReadyCheck:
                     if (!Settings.Instance.PlayNotificationSoundOnReadyCheck)
@@ -59,6 +60,10 @@ namespace BPSR_ZDPS
                     }
 
                     volumeScale = Settings.Instance.ReadyCheckNotificationVolume;
+                    ShouldLoop = Settings.Instance.LoopNotificationSoundOnReadyCheck;
+                    break;
+                default:
+                    ShouldLoop = false;
                     break;
             }
 
@@ -76,78 +81,72 @@ namespace BPSR_ZDPS
                 return;
             }
 
-            NotificationAudioFileReader = new AudioFileReader(audioPath);
+            // Stop any existing playback
+            StopNotifyAudio();
+
+            // Create new audio player instance
+            AudioPlayerInstance = new AudioPlayer();
+            
+            if (!AudioPlayerInstance.LoadWavFile(audioPath))
+            {
+                Log.Error($"Failed to load audio file: {audioPath}");
+                AudioPlayerInstance?.Dispose();
+                AudioPlayerInstance = null;
+                return;
+            }
+
             ShouldStop = false;
+            CancellationTokenSource = new CancellationTokenSource();
 
-            if (volumeScale > 1.0f)
+            // Start playback task
+            PlaybackTask = Task.Run(() =>
             {
-                // Only go through using this sampler if the volume was changed above "100%" as it incurs a performance penalty to runtime increase beyond 1.0
-                var volumeSampleProvider = new VolumeSampleProvider(NotificationAudioFileReader);
-                volumeSampleProvider.Volume = volumeScale;
+                try
+                {
+                    // Only allow looping if we know the PlayerUID
+                    bool shouldLoop = ShouldLoop && AppState.PlayerUID != 0;
 
-                NotificationWaveOutEvent = new WaveOutEvent();
-                NotificationWaveOutEvent.PlaybackStopped += NotificationWaveOutEvent_PlaybackStopped;
+                    // Play the audio
+                    AudioPlayerInstance?.Play(volumeScale, loop: shouldLoop);
 
-                NotificationWaveOutEvent.Init(volumeSampleProvider);
-            }
-            else
-            {
-                NotificationWaveOutEvent = new WaveOutEvent();
-                NotificationWaveOutEvent.PlaybackStopped += NotificationWaveOutEvent_PlaybackStopped;
-                NotificationWaveOutEvent.Init(NotificationAudioFileReader);
-                NotificationWaveOutEvent.Volume = volumeScale;
-            }
+                    if (!shouldLoop)
+                    {
+                        // If not looping, wait for playback to complete
+                        while (AudioPlayerInstance != null && AudioPlayerInstance.IsPlaying() && !ShouldStop)
+                        {
+                            Thread.Sleep(100);
+                        }
 
-            NotificationWaveOutEvent.Play();
+                        // Cleanup
+                        AudioPlayerInstance?.Dispose();
+                        AudioPlayerInstance = null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Error during audio playback");
+                    AudioPlayerInstance?.Dispose();
+                    AudioPlayerInstance = null;
+                }
+            }, CancellationTokenSource.Token);
         }
 
         public static void StopNotifyAudio()
         {
             ShouldStop = true;
-            if (NotificationWaveOutEvent != null)
+            
+            CancellationTokenSource?.Cancel();
+            
+            if (AudioPlayerInstance != null)
             {
-                NotificationWaveOutEvent.Stop();
-            }
-        }
-
-        private static void NotificationWaveOutEvent_PlaybackStopped(object? sender, StoppedEventArgs e)
-        {
-            bool shouldLoop = false;
-            switch (NotificationEventType)
-            {
-                case NotificationType.Generic:
-                    shouldLoop = false;
-                    break;
-                case NotificationType.Matchmake:
-                    shouldLoop = Settings.Instance.LoopNotificationSoundOnMatchmake;
-                    break;
-                case NotificationType.ReadyCheck:
-                    shouldLoop = Settings.Instance.LoopNotificationSoundOnReadyCheck;
-                    break;
+                AudioPlayerInstance.Stop();
+                AudioPlayerInstance.Dispose();
+                AudioPlayerInstance = null;
             }
 
-            if (NotificationWaveOutEvent != null)
-            {
-                // Only allow looping to occur if we know the PlayerUID
-                if (ShouldStop == false && shouldLoop && AppState.PlayerUID != 0)
-                {
-                    // Keep looping the audio until actually requested to stop
-                    NotificationAudioFileReader.Seek(0, SeekOrigin.Begin);
-                    NotificationWaveOutEvent.Play();
-                    return;
-                }
-
-                NotificationWaveOutEvent.PlaybackStopped -= NotificationWaveOutEvent_PlaybackStopped;
-                NotificationWaveOutEvent.Dispose();
-            }
-
-            if (NotificationAudioFileReader != null)
-            {
-                NotificationAudioFileReader.Dispose();
-            }
-
-            NotificationWaveOutEvent = null;
-            NotificationAudioFileReader = null;
+            CancellationTokenSource?.Dispose();
+            CancellationTokenSource = null;
+            PlaybackTask = null;
         }
     }
 }

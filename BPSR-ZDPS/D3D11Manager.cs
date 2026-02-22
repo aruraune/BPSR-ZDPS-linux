@@ -1,4 +1,5 @@
-﻿using Hexa.NET.GLFW;
+﻿#if WINDOWS
+using Hexa.NET.GLFW;
 using Serilog;
 using Silk.NET.Core.Native;
 using Silk.NET.Direct3D11;
@@ -257,3 +258,4 @@ namespace BPSR_ZDPS
         }
     }
 }
+#endif

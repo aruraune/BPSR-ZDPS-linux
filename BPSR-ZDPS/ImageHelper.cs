@@ -1,11 +1,16 @@
 ﻿namespace BPSR_ZDPS;
 
 using Hexa.NET.ImGui;
-using Silk.NET.Direct3D11;
-using Silk.NET.DXGI;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Runtime.InteropServices;
+#if WINDOWS
+using Silk.NET.Direct3D11;
+using Silk.NET.DXGI;
+#else
+using Silk.NET.OpenGL;
+using Hexa.NET.GLFW;
+#endif
 
 public static unsafe class ImageHelper
 {
@@ -13,13 +18,77 @@ public static unsafe class ImageHelper
     public static Dictionary<string, ImTextureRef> KeyedImages = [];
     private static Dictionary<ulong, ulong> Textures = [];
 
+#if WINDOWS
     private static D3D11Manager? _manager = null;
 
     public static void SetDeviceManager(D3D11Manager manager)
     {
         _manager = manager;
     }
+#else
+    private static OpenGLManager? _manager = null;
+    private static GL? _gl = null;
 
+    // Simple GLFW context wrapper for Silk.NET.OpenGL
+    private class GLFWGLContext : Silk.NET.Core.Contexts.IGLContext
+    {
+        private readonly GLFWwindowPtr _window;
+
+        public GLFWGLContext(GLFWwindowPtr window)
+        {
+            _window = window;
+        }
+
+        public nint Handle => (nint)_window.Handle;
+        public Silk.NET.Core.Contexts.IGLContextSource? Source => null;
+
+        public bool IsCurrent => Hexa.NET.GLFW.GLFW.GetCurrentContext() == _window;
+
+        public void Dispose() { }
+
+        public nint GetProcAddress(string proc, int? slot = null)
+        {
+            return (nint)Hexa.NET.GLFW.GLFW.GetProcAddress(proc);
+        }
+
+        public bool TryGetProcAddress(string proc, out nint addr, int? slot = null)
+        {
+            addr = GetProcAddress(proc, slot);
+            return addr != 0;
+        }
+
+        public void MakeCurrent()
+        {
+            Hexa.NET.GLFW.GLFW.MakeContextCurrent(_window);
+        }
+
+        public void SwapBuffers()
+        {
+            Hexa.NET.GLFW.GLFW.SwapBuffers(_window);
+        }
+
+        public void SwapInterval(int interval)
+        {
+            Hexa.NET.GLFW.GLFW.SwapInterval(interval);
+        }
+
+        public void Clear()
+        {
+            // Not needed for our use case
+        }
+    }
+
+    public static void SetDeviceManager(OpenGLManager manager)
+    {
+        _manager = manager;
+        // Get OpenGL context from GLFW
+        var context = new GLFWGLContext(manager.Window);
+        _gl = GL.GetApi(context);
+        Serilog.Log.Information("OpenGL texture loading initialized");
+    }
+#endif
+
+#if WINDOWS
     public static ImTextureRef? LoadTexture(string filePath, string? key = null)
     {
         try
@@ -110,6 +179,81 @@ public static unsafe class ImageHelper
             pinned.Free();
         }
     }
+#else
+    public static ImTextureRef? LoadTexture(string filePath, string? key = null)
+    {
+        try
+        {
+            if (LoadedImages.TryGetValue(filePath, out var cachedRef))
+                return cachedRef;
+
+            if (!File.Exists(filePath))
+            {
+                return null;
+            }
+
+            if (_gl == null)
+            {
+                Serilog.Log.Error("OpenGL context not initialized in ImageHelper");
+                return null;
+            }
+
+            using Image<Rgba32> image = Image.Load<Rgba32>(filePath);
+            byte[] pixels = new byte[image.Width * image.Height * 4];
+            image.CopyPixelDataTo(pixels);
+
+            // Generate OpenGL texture
+            uint textureId = _gl.GenTexture();
+            _gl.BindTexture(TextureTarget.Texture2D, textureId);
+
+            // Upload pixel data
+            unsafe
+            {
+                fixed (byte* ptr = pixels)
+                {
+                    _gl.TexImage2D(
+                        TextureTarget.Texture2D,
+                        0,
+                        InternalFormat.Rgba,
+                        (uint)image.Width,
+                        (uint)image.Height,
+                        0,
+                        PixelFormat.Rgba,
+                        PixelType.UnsignedByte,
+                        ptr
+                    );
+                }
+            }
+
+            // Set texture parameters
+            _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
+            _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
+            _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
+            _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
+
+            _gl.BindTexture(TextureTarget.Texture2D, 0);
+
+            // Store texture ID for cleanup
+            Textures.TryAdd((ulong)textureId, (ulong)textureId);
+
+            // ImGui expects texture ID as void*
+            var texRef = new ImTextureRef(null, (void*)(nuint)textureId);
+            LoadedImages.TryAdd(filePath, texRef);
+
+            if (key != null)
+            {
+                KeyedImages.TryAdd(key, texRef);
+            }
+
+            return texRef;
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Error(ex, "Error loading texture on Linux: {FilePath}", filePath);
+            return null;
+        }
+    }
+#endif
 
     public static ImTextureRef? GetTextureByKey(string key)
     {
@@ -123,12 +267,21 @@ public static unsafe class ImageHelper
 
     public static void UnloadAllImages()
     {
+#if WINDOWS
         foreach (var texInfo in Textures)
         {
             ((ID3D11Texture2D*)texInfo.Value)->Release();
             ((ID3D11ShaderResourceView*)texInfo.Key)->Release();
         }
-
+#else
+        if (_gl != null)
+        {
+            foreach (var texId in Textures.Keys)
+            {
+                _gl.DeleteTexture((uint)texId);
+            }
+        }
+#endif
         LoadedImages.Clear();
         KeyedImages.Clear();
         Textures.Clear();

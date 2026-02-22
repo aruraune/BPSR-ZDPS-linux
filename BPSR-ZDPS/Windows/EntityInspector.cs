@@ -1,11 +1,11 @@
 ﻿using BPSR_ZDPS.DataTypes;
 using Hexa.NET.ImGui;
 using Hexa.NET.ImPlot;
-using Silk.NET.Core.Native;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using ZLinq;
@@ -88,7 +88,7 @@ namespace BPSR_ZDPS.Windows
 
             var windowSettings = Settings.Instance.WindowSettings.EntityInspector;
 
-            var main_viewport = ImGui.GetMainViewport();
+            //var main_viewport = ImGui.GetMainViewport();
             //ImGui.SetNextWindowPos(new Vector2(main_viewport.WorkPos.X + 200, main_viewport.WorkPos.Y + 120), ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSize(new Vector2(900, 600), ImGuiCond.FirstUseEver);
 
@@ -116,6 +116,15 @@ namespace BPSR_ZDPS.Windows
             else
             {
                 entityName = $"[{LoadedEntity.UID}]";
+            }
+
+            bool useFullViewport = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            var main_viewport = ImGui.GetMainViewport();
+
+            if (useFullViewport)
+            {
+                ImGui.SetNextWindowPos(main_viewport.WorkPos, ImGuiCond.Always);
+                ImGui.SetNextWindowSize(main_viewport.WorkSize, ImGuiCond.Appearing);
             }
 
             ImGuiWindowFlags exWindowFlags = ImGuiWindowFlags.None;

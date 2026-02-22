@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using ZLinq;
@@ -126,8 +127,19 @@ namespace BPSR_ZDPS.Windows
 
             encounterReportWindow.Draw();
 
-            ImGui.SetNextWindowSize(new Vector2(880, 675), ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(500, 250), new Vector2(ImGui.GETFLTMAX()));
+            bool useFullViewport = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            var main_viewport = ImGui.GetMainViewport();
+
+            if (useFullViewport)
+            {
+                ImGui.SetNextWindowPos(main_viewport.WorkPos, ImGuiCond.Always);
+                ImGui.SetNextWindowSize(main_viewport.WorkSize, ImGuiCond.Appearing);
+            }
+            else
+            {
+                ImGui.SetNextWindowSize(new Vector2(880, 675), ImGuiCond.FirstUseEver);
+                ImGui.SetNextWindowSizeConstraints(new Vector2(500, 250), new Vector2(ImGui.GETFLTMAX()));
+            }
 
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 
@@ -290,12 +302,16 @@ namespace BPSR_ZDPS.Windows
                 {
                     if (ImGui.Selectable("Send Debug Report"))
                     {
+#if WINDOWS
                         if (SelectedEncounterIndex != -1 && encounters[SelectedEncounterIndex] != null)
                         {
                             Serilog.Log.Information($"Sending Debug Report for Selected Encounter Index {SelectedEncounterIndex}...");
                             var img = ReportImgGen.CreateReportImg(encounters[SelectedEncounterIndex]);
                             WebManager.SubmitReportToWebhook(encounters[SelectedEncounterIndex], img, Settings.Instance.WebhookReportsDiscordUrl);
                         }
+#else
+                        Serilog.Log.Warning("Report generation is only available on Windows.");
+#endif
                     }
                     ImGui.SetItemTooltip("For Debug Purposes Only!\nForcefully sends the selected Encounter Report to the configured Discord URL Webhook.");
                     if (ImGui.BeginMenu("Change Wipe Status"))

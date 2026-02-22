@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Runtime.InteropServices;
 using Hexa.NET.ImGui;
 using static BPSR_ZDPSLib.TcpReassembler;
 
@@ -30,6 +31,16 @@ public static class NetDebug
         ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 
         var netCap = MessageManager.netCap;
+
+        bool useFullViewport = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+        var main_viewport = ImGui.GetMainViewport();
+
+        if (useFullViewport)
+        {
+            ImGui.SetNextWindowPos(main_viewport.WorkPos, ImGuiCond.Always);
+            ImGui.SetNextWindowSize(main_viewport.WorkSize, ImGuiCond.Appearing);
+        }
+
         if (ImGui.Begin($"Network Debug{TITLE_ID}", ref IsOpened, ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking))
         {
             if (RunOnceDelayed == 0)

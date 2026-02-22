@@ -3,6 +3,7 @@ using BPSR_ZDPS.Managers;
 using Hexa.NET.ImGui;
 using System.Collections.Concurrent;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using ZLinq;
 
@@ -99,19 +100,27 @@ namespace BPSR_ZDPS.Windows
                 {
                     try
                     {
-                        using (var output = new NAudio.Wave.WaveOutEvent())
+                        string filepath = Settings.Instance.WindowSettings.RaidManagerRaidWarning.WarningNotificationSoundPath;
+                        if (string.IsNullOrEmpty(filepath) || !File.Exists(filepath))
                         {
-                            string filepath = Settings.Instance.WindowSettings.RaidManagerRaidWarning.WarningNotificationSoundPath;
-                            if (string.IsNullOrEmpty(filepath) || !File.Exists(filepath))
+                            filepath = Path.Combine(Utils.DATA_DIR_NAME, "Audio", "RaidWarning_Woosh.wav");
+                        }
+
+                        using (var audioPlayer = new AudioPlayer())
+                        {
+                            if (audioPlayer.LoadWavFile(filepath))
                             {
-                                filepath = Path.Combine(Utils.DATA_DIR_NAME, "Audio", "RaidWarning_Woosh.wav");
+                                audioPlayer.Play(volume: 1.0f, loop: false);
+                                
+                                // Wait for playback to complete
+                                while (audioPlayer.IsPlaying())
+                                {
+                                    Thread.Sleep(100);
+                                }
                             }
-                            using (var player = new NAudio.Wave.AudioFileReader(filepath))
+                            else
                             {
-                                output.Init(player);
-                                var duration = player.TotalTime;
-                                output.Play();
-                                Thread.Sleep(duration);
+                                Serilog.Log.Error($"Failed to load raid warning sound: {filepath}");
                             }
                         }
                     }
@@ -183,12 +192,14 @@ namespace BPSR_ZDPS.Windows
 
                     unsafe
                     {
+#if WINDOWS
                         // This is how we support transparency effects of just the background and not the text content.
                         // SetLayeredWindowAttributes will chromakey the given 0xAABBGGRR value anywhere on the window and also set the Alpha of the window between 0-255
                         // This is needed due to Nvidia drivers incorrectly behaving with performing an ImGui drawlist clear via Window Resize and using cached frames instead of drawing new ones like all other GPU vendors
                         Hexa.NET.ImGui.Backends.Win32.ImGuiImplWin32.EnableAlphaCompositing(ImGui.GetWindowViewport().PlatformHandleRaw);
                         Utils.SetWindowLong(User32.GWL_EXSTYLE, User32.GetWindowLong((nint)ImGui.GetWindowViewport().PlatformHandleRaw, User32.GWL_EXSTYLE) | (nint)User32.WS_EX_LAYERED);
                         User32.SetLayeredWindowAttributes((nint)ImGui.GetWindowViewport().PlatformHandleRaw, 0x00111111, 200, User32.LWA_COLORKEY | User32.LWA_ALPHA);
+#endif
                     }
 
                     ImGui.PushStyleColor(ImGuiCol.ChildBg, new Vector4(0, 0, 0, windowSettings.MessageBackgroundOpacity));
@@ -255,8 +266,19 @@ namespace BPSR_ZDPS.Windows
                 return;
             }
 
-            ImGui.SetNextWindowSize(new Vector2(680, 580), ImGuiCond.Appearing);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(680, 400), new Vector2(ImGui.GETFLTMAX()));
+            bool useFullViewport = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            var main_viewport = ImGui.GetMainViewport();
+
+            if (useFullViewport)
+            {
+                ImGui.SetNextWindowPos(main_viewport.WorkPos, ImGuiCond.Always);
+                ImGui.SetNextWindowSize(main_viewport.WorkSize, ImGuiCond.Appearing);
+            }
+            else
+            {
+                ImGui.SetNextWindowSize(new Vector2(680, 580), ImGuiCond.Appearing);
+                ImGui.SetNextWindowSizeConstraints(new Vector2(680, 400), new Vector2(ImGui.GETFLTMAX()));
+            }
 
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 
@@ -502,11 +524,16 @@ namespace BPSR_ZDPS.Windows
                 try
                 {
                     System.Diagnostics.Process process = System.Diagnostics.Process.GetProcessById(gameProc.ProcessId);
+#if WINDOWS
                     User32.RECT procRect = new();
                     User32.GetWindowRect(process.MainWindowHandle, ref procRect);
 
                     float centerX = (procRect.left + procRect.right) * 0.5f;
                     Vector2 centerPoint = new Vector2(MathF.Floor(centerX), MathF.Floor((procRect.bottom - procRect.top) * 0.15f));
+#else
+                    // Game window positioning not supported on non-Windows platforms
+                    Vector2 centerPoint = new Vector2(960, 200); // Default center position
+#endif
 
                     var size = Settings.Instance.WindowSettings.RaidManagerRaidWarning.RaidWarningMessageSize;
                     Vector2 newPoint = centerPoint - new Vector2(size.X * 0.5f, 0);
@@ -543,10 +570,15 @@ namespace BPSR_ZDPS.Windows
                 try
                 {
                     System.Diagnostics.Process process = System.Diagnostics.Process.GetProcessById(gameProc.ProcessId);
+#if WINDOWS
                     User32.RECT procRect = new();
                     User32.GetWindowRect(process.MainWindowHandle, ref procRect);
 
                     Vector2 newSize = new Vector2(MathF.Floor((procRect.right - procRect.left) * 0.90f), 100);
+#else
+                    // Game window sizing not supported on non-Windows platforms
+                    Vector2 newSize = new Vector2(1728, 100); // Default size (90% of 1920)
+#endif
 
                     Settings.Instance.WindowSettings.RaidManagerRaidWarning.RaidWarningMessageSize = newSize;
                     NewWarningWindowSize = newSize;

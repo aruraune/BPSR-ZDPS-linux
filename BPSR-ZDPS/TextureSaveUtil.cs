@@ -1,4 +1,5 @@
-﻿using Silk.NET.Direct3D11;
+﻿#if WINDOWS
+using Silk.NET.Direct3D11;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp;
@@ -69,3 +70,4 @@ namespace BPSR_ZDPS
         }
     }
 }
+#endif

@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Serilog;
 using System.Collections.Frozen;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics.X86;
 using ZLinq;
 using Zproto;
@@ -109,12 +110,24 @@ namespace BPSR_ZDPS
 
             var windowSize = new Vector2(800, 500);
             float leftWidth = 320;
-            ImGui.SetNextWindowSize(windowSize, ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(1270, 700), new Vector2(float.PositiveInfinity, float.PositiveInfinity));
 
-            if (Settings.Instance.WindowSettings.ModuleWindow.WindowPosition != new Vector2())
+            bool useFullViewport = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            var main_viewport = ImGui.GetMainViewport();
+
+            if (useFullViewport)
             {
-                ImGui.SetNextWindowPos(Settings.Instance.WindowSettings.ModuleWindow.WindowPosition, ImGuiCond.FirstUseEver);
+                ImGui.SetNextWindowPos(main_viewport.WorkPos, ImGuiCond.Always);
+                ImGui.SetNextWindowSize(main_viewport.WorkSize, ImGuiCond.Appearing);
+            }
+            else
+            {
+                ImGui.SetNextWindowSize(windowSize, ImGuiCond.FirstUseEver);
+                ImGui.SetNextWindowSizeConstraints(new Vector2(1270, 700), new Vector2(float.PositiveInfinity, float.PositiveInfinity));
+
+                if (Settings.Instance.WindowSettings.ModuleWindow.WindowPosition != new Vector2())
+                {
+                    ImGui.SetNextWindowPos(Settings.Instance.WindowSettings.ModuleWindow.WindowPosition, ImGuiCond.FirstUseEver);
+                }
             }
 
             if (ImGui.Begin("Module Optimizer", ref IsOpen, ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking))

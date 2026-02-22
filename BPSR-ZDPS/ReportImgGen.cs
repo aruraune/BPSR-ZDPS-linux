@@ -1,4 +1,5 @@
-﻿using BPSR_ZDPS.DataTypes;
+﻿#if WINDOWS
+using BPSR_ZDPS.DataTypes;
 using BPSR_ZDPS.Windows;
 using Hexa.NET.ImGui;
 using SixLabors.ImageSharp;
@@ -55,3 +56,4 @@ namespace BPSR_ZDPS
         }
     }
 }
+#endif

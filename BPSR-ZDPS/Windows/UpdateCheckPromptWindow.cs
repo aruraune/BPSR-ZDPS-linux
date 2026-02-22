@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,14 +36,25 @@ namespace BPSR_ZDPS
             }
 
             var io = ImGui.GetIO();
-            var main_viewport = ImGui.GetMainViewport();
+            //var main_viewport = ImGui.GetMainViewport();
 
             ImGui.SetNextWindowSize(new Vector2(650, 150), ImGuiCond.Appearing);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(650, 150), new Vector2(ImGui.GETFLTMAX()));
-
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 
             ImGui.PushStyleColor(ImGuiCol.TitleBgActive, Colors.DarkGreen);
+
+            bool useFullViewport = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            var main_viewport = ImGui.GetMainViewport();
+
+            if (useFullViewport)
+            {
+                ImGui.SetNextWindowPos(main_viewport.WorkPos, ImGuiCond.Always);
+                ImGui.SetNextWindowSize(main_viewport.WorkSize, ImGuiCond.Appearing);
+            }
+            else
+            {
+                ImGui.SetNextWindowSizeConstraints(new Vector2(650, 150), new Vector2(ImGui.GETFLTMAX()));
+            }
 
             if (ImGui.BeginPopupModal($"ZDPS Enable Update Checking###{TITLE_ID}", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.AlwaysAutoResize))
             {

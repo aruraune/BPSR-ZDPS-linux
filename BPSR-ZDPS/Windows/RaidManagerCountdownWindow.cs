@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using ZLinq;
@@ -156,12 +157,14 @@ namespace BPSR_ZDPS.Windows
                             CountdownRunOnceDelayed++;
                             unsafe
                             {
+#if WINDOWS
                                 // This is how we support transparency effects of just the background and not the text content.
                                 // SetLayeredWindowAttributes will chromakey the given 0xAABBGGRR value anywhere on the window and also set the Alpha of the window between 0-255
                                 // This is needed due to Nvidia drivers incorrectly behaving with performing an ImGui drawlist clear via Window Resize and using cached frames instead of drawing new ones like all other GPU vendors
                                 Hexa.NET.ImGui.Backends.Win32.ImGuiImplWin32.EnableAlphaCompositing(ImGui.GetWindowViewport().PlatformHandleRaw);
                                 Utils.SetWindowLong(User32.GWL_EXSTYLE, User32.GetWindowLong((nint)ImGui.GetWindowViewport().PlatformHandleRaw, User32.GWL_EXSTYLE) | (nint)User32.WS_EX_LAYERED);
                                 User32.SetLayeredWindowAttributes((nint)ImGui.GetWindowViewport().PlatformHandleRaw, 0x00010101, 255, User32.LWA_COLORKEY | User32.LWA_ALPHA);
+#endif
                             }
                         }
                         else if (CountdownRunOnceDelayed < 3)
@@ -231,8 +234,19 @@ namespace BPSR_ZDPS.Windows
 
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 
-            ImGui.SetNextWindowSize(new Vector2(650, 550), ImGuiCond.Appearing);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(550, 450), new Vector2(ImGui.GETFLTMAX()));
+            bool useFullViewport = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            var main_viewport = ImGui.GetMainViewport();
+
+            if (useFullViewport)
+            {
+                ImGui.SetNextWindowPos(main_viewport.WorkPos, ImGuiCond.Always);
+                ImGui.SetNextWindowSize(main_viewport.WorkSize, ImGuiCond.Appearing);
+            }
+            else
+            {
+                ImGui.SetNextWindowSize(new Vector2(650, 550), ImGuiCond.Appearing);
+                ImGui.SetNextWindowSizeConstraints(new Vector2(550, 450), new Vector2(ImGui.GETFLTMAX()));
+            }
 
             if (ImGui.Begin($"Raid Manager - Countdowns{TITLE_ID}", ref IsOpened, ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking))
             {
@@ -453,11 +467,16 @@ namespace BPSR_ZDPS.Windows
                 try
                 {
                     System.Diagnostics.Process process = System.Diagnostics.Process.GetProcessById(gameProc.ProcessId);
+#if WINDOWS
                     User32.RECT procRect = new();
                     User32.GetWindowRect(process.MainWindowHandle, ref procRect);
                     float centerX = MathF.Floor((procRect.left + procRect.right) * 0.5f);
                     float centerY = MathF.Floor((procRect.top + procRect.bottom) * 0.5f);
                     Vector2 centerPoint = new Vector2(centerX, centerY);
+#else
+                    // Game window positioning not supported on non-Windows platforms
+                    Vector2 centerPoint = new Vector2(960, 540); // Default center position (1920x1080 center)
+#endif
                     var newPosition = centerPoint - new Vector2(150, 150);
                     Settings.Instance.WindowSettings.RaidManagerCountdown.CountdownPosition = newPosition;
                     NewCountdownWindowLocation = newPosition;

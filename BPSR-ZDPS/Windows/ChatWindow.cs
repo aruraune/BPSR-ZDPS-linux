@@ -4,6 +4,7 @@ using BPSR_ZDPS.Managers;
 using Hexa.NET.ImGui;
 using System.Globalization;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using ZLinq;
 using Zproto;
 
@@ -107,6 +108,15 @@ namespace BPSR_ZDPS.Windows
 
         private static void InnerDraw(ChatWindowSettings windowSettings)
         {
+            bool useFullViewport = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            var main_viewport = ImGui.GetMainViewport();
+
+            if (useFullViewport)
+            {
+                ImGui.SetNextWindowPos(main_viewport.WorkPos, ImGuiCond.Always);
+                ImGui.SetNextWindowSize(main_viewport.WorkSize, ImGuiCond.Appearing);
+            }
+
             ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(17 / 255.0f, 17 / 255.0f, 17 / 255.0f, 0.0f));
             ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
             if (ImGui.Begin($"Chat##ChatWindow", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse |
@@ -132,6 +142,7 @@ namespace BPSR_ZDPS.Windows
                     }
                 }
 
+#if WINDOWS
                 unsafe
                 {
                     // This is how we support transparency effects of just the background and not the text content.
@@ -141,6 +152,7 @@ namespace BPSR_ZDPS.Windows
                     Utils.SetWindowLong(User32.GWL_EXSTYLE, User32.GetWindowLong((nint)ImGui.GetWindowViewport().PlatformHandleRaw, User32.GWL_EXSTYLE) | (nint)User32.WS_EX_LAYERED);
                     User32.SetLayeredWindowAttributes((nint)ImGui.GetWindowViewport().PlatformHandleRaw, 0x00111111, (byte)(windowSettings.Opacity == 100 ? 255 : 210), User32.LWA_COLORKEY | User32.LWA_ALPHA);
                 }
+#endif
 
                 ImGui.PushStyleColor(ImGuiCol.ChildBg, new Vector4(0, 0, 0, windowSettings.Opacity * 0.01f));
                 if (ImGui.BeginChild("##ChatWindowChild", new Vector2(0, windowSettings.WindowSize.Y - 8), ImGuiChildFlags.AutoResizeY))
@@ -181,7 +193,7 @@ namespace BPSR_ZDPS.Windows
 
             if (ResetWindowSize)
             {
-                ImGui.SetNextWindowSize(DefaultWindowSize, ImGuiCond.Always);
+                ImGui.SetNextWindowSize(DefaultWindowSize, ImGuiCond.Appearing);
                 ResetWindowSize = false;
             }
 

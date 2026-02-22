@@ -1,4 +1,5 @@
 ﻿using Hexa.NET.ImGui;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace BPSR_ZDPS
 {
     public static class HotKeyManager
     {
+#if WINDOWS
         [DllImport("user32.dll")]
         public static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
 
@@ -65,11 +67,13 @@ namespace BPSR_ZDPS
 
         public delegate IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
-        private static List<HotKey> RegisteredKeys = new(); // <KeyName, VirtualKeyCode>
         private static IntPtr OriginalWndProc;
         private static WndProc HotKeysWndProc;
         private static User32.HookProc HotKeysHookProc;
         private static IntPtr HotKeysHookHandle;
+#endif
+
+        private static List<HotKey> RegisteredKeys = new(); // <KeyName, VirtualKeyCode>
 
         struct HotKey
         {
@@ -81,6 +85,7 @@ namespace BPSR_ZDPS
 
         public unsafe static void RegisterKey(string keyName, Action action, uint vk, uint modififers = 0)
         {
+#if WINDOWS
             HotKey? registeredKey = RegisteredKeys.Where(x => x.Name == keyName).FirstOrDefault();
             if (registeredKey != null && registeredKey.Value.Name == keyName)
             {
@@ -102,38 +107,48 @@ namespace BPSR_ZDPS
             {
                 RegisteredKeys.Add(newKey);
             }
+#endif
         }
 
         public static void UnregisterAllHotKeys()
         {
+#if WINDOWS
             foreach (var key in RegisteredKeys)
             {
                 UnregisterHotKey(HelperMethods.MainWindowPlatformHandleRaw, key.Id);
             }
 
             //RegisteredKeys.Clear();
+#endif
         }
 
         public static void UnregisterHookProc()
         {
+#if WINDOWS
             if (HotKeysHookHandle != IntPtr.Zero)
             {
                 User32.UnhookWindowsHookEx(HotKeysHookHandle);
                 HotKeysHookHandle = IntPtr.Zero;
             }
+#endif
         }
 
         public unsafe static void SetWndProc()
         {
+#if WINDOWS
             HotKeysWndProc = new WndProc(HotKeyWndProc);
 
             IntPtr newProcPtr = Marshal.GetFunctionPointerForDelegate(HotKeysWndProc);
 
             OriginalWndProc = SetWindowLongPtr(HelperMethods.MainWindowPlatformHandleRaw, GWLP_WNDPROC, newProcPtr);
+#else
+            // Window procedure hooks not supported on non-Windows platforms
+#endif
         }
 
         public static void SetHookProc()
         {
+#if WINDOWS
             HotKeysHookProc = new User32.HookProc(HotKeyHookProc);
 
             System.Diagnostics.Process cProcess = System.Diagnostics.Process.GetCurrentProcess();
@@ -148,10 +163,15 @@ namespace BPSR_ZDPS
                 var lastError = Marshal.GetLastWin32Error();
                 System.Diagnostics.Debug.WriteLine($"SetHookProc.GetLastWin32Error = {lastError}");
             }
+#else
+            // Hotkeys not supported on non-Windows platforms
+            Log.Warning("HotKey hooks are not supported on this platform");
+#endif
         }
 
         public static IntPtr HotKeyWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
         {
+#if WINDOWS
             if (msg == WM_HOTKEY)
             {
                 var hotKeyId = wParam.ToInt32();
@@ -164,10 +184,14 @@ namespace BPSR_ZDPS
             }
 
             return CallWindowProc(OriginalWndProc, hWnd, msg, wParam, lParam);
+#else
+            return IntPtr.Zero;
+#endif
         }
 
         public static IntPtr HotKeyHookProc(int nCode, IntPtr wParam, IntPtr lParam)
         {
+#if WINDOWS
             if (nCode >= 0)
             {
                 if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)
@@ -183,6 +207,9 @@ namespace BPSR_ZDPS
             }
 
             return User32.CallNextHookEx(HotKeysHookHandle, nCode, wParam, lParam);
+#else
+            return IntPtr.Zero;
+#endif
         }
 
         public static int ImGuiKeyToVirtualKey(Hexa.NET.ImGui.ImGuiKey key)
