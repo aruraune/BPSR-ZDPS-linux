@@ -3,6 +3,7 @@ using Hexa.NET.GLFW;
 using Serilog;
 using Silk.NET.Core.Native;
 using Silk.NET.Direct3D11;
+using Silk.NET.DirectComposition;
 using Silk.NET.DXGI;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,9 @@ namespace BPSR_ZDPS
         private ComPtr<ID3D11Texture2D> swapChainBackbuffer;
 
         private ComPtr<ID3D11RenderTargetView> swapChainRTV;
+
+        public IDCompositionDevice* dcompDevice;
+        public ComPtr<IDCompositionDesktopDevice> DCompositionDesktopDevice;
 
         public D3D11Manager(GLFWwindowPtr window, bool debug)
         {
@@ -66,10 +70,39 @@ namespace BPSR_ZDPS
             tempDevice->QueryInterface(out Device);
             tempContext->QueryInterface(out DeviceContext);
 
+            Device.Handle = (ID3D11Device1*)tempDevice;
             tempDevice->Release();
             tempContext->Release();
 
+            DCompositionDesktopDevice = CreateDesktopDevice(Device);
+
             CreateSwapChain(window);
+        }
+
+        unsafe ComPtr<IDCompositionDesktopDevice> CreateDesktopDevice(ComPtr<ID3D11Device1> d3dDevice)
+        {
+            var dcomp = DComp.GetApi();
+
+            ComPtr<IDXGIDevice> dxgiDevice = default;
+            d3dDevice.QueryInterface(out dxgiDevice);
+
+            ComPtr<IDCompositionDevice> compDevice = default;
+            int hr = dcomp.CreateDevice2(dxgiDevice, out compDevice);
+
+            if (hr < 0)
+            {
+                throw new Exception($"CreateDevice failed: 0x{hr:X}");
+            }
+
+            ComPtr<IDCompositionDesktopDevice> desktopDevice = default;
+            hr = compDevice.QueryInterface(out desktopDevice);
+
+            if (hr < 0)
+            {
+                throw new Exception($"QueryInterface DesktopDevice failed: 0x{hr:X}");
+            }
+
+            return desktopDevice;
         }
 
         private void CreateSwapChain(GLFWwindow* window)

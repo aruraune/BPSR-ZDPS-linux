@@ -19,6 +19,8 @@ using System.Security.Policy;
 using System.IO.Hashing;
 using ZLinq;
 using System.Text.RegularExpressions;
+using System.Numerics;
+using static BPSR_ZDPS.RendererImpl;
 
 namespace BPSR_ZDPS
 {
@@ -367,6 +369,67 @@ namespace BPSR_ZDPS
             viewport = viewport ?? ImGui.GetWindowViewport();
             User32.SetWindowLong((IntPtr)viewport.Value.PlatformHandleRaw, nIndex, dwNewLong);
 #endif
+        }
+
+        public static void SetWindowClearColor(Vector4 clearColor, ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
+            if (rdata != null)
+            {
+                clearColor.X *= clearColor.W;
+                clearColor.Y *= clearColor.W;
+                clearColor.Z *= clearColor.W;
+
+                rdata->ClearColor = clearColor;
+            }
+        }
+
+        public static void SetWindowDesiredRenderFPS(int fps, ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
+            if (rdata != null)
+            {
+                rdata->DesiredRenderFPS = fps;
+            }
+        }
+
+        public static void SetWindowSyncInterval(uint syncInterval, ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
+            if (rdata != null)
+            {
+                rdata->SyncInterval = syncInterval;
+            }
+        }
+
+        public static void SetWindowLimitFPS(bool limitFps, ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
+            if (rdata != null)
+            {
+                rdata->LimitFPS = limitFps;
+            }
+        }
+
+        public static ViewportRendererData* GetViewportRenderData(ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
+            return rdata;
+        }
+
+        public static void SetViewportRenderData(Func<ViewportRendererData, ViewportRendererData> func, ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
+            if (rdata != null)
+            {
+                *rdata = func(*rdata);
+            }
         }
 
         public static unsafe void SetCurrentWindowIcon()

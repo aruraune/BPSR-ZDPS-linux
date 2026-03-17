@@ -176,6 +176,8 @@ namespace BPSR_ZDPS
             Log.Error("DEBUG: OpenGL3 backend initialized, now loading fonts...");
             LoadFonts();
 
+            RendererImpl.Init(guiContext);
+
             // Setup resizing.
             unsafe
             {

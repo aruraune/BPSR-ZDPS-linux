@@ -220,6 +220,25 @@ namespace BPSR_ZDPS
             return encounters;
         }
 
+        public static EncounterExData GetEncounterExDataForBattle(int battleId)
+        {
+            try
+            {
+                var encounter = DB.DbConn.QueryFirst<Encounter>(DBSchema.Encounter.SelectOneByBattleId, new { BattleId = battleId });
+                var decompressedEncEx = Decompressor.Unwrap(encounter.ExDataBlob);
+                ProtoBuf.Serializer.Deserialize<EncounterExData>(decompressedEncEx, encounter.ExData);
+                encounter.ExDataBlob = null;
+
+                return encounter.ExData;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error getting GetEncounterExDataForBattle by {battleId}", battleId);
+            }
+
+            return null;
+        }
+
         public static DBCleanUpResults ClearOldEncounters(int olderThanDays)
         {
             lock (DBLock)
