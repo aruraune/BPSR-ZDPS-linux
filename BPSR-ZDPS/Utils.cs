@@ -428,20 +428,6 @@ namespace BPSR_ZDPS
 #endif
         }
 
-        public static void SetWindowClearColor(Vector4 clearColor, ImGuiViewportPtr? viewport = null)
-        {
-            viewport = viewport ?? ImGui.GetWindowViewport();
-            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
-            if (rdata != null)
-            {
-                clearColor.X *= clearColor.W;
-                clearColor.Y *= clearColor.W;
-                clearColor.Z *= clearColor.W;
-
-                rdata->ClearColor = clearColor;
-            }
-        }
-
         public static void SetWindowDesiredRenderFPS(int fps, ImGuiViewportPtr? viewport = null)
         {
             viewport = viewport ?? ImGui.GetWindowViewport();
@@ -449,26 +435,6 @@ namespace BPSR_ZDPS
             if (rdata != null)
             {
                 rdata->DesiredRenderFPS = fps;
-            }
-        }
-
-        public static void SetWindowSyncInterval(uint syncInterval, ImGuiViewportPtr? viewport = null)
-        {
-            viewport = viewport ?? ImGui.GetWindowViewport();
-            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
-            if (rdata != null)
-            {
-                rdata->SyncInterval = syncInterval;
-            }
-        }
-
-        public static void SetWindowLimitFPS(bool limitFps, ImGuiViewportPtr? viewport = null)
-        {
-            viewport = viewport ?? ImGui.GetWindowViewport();
-            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
-            if (rdata != null)
-            {
-                rdata->LimitFPS = limitFps;
             }
         }
 
@@ -516,16 +482,6 @@ namespace BPSR_ZDPS
             }
         }
 
-        public static void SetWindowDesiredRenderFPS(int fps, ImGuiViewportPtr? viewport = null)
-        {
-            viewport = viewport ?? ImGui.GetWindowViewport();
-            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
-            if (rdata != null)
-            {
-                rdata->DesiredRenderFPS = fps;
-            }
-        }
-
         public static void SetWindowSyncInterval(uint syncInterval, ImGuiViewportPtr? viewport = null)
         {
             viewport = viewport ?? ImGui.GetWindowViewport();
@@ -553,23 +509,6 @@ namespace BPSR_ZDPS
             if (rdata != null)
             {
                 rdata->CopyToGDIEveryNthFrame = frameNum;
-            }
-        }
-
-        public static ViewportRendererData* GetViewportRenderData(ImGuiViewportPtr? viewport = null)
-        {
-            viewport = viewport ?? ImGui.GetWindowViewport();
-            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
-            return rdata;
-        }
-
-        public static void SetViewportRenderData(Func<ViewportRendererData, ViewportRendererData> func, ImGuiViewportPtr? viewport = null)
-        {
-            viewport = viewport ?? ImGui.GetWindowViewport();
-            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
-            if (rdata != null)
-            {
-                *rdata = func(*rdata);
             }
         }
 
