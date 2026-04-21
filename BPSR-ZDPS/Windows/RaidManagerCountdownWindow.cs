@@ -134,46 +134,50 @@ namespace BPSR_ZDPS.Windows
                 if (countdownRemaining.TotalSeconds > 0)
                 {
 #if !WINDOWS
-                    // On Linux (single viewport), draw centered in the main viewport using
-                    // the foreground draw list — no separate window needed
-                    var fgDrawList = ImGui.GetForegroundDrawList();
+                    // On Linux (single viewport), draw as a centered transparent window
                     var mainVp = ImGui.GetMainViewport();
-                    var vpCenter = new Vector2(
-                        mainVp.WorkPos.X + mainVp.WorkSize.X * 0.5f,
-                        mainVp.WorkPos.Y + mainVp.WorkSize.Y * 0.5f);
-
-                    var countdownText = $"{(int)Math.Ceiling(countdownRemaining.TotalSeconds)}";
-
-                    if (windowSettings.UseStylizedNumbers)
+                    ImGui.SetNextWindowPos(
+                        new Vector2(mainVp.WorkPos.X + mainVp.WorkSize.X * 0.5f - 150,
+                                    mainVp.WorkPos.Y + mainVp.WorkSize.Y * 0.5f - 150),
+                        ImGuiCond.Always);
+                    ImGui.SetNextWindowSize(new Vector2(300, 300), ImGuiCond.Always);
+                    ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(0, 0, 0, 0));
+                    ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
+                    if (ImGui.Begin("##CountdownDisplay",
+                        ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove |
+                        ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoBackground |
+                        ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoSavedSettings))
                     {
-                        float totalWidth = 0, maxHeight = 0;
-                        for (int i = 0; i < countdownText.Length; i++)
+                        var countdownText = $"{(int)Math.Ceiling(countdownRemaining.TotalSeconds)}";
+                        if (windowSettings.UseStylizedNumbers)
                         {
-                            if (ImageHelper.GetTextureByKey($"BasicNumber{countdownText[i]}") != null)
-                            { totalWidth += 70 * 1.75f; maxHeight = MathF.Max(maxHeight, 110 * 1.75f); }
-                        }
-                        float startX = vpCenter.X - totalWidth * 0.5f;
-                        float startY = vpCenter.Y - maxHeight * 0.5f;
-                        for (int i = 0; i < countdownText.Length; i++)
-                        {
-                            var tex = ImageHelper.GetTextureByKey($"BasicNumber{countdownText[i]}");
-                            if (tex != null)
+                            var avail = ImGui.GetContentRegionAvail();
+                            ImGui.SetCursorPos(new Vector2(MathF.Max(0.0f, (avail.X - CountdownImageGroupSize.X) * 0.5f), MathF.Max(0.0f, (avail.Y - CountdownImageGroupSize.Y) * 0.5f)));
+                            ImGui.BeginGroup();
+                            for (int i = 0; i < countdownText.Length; i++)
                             {
-                                var imgMin = new Vector2(startX, startY);
-                                var imgMax = new Vector2(startX + 70 * 1.75f, startY + 110 * 1.75f);
-                                fgDrawList.AddImage(tex.Value, imgMin, imgMax, new Vector2(0, 0), new Vector2(1, 1), ImGui.GetColorU32(Colors.OrangeRed));
-                                startX += 70 * 1.75f;
+                                var tex = ImageHelper.GetTextureByKey($"BasicNumber{countdownText[i]}");
+                                if (tex != null)
+                                {
+                                    if (i != 0) ImGui.SameLine();
+                                    ImGui.ImageWithBg(tex.Value, new Vector2(70 * 1.75f, 110 * 1.75f), new Vector2(0, 0), new Vector2(1, 1), new Vector4(0, 0, 0, 0), Colors.OrangeRed_Transparent);
+                                }
                             }
+                            ImGui.EndGroup();
+                            CountdownImageGroupSize = ImGui.GetItemRectSize();
+                        }
+                        else
+                        {
+                            ImGui.PushFont(null, 250);
+                            ImGui.PushStyleColor(ImGuiCol.Text, Colors.OrangeRed_Transparent);
+                            ImGui.TextAligned(0.5f, -1, countdownText);
+                            ImGui.PopStyleColor();
+                            ImGui.PopFont();
                         }
                     }
-                    else
-                    {
-                        ImGui.PushFont(null, 250);
-                        var textSize = ImGui.CalcTextSize(countdownText);
-                        var textPos = new Vector2(vpCenter.X - textSize.X * 0.5f, vpCenter.Y - textSize.Y * 0.5f);
-                        unsafe { fgDrawList.AddText(ImGui.GetFont(), 250, textPos, ImGui.GetColorU32(Colors.OrangeRed), countdownText); }
-                        ImGui.PopFont();
-                    }
+                    ImGui.End();
+                    ImGui.PopStyleVar();
+                    ImGui.PopStyleColor();
 #else
                     ImGui.SetNextWindowClass(CountdownDisplayClass);
 
@@ -235,7 +239,7 @@ namespace BPSR_ZDPS.Windows
                                         {
                                             ImGui.SameLine();
                                         }
-                                        ImGui.ImageWithBg(tex.Value, new Vector2(70 * 1.75f, 110 * 1.75f), new Vector2(0, 0), new Vector2(1, 1), new Vector4(0, 0, 0, 0), Colors.OrangeRed);
+                                        ImGui.ImageWithBg(tex.Value, new Vector2(70 * 1.75f, 110 * 1.75f), new Vector2(0, 0), new Vector2(1, 1), new Vector4(0, 0, 0, 0), Colors.OrangeRed_Transparent);
                                     }
                                 }
                                 ImGui.EndGroup();
@@ -244,7 +248,7 @@ namespace BPSR_ZDPS.Windows
                             else
                             {
                                 ImGui.PushFont(null, 250);
-                                ImGui.PushStyleColor(ImGuiCol.Text, Colors.OrangeRed);
+                                ImGui.PushStyleColor(ImGuiCol.Text, Colors.OrangeRed_Transparent);
                                 ImGui.TextAligned(0.5f, -1, $"{(int)Math.Ceiling(countdownRemaining.TotalSeconds)}");
                                 ImGui.PopStyleColor();
                                 ImGui.PopFont();
@@ -500,7 +504,7 @@ namespace BPSR_ZDPS.Windows
                                 {
                                     ImGui.SameLine();
                                 }
-                                ImGui.ImageWithBg(tex.Value, new Vector2(70 * 1.75f, 110 * 1.75f), new Vector2(0, 0), new Vector2(1, 1), new Vector4(0, 0, 0, 0), Colors.OrangeRed);
+                                ImGui.ImageWithBg(tex.Value, new Vector2(70 * 1.75f, 110 * 1.75f), new Vector2(0, 0), new Vector2(1, 1), new Vector4(0, 0, 0, 0), Colors.OrangeRed_Transparent);
                             }
                         }
                         ImGui.EndGroup();
