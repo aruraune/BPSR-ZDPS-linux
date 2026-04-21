@@ -1,5 +1,6 @@
 using Hexa.NET.GLFW;
 using Serilog;
+using Silk.NET.OpenGL;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
@@ -11,6 +12,7 @@ namespace BPSR_ZDPS
         public GLFWwindowPtr Window => window;
         public int Width { get; private set; }
         public int Height { get; private set; }
+        private GL gl;
 
         public OpenGLManager(GLFWwindowPtr window, bool debug)
         {
@@ -24,7 +26,9 @@ namespace BPSR_ZDPS
             Height = height;
 
             GLFW.MakeContextCurrent(window);
-            
+
+            gl = GL.GetApi(proc => (nint)GLFW.GetProcAddress(proc));
+
             // On Linux, always enable vsync to cap framerate at monitor refresh rate
             // On Windows, disable vsync for lower latency in overlay mode
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
@@ -53,7 +57,8 @@ namespace BPSR_ZDPS
 
         public void Clear(Vector4 color)
         {
-            // OpenGL clearing is handled by ImGui backend
+            gl.ClearColor(color.X, color.Y, color.Z, color.W);
+            gl.Clear(ClearBufferMask.ColorBufferBit);
         }
 
         public void SetTarget()

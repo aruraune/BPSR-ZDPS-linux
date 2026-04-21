@@ -133,6 +133,48 @@ namespace BPSR_ZDPS.Windows
                 var countdownRemaining = CountdownEnd.Subtract(DateTime.Now);
                 if (countdownRemaining.TotalSeconds > 0)
                 {
+#if !WINDOWS
+                    // On Linux (single viewport), draw centered in the main viewport using
+                    // the foreground draw list — no separate window needed
+                    var fgDrawList = ImGui.GetForegroundDrawList();
+                    var mainVp = ImGui.GetMainViewport();
+                    var vpCenter = new Vector2(
+                        mainVp.WorkPos.X + mainVp.WorkSize.X * 0.5f,
+                        mainVp.WorkPos.Y + mainVp.WorkSize.Y * 0.5f);
+
+                    var countdownText = $"{(int)Math.Ceiling(countdownRemaining.TotalSeconds)}";
+
+                    if (windowSettings.UseStylizedNumbers)
+                    {
+                        float totalWidth = 0, maxHeight = 0;
+                        for (int i = 0; i < countdownText.Length; i++)
+                        {
+                            if (ImageHelper.GetTextureByKey($"BasicNumber{countdownText[i]}") != null)
+                            { totalWidth += 70 * 1.75f; maxHeight = MathF.Max(maxHeight, 110 * 1.75f); }
+                        }
+                        float startX = vpCenter.X - totalWidth * 0.5f;
+                        float startY = vpCenter.Y - maxHeight * 0.5f;
+                        for (int i = 0; i < countdownText.Length; i++)
+                        {
+                            var tex = ImageHelper.GetTextureByKey($"BasicNumber{countdownText[i]}");
+                            if (tex != null)
+                            {
+                                var imgMin = new Vector2(startX, startY);
+                                var imgMax = new Vector2(startX + 70 * 1.75f, startY + 110 * 1.75f);
+                                fgDrawList.AddImage(tex.Value, imgMin, imgMax, new Vector2(0, 0), new Vector2(1, 1), ImGui.GetColorU32(Colors.OrangeRed));
+                                startX += 70 * 1.75f;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ImGui.PushFont(null, 250);
+                        var textSize = ImGui.CalcTextSize(countdownText);
+                        var textPos = new Vector2(vpCenter.X - textSize.X * 0.5f, vpCenter.Y - textSize.Y * 0.5f);
+                        unsafe { fgDrawList.AddText(ImGui.GetFont(), 250, textPos, ImGui.GetColorU32(Colors.OrangeRed), countdownText); }
+                        ImGui.PopFont();
+                    }
+#else
                     ImGui.SetNextWindowClass(CountdownDisplayClass);
 
                     ImGui.SetNextWindowSize(new Vector2(300, 300), ImGuiCond.Always);
@@ -161,14 +203,12 @@ namespace BPSR_ZDPS.Windows
                             CountdownRunOnceDelayed++;
                             unsafe
                             {
-#if WINDOWS
                                 // This is how we support transparency effects of just the background and not the text content.
                                 // SetLayeredWindowAttributes will chromakey the given 0xAABBGGRR value anywhere on the window and also set the Alpha of the window between 0-255
                                 // This is needed due to Nvidia drivers incorrectly behaving with performing an ImGui drawlist clear via Window Resize and using cached frames instead of drawing new ones like all other GPU vendors
                                 Hexa.NET.ImGui.Backends.Win32.ImGuiImplWin32.EnableAlphaCompositing(ImGui.GetWindowViewport().PlatformHandleRaw);
                                 Utils.SetWindowLong(User32.GWL_EXSTYLE, User32.GetWindowLong((nint)ImGui.GetWindowViewport().PlatformHandleRaw, User32.GWL_EXSTYLE) | (nint)User32.WS_EX_LAYERED);
                                 User32.SetLayeredWindowAttributes((nint)ImGui.GetWindowViewport().PlatformHandleRaw, 0x00010101, 255, User32.LWA_COLORKEY | User32.LWA_ALPHA);
-#endif
                             }
                         }
                         else if (CountdownRunOnceDelayed < 3)
@@ -209,15 +249,14 @@ namespace BPSR_ZDPS.Windows
                                 ImGui.PopStyleColor();
                                 ImGui.PopFont();
                             }
-
-                            ImGui.EndChild();
                         }
+                        ImGui.EndChild();
                         ImGui.PopStyleColor();
-
-                        ImGui.End();
                     }
+                    ImGui.End();
                     ImGui.PopStyleVar();
                     ImGui.PopStyleColor();
+#endif
                 }
                 else
                 {

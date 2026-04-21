@@ -154,6 +154,12 @@ public class User32
 
     [DllImport("user32.dll")]
     public static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags);
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    public static extern int GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
 #else
     // Linux stubs - no-op implementations
     public static bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags) => false;
@@ -170,6 +176,9 @@ public class User32
     private static int SetWindowLong32(IntPtr hWnd, int nIndex, int dwNewLong) => 0;
     private static IntPtr SetWindowLongPtr64(IntPtr hWnd, int nIndex, IntPtr dwNewLong) => IntPtr.Zero;
     public static bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags) => false;
+    public static IntPtr GetForegroundWindow() => IntPtr.Zero;
+    public static IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags) => IntPtr.Zero;
+    public static int GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId) { lpdwProcessId = 0; return 0; }
 #endif
 
     public static IntPtr GetWindowLong(IntPtr hWnd, int nIndex)

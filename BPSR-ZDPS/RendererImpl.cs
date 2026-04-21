@@ -1,10 +1,14 @@
 ﻿using Hexa.NET.GLFW;
 using Hexa.NET.ImGui;
+#if WINDOWS
 using Hexa.NET.ImGui.Backends.D3D11;
 using Silk.NET.Core.Native;
 using Silk.NET.Direct3D11;
 using Silk.NET.DirectComposition;
 using Silk.NET.DXGI;
+#else
+using Hexa.NET.ImGui.Backends.OpenGL3;
+#endif
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -15,32 +19,41 @@ namespace BPSR_ZDPS
     {
         public struct ViewportRendererData
         {
+#if WINDOWS
             public ComPtr<IDXGISwapChain1> SwapChain;
             public unsafe ID3D11RenderTargetView* RTV;
             public unsafe IDCompositionTarget* CompositionTarget;
+#endif
             public Vector4 ClearColor;
             public uint SyncInterval;
             public int DesiredRenderFPS;
             public bool LimitFPS;
             public DateTime LastRenderTime;
+            public int FrameCount;
+            public int CopyToGDIEveryNthFrame;
 
             public void Init()
             {
                 unsafe
                 {
+#if WINDOWS
                     SwapChain = null;
                     RTV = null;
                     CompositionTarget = null;
-                    ClearColor = new Vector4(0, 0, 0, 0);
-                    SyncInterval = 1;
-                    DesiredRenderFPS = -1;
-                    LimitFPS = false;
-                    LastRenderTime = DateTime.Now;
+#endif
                 }
+                ClearColor = new Vector4(0, 0, 0, 0);
+                SyncInterval = 1;
+                DesiredRenderFPS = -1;
+                LimitFPS = false;
+                LastRenderTime = DateTime.Now;
+                FrameCount = 0;
+                CopyToGDIEveryNthFrame = 2;
             }
         }
 
         private unsafe static void* OldRendererCreateWindow;
+        public static bool EnableGDIBackBufferCopyCompatibility = false;
 
 
         public unsafe static void Init(ImGuiContextPtr context)
@@ -59,8 +72,15 @@ namespace BPSR_ZDPS
         [UnmanagedCallersOnly]
         static unsafe void PlatformCreateWindow(ImGuiViewportPtr viewport)
         {
+#if WINDOWS
             GLFW.WindowHint(GLFW.GLFW_CLIENT_API, 0);
             GLFW.WindowHint(GLFW.GLFW_TRANSPARENT_FRAMEBUFFER, 1);
+#else
+            // Match the main window's OpenGL context version
+            GLFW.WindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
+            GLFW.WindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 3);
+            GLFW.WindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
+#endif
             ((delegate* unmanaged<ImGuiViewportPtr, void>)OldRendererCreateWindow)(viewport);
         }
 
@@ -70,6 +90,7 @@ namespace BPSR_ZDPS
             var rdata = (ViewportRendererData*)NativeMemory.Alloc((nuint)sizeof(ViewportRendererData));
             rdata->Init();
 
+#if WINDOWS
             SwapChainDesc1 desc = new()
             {
                 Width = (uint)viewport.Size.X,
@@ -79,10 +100,15 @@ namespace BPSR_ZDPS
                 BufferUsage = DXGI.UsageRenderTargetOutput,
                 SampleDesc = new(1, 0),
                 Scaling = Scaling.Stretch,
-                SwapEffect = SwapEffect.FlipSequential,
-                Flags = (uint)(SwapChainFlag.AllowModeSwitch | SwapChainFlag.AllowTearing),
+                SwapEffect = SwapEffect.FlipDiscard,
+                Flags = (uint)(SwapChainFlag.AllowTearing),
                 AlphaMode = AlphaMode.Premultiplied
             };
+
+            if (EnableGDIBackBufferCopyCompatibility)
+            {
+                desc.Flags |= (uint)SwapChainFlag.GdiCompatible;
+            }
 
             SwapChainFullscreenDesc fullscreenDesc = new()
             {
@@ -120,6 +146,7 @@ namespace BPSR_ZDPS
             // Maybe safe to do here
             visual->Release();
             visual2.Dispose();
+#endif
 
             viewport.RendererUserData = rdata;
         }
@@ -134,12 +161,14 @@ namespace BPSR_ZDPS
                 return;
             }
 
+#if WINDOWS
             rdata->RTV->Release();
             rdata->RTV = null;
             rdata->SwapChain.Dispose();
             rdata->SwapChain = null;
             rdata->CompositionTarget->Release();
             rdata->CompositionTarget = null;
+#endif
 
             NativeMemory.Free(rdata);
             viewport.RendererUserData = null;
@@ -148,6 +177,7 @@ namespace BPSR_ZDPS
         [UnmanagedCallersOnly]
         private unsafe static void OnSetWindowSize(ImGuiViewportPtr viewport, Vector2 size)
         {
+#if WINDOWS
             var rdata = (ViewportRendererData*)viewport.RendererUserData;
 
             Program.manager.DeviceContext.Handle->OMSetRenderTargets(0, null, null);
@@ -188,6 +218,7 @@ namespace BPSR_ZDPS
             );
 
             backBuffer->Release();
+#endif
         }
 
         [UnmanagedCallersOnly]
@@ -201,10 +232,18 @@ namespace BPSR_ZDPS
             {
                 var start = Stopwatch.GetTimestamp();
 
+#if WINDOWS
                 Program.manager.DeviceContext.Handle->OMSetRenderTargets(1, &rdata->RTV, null);
                 Program.manager.DeviceContext.Handle->ClearRenderTargetView(rdata->RTV, (float*)&rdata->ClearColor);
 
                 ImGuiImplD3D11.RenderDrawData(viewport.DrawData);
+#else
+                // Make this viewport's GL context current before rendering
+                var glfwWindow = (GLFWwindowPtr)(GLFWwindow*)viewport.PlatformHandle;
+                GLFW.MakeContextCurrent(glfwWindow);
+
+                ImGuiImplOpenGL3.RenderDrawData(viewport.DrawData);
+#endif
 
                 var end = Stopwatch.GetTimestamp();
 
@@ -228,7 +267,12 @@ namespace BPSR_ZDPS
             var rdata = (ViewportRendererData*)viewport.RendererUserData;
             if (rdata != null)
             {
+#if WINDOWS
                 rdata->SwapChain.Present(rdata->SyncInterval, 0);
+#else
+                var glfwWindow = (GLFWwindowPtr)(GLFWwindow*)viewport.PlatformHandle;
+                GLFW.SwapBuffers(glfwWindow);
+#endif
             }
         }
     }

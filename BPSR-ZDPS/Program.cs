@@ -150,7 +150,7 @@ namespace BPSR_ZDPS
             
             // On Linux, keep it simple - single window with docking, no separate viewports
             // All windows will dock as tabs in the main window
-            //if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 io.ConfigFlags |= ImGuiConfigFlags.ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
             }
@@ -182,9 +182,9 @@ namespace BPSR_ZDPS
             Log.Error("DEBUG: OpenGL3 backend initialized, now loading fonts...");
             LoadFonts();
 
+#if WINDOWS
             RendererImpl.Init(guiContext);
-
-            RendererImpl.Init(guiContext);
+#endif
 
             // Setup resizing.
             unsafe
@@ -269,6 +269,10 @@ namespace BPSR_ZDPS
                 {
                     ImGui.UpdatePlatformWindows();
                     ImGui.RenderPlatformWindowsDefault();
+#if !WINDOWS
+                    // Restore main window GL context after secondary viewports steal it
+                    GLFW.MakeContextCurrent(window);
+#endif
                 }
 
                 // We can present without vsync to run at double the normal framerate to have input be more responive
