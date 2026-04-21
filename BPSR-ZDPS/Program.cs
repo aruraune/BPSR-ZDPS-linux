@@ -107,7 +107,24 @@ namespace BPSR_ZDPS
             // Center window initially
             var glfwMonitor = GLFW.GetPrimaryMonitor();
             var glfwVidMode = GLFW.GetVideoMode(glfwMonitor);
-            GLFW.SetWindowPos(window, (glfwVidMode.Width - windowWidth) / 2, (glfwVidMode.Height - windowHeight) / 2);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                // On Linux, the main GLFW window stays hidden and only hosts the OpenGL/ImGui main viewport.
+                // With ConfigFlags.ViewportsEnable, ImGui popups (e.g. combo dropdowns) that fall back to the
+                // main viewport are positioned relative to this hidden window. If it's centered on screen,
+                // popups opened from full-viewport ImGui windows appear offset from the screen center.
+                // Anchor it at the monitor's work-area origin so popup positions line up with the visible UI.
+                int workX = 0, workY = 0, workW = 0, workH = 0;
+                unsafe
+                {
+                    GLFW.GetMonitorWorkarea(glfwMonitor, &workX, &workY, &workW, &workH);
+                }
+                GLFW.SetWindowPos(window, workX, workY);
+            }
+            else
+            {
+                GLFW.SetWindowPos(window, (glfwVidMode.Width - windowWidth) / 2, (glfwVidMode.Height - windowHeight) / 2);
+            }
 
             Log.Debug($"Primary Monitor Refresh Rate = {glfwVidMode.RefreshRate}hz");
             if (Settings.Instance.LowPerformanceMode)
