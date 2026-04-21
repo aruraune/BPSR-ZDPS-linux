@@ -24,6 +24,7 @@ namespace BPSR_ZDPS.Windows
         // if pulling from current, maintain a connection to current encounter to show latest data as encounters change
         public Entity? LoadedEntity { get; set; }
         public DateTime? LoadedEncounterStartTime { get; private set; }
+        public DateTime? LoadedEncounterFirstDamageTimeStamp { get; private set; }
 
         public bool IsOpened = false;
 
@@ -51,6 +52,8 @@ namespace BPSR_ZDPS.Windows
         static float[] SkillSnapshotsHits = [];
         static Dictionary<string, ScatterPlotSkillMap> SkillScatterMap = new();
 
+        static ImGuiWindowClassPtr TopMostWindowClass = ImGui.ImGuiWindowClass();
+
         public enum ETableFilterMode : int
         {
             SkillsDamage,
@@ -71,6 +74,7 @@ namespace BPSR_ZDPS.Windows
             //ImGui.OpenPopup("###EntityInspectorWindow");
             IsOpened = true;
             IsPinned = false;
+            TopMostWindowClass.ViewportFlagsOverrideSet = ImGuiViewportFlags.TopMost;
             ImGui.PopID();
         }
 
@@ -102,8 +106,19 @@ namespace BPSR_ZDPS.Windows
                 {
                     if (LoadedEncounterStartTime != EncounterManager.Current.StartTime)
                     {
-                        LoadEntity(foundEntity, EncounterManager.Current.StartTime);
+                        LoadEntity(foundEntity, EncounterManager.Current.StartTime, EncounterManager.Current.ExData.FirstDamageTimeStamp);
                         //LoadedFromEncounterIdx = EncounterManager.Encounters.Count - 1;
+                    }
+                }
+            }
+            if (LoadedEncounterFirstDamageTimeStamp == null && LoadedEncounterStartTime != null)
+            {
+                if (LoadedEncounterStartTime == EncounterManager.Current.StartTime)
+                {
+                    // The active Encounter is almost certainly the same as the Loaded one
+                    if (EncounterManager.Current.ExData.FirstDamageTimeStamp != null)
+                    {
+                        LoadedEncounterFirstDamageTimeStamp = EncounterManager.Current.ExData.FirstDamageTimeStamp;
                     }
                 }
             }
@@ -213,7 +228,17 @@ namespace BPSR_ZDPS.Windows
                     }
                     ImGui.TextUnformatted($"Profession: {LoadedEntity.Profession}");
                     ImGui.TextUnformatted($"ProfessionSpec: {LoadedEntity.SubProfession}");
+                    ImGui.AlignTextToFramePadding();
                     ImGui.TextUnformatted($"EntityType: {LoadedEntity.EntityType.ToString()}");
+                    if (LoadedEntity.EntityType == Zproto.EEntityType.EntChar)
+                    {
+                        ImGui.SameLine();
+                        if (ImGui.Button("View Gear"))
+                        {
+                            GearInspector.LoadEntity(LoadedEntity);
+                            GearInspector.Open();
+                        }
+                    }
 
                     ImGui.TableNextColumn();
 
@@ -249,8 +274,15 @@ namespace BPSR_ZDPS.Windows
                         ImGui.TextUnformatted($"HP: {hp:N0} ({hpPct}%)");
                         
                         ImGui.TextUnformatted($"Max HP: {maxHp:N0}");
-                        ImGui.TextUnformatted($"ATK: {LoadedEntity.GetAttrKV("AttrAttack") ?? "0"}");
                         string MainStat = Professions.GetBaseProfessionMainStatName(LoadedEntity.ProfessionId);
+                        if (MainStat == "Intellect")
+                        {
+                            ImGui.TextUnformatted($"MATK: {LoadedEntity.GetAttrKV("AttrMattack") ?? "0"}");
+                        }
+                        else
+                        {
+                            ImGui.TextUnformatted($"ATK: {LoadedEntity.GetAttrKV("AttrAttack") ?? "0"}");
+                        }
                         if (MainStat == "Strength" || MainStat == "")
                         {
                             ImGui.TextUnformatted($"Strength: {LoadedEntity.GetAttrKV("AttrStrength") ?? "0"}");
@@ -454,6 +486,17 @@ namespace BPSR_ZDPS.Windows
                         ImGui.Text($"Total Average Damage: {Utils.NumberToShorthand(combatStats.ValueAverage)}");
                         ImGui.SetItemTooltip($"{combatStats.ValueAverage:N0}");
                         ImGui.Text($"Total Casts: {LoadedEntity.TotalCasts}");
+                        TimeSpan? activeDuration = (LoadedEntity.LastCombatActionTime - LoadedEntity.FirstCombatActionTime);
+                        if (activeDuration != null && activeDuration.Value.TotalSeconds > 0.0f)
+                        {
+                            double activeSeconds = activeDuration.Value.TotalSeconds;
+                            double activeMinutes = activeDuration.Value.TotalMinutes;
+
+                            double CastsPerSecond = Math.Round((double)LoadedEntity.TotalCasts / activeSeconds, 2);
+                            double CastsPerMinute = Math.Round((double)LoadedEntity.TotalCasts / activeMinutes, 2);
+                            ImGui.Text($"Casts Per Min: {CastsPerMinute} ({CastsPerSecond})");
+                            ImGui.SetItemTooltip($"Average number of Casts performed during Entity's Active Time\nFormat: CastsPerMinute (CastsPerSecond)\nActive Time Minutes: {activeDuration.Value.ToString("mm\\:ss")}");
+                        }
 
                         ImGui.EndTable();
                     }
@@ -578,6 +621,7 @@ namespace BPSR_ZDPS.Windows
                             {
 
                             }
+                            ImGui.SetNextWindowClass(TopMostWindowClass);
                             if (ImGui.BeginPopupContextItem())
                             {
                                 if (ImGui.MenuItem("Copy Skill ID"))
@@ -663,6 +707,10 @@ namespace BPSR_ZDPS.Windows
                             if (ImGui.IsItemHovered() && ImGui.BeginTooltip())
                             {
                                 ImGui.TextUnformatted($"{stat.Value.ValueTotal:N0}");
+                                if (TableFilterMode == ETableFilterMode.SkillsHealing)
+                                {
+                                    ImGui.TextUnformatted($"Overheal: {stat.Value.HpLessenTotal:N0}");
+                                }
                                 ImGui.TextUnformatted($"Type: {stat.Value.DamageMode}\nElement: {Utils.DamagePropertyToString(stat.Value.DamageElement)}");
                                 if (shieldBreakTotal > 0)
                                 {
@@ -757,19 +805,21 @@ namespace BPSR_ZDPS.Windows
                                         ImGui.PushStyleColor(ImGuiCol.Text, Colors.LightRed);
                                     }
                                     ImGui.TextUnformatted(snapshot.Timestamp.Value.Subtract(startTime.Value).ToString());
-                                    if (TableFilterMode == ETableFilterMode.SkillsTaken)
+                                    ImGui.SetNextWindowClass(TopMostWindowClass);
+                                    if (ImGui.IsItemHovered() && ImGui.BeginItemTooltip())
                                     {
-                                        if (ImGui.IsItemHovered() && ImGui.BeginItemTooltip())
+                                        if (EntityCache.Instance.Cache.Lines.TryGetValue(snapshot.OtherUUID, out var cachedOther))
                                         {
-                                            if (EntityCache.Instance.Cache.Lines.TryGetValue(snapshot.OtherUUID, out var cachedOther))
+                                            if (!string.IsNullOrEmpty(cachedOther.Name))
                                             {
-                                                if (!string.IsNullOrEmpty(cachedOther.Name))
-                                                {
-                                                    ImGui.TextUnformatted($"{cachedOther.Name}");
-                                                }
+                                                ImGui.TextUnformatted($"{cachedOther.Name}");
                                             }
-                                            ImGui.EndTooltip();
+                                            else
+                                            {
+                                                ImGui.TextUnformatted($"UUID: {cachedOther.UUID} (UID: {cachedOther.UID})");
+                                            }
                                         }
+                                        ImGui.EndTooltip();
                                     }
 
                                     ImGui.TableNextColumn();
@@ -783,7 +833,7 @@ namespace BPSR_ZDPS.Windows
                                     ImGui.TextUnformatted($"Hit: {snapshotIdx + 1}");
 
                                     ImGui.TableNextColumn();
-                                    ImGui.TextUnformatted($"Crit: {snapshot.IsCrit}");
+                                    ImGui.TextUnformatted($"{(snapshot.IsCrit ? "Crit" : "")}{(snapshot.IsCauseLucky || snapshot.IsLucky ? "Lucky" : "")}");
 
                                     ImGui.TableNextColumn(); // AVG Column
 
@@ -1113,6 +1163,21 @@ namespace BPSR_ZDPS.Windows
                                         }
                                     }
                                     ImGui.TextUnformatted($"Buff Id: {buffEvent.BaseId}\n{buffEvent.Description}{extraTooltip}");
+
+                                    bool ctrlHeld = ImGui.IsKeyDown(ImGuiKey.ModCtrl);
+                                    if (ctrlHeld)
+                                    {
+                                        if (!string.IsNullOrEmpty(buffEvent.EntityCasterName))
+                                        {
+                                            ImGui.TextUnformatted($"Caster: {buffEvent.EntityCasterName}");
+                                        }
+                                        else
+                                        {
+                                            ImGui.TextUnformatted($"Caster: {buffEvent.FireUuid}");
+                                        }
+                                        ImGui.TextUnformatted($"Caster Type: {(Zproto.EEntityType)Utils.UuidToEntityType(buffEvent.FireUuid)}");
+                                    }
+
                                     ImGui.EndTooltip();
                                 }
 
@@ -1168,10 +1233,21 @@ namespace BPSR_ZDPS.Windows
                                     ImGui.TextUnformatted($"{buffEvent.FireUuid}");
                                 }
 
-
                                 ImGui.TableNextColumn();
                                 string addTime = "";
-                                if (buffEvent.EventAddTime.TotalMilliseconds > 0)
+                                if (LoadedEncounterFirstDamageTimeStamp != null && LoadedEncounterStartTime != null)
+                                {
+                                    if (buffEvent.AddDateTime != DateTime.MinValue)
+                                    {
+                                        if (buffEvent.AddDateTime.CompareTo(LoadedEncounterFirstDamageTimeStamp) < 0)
+                                        {
+                                            // Added before the first damage event, display time as negative offset
+                                            var diff = buffEvent.AddDateTime.Subtract((DateTime)LoadedEncounterFirstDamageTimeStamp);
+                                            addTime = (diff < TimeSpan.Zero ? "-" : "") + diff.ToString("hh\\:mm\\:ss");
+                                        }
+                                    }
+                                }
+                                if (string.IsNullOrEmpty(addTime) && buffEvent.EventAddTime.TotalMilliseconds > 0)
                                 {
                                     addTime = buffEvent.EventAddTime.ToString("hh\\:mm\\:ss");
                                 }
@@ -1179,7 +1255,20 @@ namespace BPSR_ZDPS.Windows
 
                                 ImGui.TableNextColumn();
                                 string removeTime = "";
-                                if (buffEvent.EventRemoveTime.TotalMilliseconds > 0)
+                                if (LoadedEncounterFirstDamageTimeStamp != null && LoadedEncounterStartTime != null)
+                                {
+                                    if (buffEvent.RemoveDateTime != DateTime.MinValue)
+                                    {
+                                        if (buffEvent.RemoveDateTime.CompareTo(LoadedEncounterFirstDamageTimeStamp) < 0)
+                                        {
+                                            // Removed before the first damage event, display time as negative offset
+                                            var diff = buffEvent.RemoveDateTime.Subtract((DateTime)LoadedEncounterFirstDamageTimeStamp);
+                                            removeTime = (diff < TimeSpan.Zero ? "-" : "") + diff.ToString("hh\\:mm\\:ss");
+                                        }
+                                    }
+                                    var diffTime = LoadedEncounterFirstDamageTimeStamp?.Subtract((DateTime)LoadedEncounterStartTime?.ToUniversalTime());
+                                }
+                                if (string.IsNullOrEmpty(removeTime) && buffEvent.EventRemoveTime.TotalMilliseconds > 0)
                                 {
                                     removeTime = buffEvent.EventRemoveTime.ToString("hh\\:mm\\:ss");
                                 }
@@ -1467,7 +1556,7 @@ namespace BPSR_ZDPS.Windows
                     entityName = $"[{LoadedEntity.UID}]";
                 }
 
-                ImGui.Text($"{TITLE} - {entityName}");
+                ImGui.TextUnformatted($"{TITLE} - {entityName}");
 
                 ImGui.SetCursorPosX(MenuBarSize.X - (MenuBarButtonWidth * 2));
                 ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
@@ -1508,10 +1597,11 @@ namespace BPSR_ZDPS.Windows
             }
         }
 
-        public void LoadEntity(Entity entity, DateTime encounterStartTime)
+        public void LoadEntity(Entity entity, DateTime encounterStartTime, DateTime? encounterFirstDamageTimeStamp)
         {
             LoadedEntity = entity;
             LoadedEncounterStartTime = encounterStartTime;
+            LoadedEncounterFirstDamageTimeStamp = encounterFirstDamageTimeStamp;
 
             HasLoadedGraphsData = false;
             SkillSnapshotTimestampSeconds = [];

@@ -92,7 +92,7 @@ public class TcpReassembler
     public class TcpConnection(IPEndPoint endPoint, IPEndPoint destEndPoint, TcpReassembler owner)
     {
         public const int NUM_PACKETS_BEFORE_CLEAN_UP = 200;
-        public const int MAX_DUPE_PACKET_SEQ_DIFF = 1000;
+        public const int MAX_DUPE_PACKET_SEQ_DIFF = 1700;
 
         public IPEndPoint EndPoint = endPoint;
         public IPEndPoint DestEndPoint = destEndPoint;
@@ -112,6 +112,11 @@ public class TcpReassembler
         public void AddPacket(TcpPacket tcpPacket, PosixTimeval timeVal)
         
         {
+            if (tcpPacket.PayloadData.Length <= 0)
+            {
+                return;
+            }
+
             if (!IsSynced)
             {
                 if (tcpPacket.PayloadData.Length >= 6 && BinaryPrimitives.ReadInt32BigEndian(tcpPacket.PayloadData) == tcpPacket.PayloadData.Length &&

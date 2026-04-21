@@ -25,13 +25,15 @@ namespace Zproto {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "CiRzdHJ1X21haGpvbmdfZmluYWxfc2V0dGxlX2luZm8ucHJvdG8SBnpwcm90",
-            "byJ5ChZNYWhqb25nRmluYWxTZXR0bGVJbmZvEhEKCXBsYXllcl9pZBgBIAEo",
-            "AxIMCgRjb2luGAIgASgFEhUKDXNjb3JpbmdfcG9pbnQYAyABKAUSEgoKcmFu",
-            "a19zY29yZRgEIAEoBRITCgtjb2luX2NoYW5nZRgFIAEoBWIGcHJvdG8z"));
+            "bxodc3RydV9tYWhqb25nX2F3YXJkX2l0ZW0ucHJvdG8itgEKFk1haGpvbmdG",
+            "aW5hbFNldHRsZUluZm8SEQoJcGxheWVyX2lkGAEgASgDEgwKBGNvaW4YAiAB",
+            "KAUSFQoNc2NvcmluZ19wb2ludBgDIAEoBRISCgpyYW5rX3Njb3JlGAQgASgF",
+            "EhMKC2NvaW5fY2hhbmdlGAUgASgFEjsKGWNsaWVudF9tYWhqb25nX2F3YXJk",
+            "X2l0ZW0YBiADKAsyGC56cHJvdG8uTWFoam9uZ0F3YXJkSXRlbWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { },
+          new pbr::FileDescriptor[] { global::Zproto.StruMahjongAwardItemReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Zproto.MahjongFinalSettleInfo), global::Zproto.MahjongFinalSettleInfo.Parser, new[]{ "PlayerId", "Coin", "ScoringPoint", "RankScore", "CoinChange" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Zproto.MahjongFinalSettleInfo), global::Zproto.MahjongFinalSettleInfo.Parser, new[]{ "PlayerId", "Coin", "ScoringPoint", "RankScore", "CoinChange", "ClientMahjongAwardItem" }, null, null, null, null)
           }));
     }
     #endregion
@@ -78,6 +80,7 @@ namespace Zproto {
       scoringPoint_ = other.scoringPoint_;
       rankScore_ = other.rankScore_;
       coinChange_ = other.coinChange_;
+      clientMahjongAwardItem_ = other.clientMahjongAwardItem_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -147,6 +150,17 @@ namespace Zproto {
       }
     }
 
+    /// <summary>Field number for the "client_mahjong_award_item" field.</summary>
+    public const int ClientMahjongAwardItemFieldNumber = 6;
+    private static readonly pb::FieldCodec<global::Zproto.MahjongAwardItem> _repeated_clientMahjongAwardItem_codec
+        = pb::FieldCodec.ForMessage(50, global::Zproto.MahjongAwardItem.Parser);
+    private readonly pbc::RepeatedField<global::Zproto.MahjongAwardItem> clientMahjongAwardItem_ = new pbc::RepeatedField<global::Zproto.MahjongAwardItem>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<global::Zproto.MahjongAwardItem> ClientMahjongAwardItem {
+      get { return clientMahjongAwardItem_; }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -167,6 +181,7 @@ namespace Zproto {
       if (ScoringPoint != other.ScoringPoint) return false;
       if (RankScore != other.RankScore) return false;
       if (CoinChange != other.CoinChange) return false;
+      if(!clientMahjongAwardItem_.Equals(other.clientMahjongAwardItem_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -179,6 +194,7 @@ namespace Zproto {
       if (ScoringPoint != 0) hash ^= ScoringPoint.GetHashCode();
       if (RankScore != 0) hash ^= RankScore.GetHashCode();
       if (CoinChange != 0) hash ^= CoinChange.GetHashCode();
+      hash ^= clientMahjongAwardItem_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -217,6 +233,7 @@ namespace Zproto {
         output.WriteRawTag(40);
         output.WriteInt32(CoinChange);
       }
+      clientMahjongAwardItem_.WriteTo(output, _repeated_clientMahjongAwardItem_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -247,6 +264,7 @@ namespace Zproto {
         output.WriteRawTag(40);
         output.WriteInt32(CoinChange);
       }
+      clientMahjongAwardItem_.WriteTo(ref output, _repeated_clientMahjongAwardItem_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -272,6 +290,7 @@ namespace Zproto {
       if (CoinChange != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(CoinChange);
       }
+      size += clientMahjongAwardItem_.CalculateSize(_repeated_clientMahjongAwardItem_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -299,6 +318,7 @@ namespace Zproto {
       if (other.CoinChange != 0) {
         CoinChange = other.CoinChange;
       }
+      clientMahjongAwardItem_.Add(other.clientMahjongAwardItem_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -338,6 +358,10 @@ namespace Zproto {
             CoinChange = input.ReadInt32();
             break;
           }
+          case 50: {
+            clientMahjongAwardItem_.AddEntriesFrom(input, _repeated_clientMahjongAwardItem_codec);
+            break;
+          }
         }
       }
     #endif
@@ -375,6 +399,10 @@ namespace Zproto {
           }
           case 40: {
             CoinChange = input.ReadInt32();
+            break;
+          }
+          case 50: {
+            clientMahjongAwardItem_.AddEntriesFrom(ref input, _repeated_clientMahjongAwardItem_codec);
             break;
           }
         }

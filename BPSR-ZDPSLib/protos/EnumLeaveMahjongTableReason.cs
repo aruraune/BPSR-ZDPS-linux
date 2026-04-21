@@ -25,10 +25,11 @@ namespace Zproto {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "CiVlbnVtX2xlYXZlX21haGpvbmdfdGFibGVfcmVhc29uLnByb3RvEgZ6cHJv",
-            "dG8qhgEKF0xlYXZlTWFoam9uZ1RhYmxlUmVhc29uEh8KG0xlYXZlTWFoam9u",
+            "dG8qrwEKF0xlYXZlTWFoam9uZ1RhYmxlUmVhc29uEh8KG0xlYXZlTWFoam9u",
             "Z1RhYmxlUmVhc29uTnVsbBAAEiYKIkxlYXZlTWFoam9uZ1RhYmxlUmVhc29u",
             "SWRpcEtpY2tvdXQQARIiCh5MZWF2ZU1haGpvbmdUYWJsZVJlYXNvblJlcXVl",
-            "c3QQAmIGcHJvdG8z"));
+            "c3QQAhInCiNMZWF2ZU1haGpvbmdUYWJsZVJlYXNvbkRpc2JhbmRUYWJsZRAD",
+            "YgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Zproto.LeaveMahjongTableReason), }, null, null));
@@ -41,6 +42,7 @@ namespace Zproto {
     [pbr::OriginalName("LeaveMahjongTableReasonNull")] Null = 0,
     [pbr::OriginalName("LeaveMahjongTableReasonIdipKickout")] IdipKickout = 1,
     [pbr::OriginalName("LeaveMahjongTableReasonRequest")] Request = 2,
+    [pbr::OriginalName("LeaveMahjongTableReasonDisbandTable")] DisbandTable = 3,
   }
 
   #endregion

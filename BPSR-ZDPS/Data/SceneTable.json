@@ -192,12 +192,12 @@
   },
   "10": {
     "Id": 10,
-    "Name": "Bahamar Highlands (Lower) (Unavailable)",
+    "Name": "Valley",
     "SceneType": 1,
     "SceneSubType": 4,
     "ParentId": 0,
     "IsShareParentSceneData": false,
-    "SceneResourceId": 90,
+    "SceneResourceId": 12,
     "SceneUi": [],
     "MapSize": {
       "x": 2048.0,
@@ -252,7 +252,12 @@
       "x": 0.0,
       "y": 0.0
     },
-    "MapEntryCondition": [],
+    "MapEntryCondition": [
+      [
+        9,
+        99999
+      ]
+    ],
     "AudioBank": [],
     "BornId": 5,
     "ReviveTableId": [
@@ -272,8 +277,12 @@
     "EPFlowId": 0,
     "ShowMiniMap": 0,
     "MiniMapRatio": 50,
-    "SubScene": [],
-    "AmbEvent": "",
+    "SubScene": [
+      15,
+      16,
+      17
+    ],
+    "AmbEvent": "Amb_2D_Common_WindSoft_Grass_Loop",
     "ReverEvent": "Reverb_Normal",
     "DefaultSceneArea": 0,
     "MoveSyncConfigId": 0,
@@ -572,7 +581,7 @@
   },
   "91": {
     "Id": 91,
-    "Name": "Highland Cave 1 (Unavailable)",
+    "Name": "Sunken Corridor",
     "SceneType": 1,
     "SceneSubType": 4,
     "ParentId": 0,
@@ -617,7 +626,7 @@
   },
   "92": {
     "Id": 92,
-    "Name": "Highland Cave 2 (Unavailable)",
+    "Name": "Gloomy Depths",
     "SceneType": 1,
     "SceneSubType": 4,
     "ParentId": 0,
@@ -754,6 +763,51 @@
     "MiniMapRatio": 50,
     "SubScene": [],
     "AmbEvent": "Amb_2D_Common_WindSoft_Grass_Loop",
+    "ReverEvent": "Reverb_Normal",
+    "DefaultSceneArea": 0,
+    "MoveSyncConfigId": 0,
+    "HaveWater": true,
+    "FootstepFxOverride": []
+  },
+  "95": {
+    "Id": 95,
+    "Name": "Sunset Wilds",
+    "SceneType": 1,
+    "SceneSubType": 4,
+    "ParentId": 0,
+    "IsShareParentSceneData": false,
+    "SceneResourceId": 90,
+    "SceneUi": [],
+    "MapSize": {
+      "x": 2048.0,
+      "y": 2048.0
+    },
+    "MapOffset": {
+      "x": 0.0,
+      "y": 0.0
+    },
+    "MapEntryCondition": [],
+    "AudioBank": [],
+    "BornId": 1,
+    "ReviveTableId": [
+      101,
+      200
+    ],
+    "Bgm": [],
+    "LoadingBgm": "",
+    "FallDis": 1.0,
+    "Weather": -1,
+    "DayAndNight": 1,
+    "CutsceneId": 0,
+    "MainUi": 1,
+    "CanChangeLayer": false,
+    "PreloadCutscenes": [],
+    "PreloadEPFlows": [],
+    "EPFlowId": 0,
+    "ShowMiniMap": 0,
+    "MiniMapRatio": 50,
+    "SubScene": [],
+    "AmbEvent": "",
     "ReverEvent": "Reverb_Normal",
     "DefaultSceneArea": 0,
     "MoveSyncConfigId": 0,
@@ -3307,6 +3361,50 @@
     "DefaultSceneArea": 0,
     "MoveSyncConfigId": 0,
     "HaveWater": true,
+    "FootstepFxOverride": []
+  },
+  "5812": {
+    "Id": 5812,
+    "Name": "Frostjade Staff",
+    "SceneType": 2,
+    "SceneSubType": 5,
+    "ParentId": 0,
+    "IsShareParentSceneData": false,
+    "SceneResourceId": 13001,
+    "SceneUi": [],
+    "MapSize": {
+      "x": 1024.0,
+      "y": 1024.0
+    },
+    "MapOffset": {
+      "x": 0.0,
+      "y": 0.0
+    },
+    "MapEntryCondition": [],
+    "AudioBank": [],
+    "BornId": 1,
+    "ReviveTableId": [
+      103
+    ],
+    "Bgm": [],
+    "LoadingBgm": "",
+    "FallDis": 1.0,
+    "Weather": -1,
+    "DayAndNight": 0,
+    "CutsceneId": 0,
+    "MainUi": 2,
+    "CanChangeLayer": false,
+    "PreloadCutscenes": [],
+    "PreloadEPFlows": [],
+    "EPFlowId": 0,
+    "ShowMiniMap": 1,
+    "MiniMapRatio": 0,
+    "SubScene": [],
+    "AmbEvent": "",
+    "ReverEvent": "Reverb_Normal",
+    "DefaultSceneArea": 0,
+    "MoveSyncConfigId": 0,
+    "HaveWater": false,
     "FootstepFxOverride": []
   },
   "6001": {
@@ -7519,6 +7617,50 @@
     "PreloadEPFlows": [],
     "EPFlowId": 0,
     "ShowMiniMap": 0,
+    "MiniMapRatio": 0,
+    "SubScene": [],
+    "AmbEvent": "",
+    "ReverEvent": "Reverb_Normal",
+    "DefaultSceneArea": 0,
+    "MoveSyncConfigId": 0,
+    "HaveWater": false,
+    "FootstepFxOverride": []
+  },
+  "11001": {
+    "Id": 11001,
+    "Name": "Wondrous Tag",
+    "SceneType": 2,
+    "SceneSubType": 5,
+    "ParentId": 0,
+    "IsShareParentSceneData": false,
+    "SceneResourceId": 11001,
+    "SceneUi": [],
+    "MapSize": {
+      "x": 1024.0,
+      "y": 1024.0
+    },
+    "MapOffset": {
+      "x": 0.0,
+      "y": 0.0
+    },
+    "MapEntryCondition": [],
+    "AudioBank": [],
+    "BornId": 1,
+    "ReviveTableId": [
+      5
+    ],
+    "Bgm": [],
+    "LoadingBgm": "",
+    "FallDis": 1.0,
+    "Weather": -1,
+    "DayAndNight": 1,
+    "CutsceneId": 0,
+    "MainUi": 14,
+    "CanChangeLayer": false,
+    "PreloadCutscenes": [],
+    "PreloadEPFlows": [],
+    "EPFlowId": 0,
+    "ShowMiniMap": 1,
     "MiniMapRatio": 0,
     "SubScene": [],
     "AmbEvent": "",

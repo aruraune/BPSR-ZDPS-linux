@@ -64,6 +64,8 @@ namespace BPSR_ZDPS.DataTypes
             01_00_02 => AppStrings.GetLocalized("SubProfession_Moonstrike"),
             02_00_01 => AppStrings.GetLocalized("SubProfession_Icicle"),
             02_00_02 => AppStrings.GetLocalized("SubProfession_Frostbeam"),
+            03_00_01 => AppStrings.GetLocalized("SubProfession_FormlessExpertise"),
+            03_00_02 => AppStrings.GetLocalized("SubProfession_CrimsonExpertise"),
             04_00_01 => AppStrings.GetLocalized("SubProfession_Vanguard"),
             04_00_02 => AppStrings.GetLocalized("SubProfession_Skyward"),
             05_00_01 => AppStrings.GetLocalized("SubProfession_Smite"),
@@ -86,6 +88,8 @@ namespace BPSR_ZDPS.DataTypes
             (int)SubProfessionId.SubProfession_Moonstrike => (int)EProfessionId.Profession_Stormblade,
             (int)SubProfessionId.SubProfession_Icicle => (int)EProfessionId.Profession_FrostMage,
             (int)SubProfessionId.SubProfession_Frostbeam => (int)EProfessionId.Profession_FrostMage,
+            (int)SubProfessionId.SubProfession_FormlessExpertise => (int)EProfessionId.Profession_TwinStriker,
+            (int)SubProfessionId.SubProfession_CrimsonExpertise => (int)EProfessionId.Profession_TwinStriker,
             (int)SubProfessionId.SubProfession_Vanguard => (int)EProfessionId.Profession_WindKnight,
             (int)SubProfessionId.SubProfession_Skyward => (int)EProfessionId.Profession_WindKnight,
             (int)SubProfessionId.SubProfession_Smite => (int)EProfessionId.Profession_VerdantOracle,
@@ -101,10 +105,43 @@ namespace BPSR_ZDPS.DataTypes
             _ => (int)EProfessionId.Profession_Unknown
         };
 
+        public static int GetTalentIdFromSubProfessionId(int subProfessionId) => subProfessionId switch
+        {
+            (int)SubProfessionId.SubProfession_Unknown => (int)ETalentId.Unknown,
+            (int)EProfessionId.Profession_Stormblade => (int)ETalentId.Profession_Stormblade,
+            (int)SubProfessionId.SubProfession_Iaido => (int)ETalentId.SubProfession_Iaido,
+            (int)SubProfessionId.SubProfession_Moonstrike => (int)ETalentId.SubProfession_Moonstrike,
+            (int)EProfessionId.Profession_FrostMage => (int)ETalentId.Profession_FrostMage,
+            (int)SubProfessionId.SubProfession_Icicle => (int)ETalentId.SubProfession_Icicle,
+            (int)SubProfessionId.SubProfession_Frostbeam => (int)ETalentId.SubProfession_Frostbeam,
+            (int)SubProfessionId.SubProfession_FormlessExpertise => (int)ETalentId.SubProfession_FormlessExpertise,
+            (int)SubProfessionId.SubProfession_CrimsonExpertise => (int)ETalentId.SubProfession_CrimsonExpertise,
+            (int)EProfessionId.Profession_WindKnight => (int)ETalentId.Profession_WindKnight,
+            (int)SubProfessionId.SubProfession_Vanguard => (int)ETalentId.SubProfession_Vanguard,
+            (int)SubProfessionId.SubProfession_Skyward => (int)ETalentId.SubProfession_Skyward,
+            (int)EProfessionId.Profession_VerdantOracle => (int)ETalentId.Profession_VerdantOracle,
+            (int)SubProfessionId.SubProfession_Smite => (int)ETalentId.SubProfession_Smite,
+            (int)SubProfessionId.SubProfession_Lifebind => (int)ETalentId.SubProfession_Lifebind,
+            (int)EProfessionId.Profession_HeavyGuardian => (int)ETalentId.Profession_HeavyGuardian,
+            (int)SubProfessionId.SubProfession_Earthfort => (int)ETalentId.SubProfession_Earthfort,
+            (int)SubProfessionId.SubProfession_Block => (int)ETalentId.SubProfession_Block,
+            (int)EProfessionId.Profession_Marksman => (int)ETalentId.Profession_Marksman,
+            (int)SubProfessionId.SubProfession_Wildpack => (int)ETalentId.SubProfession_Wildpack,
+            (int)SubProfessionId.SubProfession_Falconry => (int)ETalentId.SubProfession_Falconry,
+            (int)EProfessionId.Profession_ShieldKnight => (int)ETalentId.Profession_ShieldKnight,
+            (int)SubProfessionId.SubProfession_Recovery => (int)ETalentId.SubProfession_Recovery,
+            (int)SubProfessionId.SubProfession_Shield => (int)ETalentId.SubProfession_Shield,
+            (int)EProfessionId.Profession_BeatPerformer => (int)ETalentId.Profession_BeatPerformer,
+            (int)SubProfessionId.SubProfession_Dissonance => (int)ETalentId.SubProfession_Dissonance,
+            (int)SubProfessionId.SubProfession_Concerto => (int)ETalentId.SubProfession_Concerto,
+            _ => (int)ETalentId.Unknown
+        };
+
         public static int GetBaseProfessionIdBySkillId(int skillId) => skillId switch
         {
             1701 or 1705 or 1713 or 1714 or 1715 or 1716 or 1717 or 1718 or 1719 or 1720 or 1724 or 1728 or 1730 or 1731 => 1, // Stormblade
             1201 or 1210 or 1211 or 1239 or 1240 or 1241 or 1242 or 1243 or 1244 or 1245 or 1246 or 1248 => 2, // FrostMage
+            1601 or 1602 or 1603 or 1604 or 1605 or 1606 or 1607 or 1608 or 1609 or 1610 or 1611 or 1612 or 1613 or 1614 => 3, // Twin Striker
             1401 or 1410 or 1418 or 1419 or 1420 or 1421 or 1422 or 1423 or 1424 or 1425 or 1426 or 1430 or 1431 => 4, // WindKnight
             1501 or 1507 or 1509 or 1518 or 1519 or 1520 or 1521 or 1522 or 1523 or 1524 or 1527 or 1528 or 1529 or 1531 => 5, // VerdantOracle
             1901 or 1907 or 1917 or 1922 or 1923 or 1924 or 1925 or 1926 or 1927 or 1930 or 1932 or 1936 or 1937 or 1938 or 1940 => 9, // HeavyGuardian
@@ -172,6 +209,10 @@ namespace BPSR_ZDPS.DataTypes
             {
                 return Colors.FromColor(ColorTranslator.FromHtml("#7788D4"));
             }
+            else if (professionName == AppStrings.GetLocalized("Profession_TwinStriker") || professionName == AppStrings.GetLocalized("SubProfession_FormlessExpertise") || professionName == AppStrings.GetLocalized("SubProfession_CrimsonExpertise"))
+            {
+                return Colors.FromColor(ColorTranslator.FromHtml("#F5A614"));
+            }
             else if (professionName == AppStrings.GetLocalized("Profession_WindKnight") || professionName == AppStrings.GetLocalized("SubProfession_Skyward") || professionName == AppStrings.GetLocalized("SubProfession_Vanguard"))
             {
                 return Colors.FromColor(ColorTranslator.FromHtml("#799A9C"));
@@ -217,9 +258,10 @@ namespace BPSR_ZDPS.DataTypes
                     {
                         return "Intellect";
                     }
+                case (int)EProfessionId.Profession_TwinStriker:
                 case (int)EProfessionId.Profession_WindKnight:
-                case (int)EProfessionId.Profession_ShieldKnight:
                 case (int)EProfessionId.Profession_HeavyGuardian:
+                case (int)EProfessionId.Profession_ShieldKnight:
                     {
                         return "Strength";
                     }
@@ -236,6 +278,7 @@ namespace BPSR_ZDPS.DataTypes
             {
                 case (int)EProfessionId.Profession_Stormblade:
                 case (int)EProfessionId.Profession_FrostMage:
+                case (int)EProfessionId.Profession_TwinStriker:
                 case (int)EProfessionId.Profession_WindKnight:
                 case (int)EProfessionId.Profession_Marksman:
                     return ERoleType.DPS;

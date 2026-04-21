@@ -42,6 +42,12 @@ namespace BPSR_ZDPS
 
                 logBuilder = logBuilder.WriteTo.File("ZDPS_log.txt");
                 AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
+                if (Settings.Instance.AggressiveExceptionDebugLogging)
+                {
+                    Log.Information("Aggressive Exception Debug Logging is Enabled");
+                    AppDomain.CurrentDomain.FirstChanceException += CurrentDomain_FirstChanceException;
+                }
             }
 
             Log.Logger = logBuilder.CreateLogger();
@@ -175,6 +181,8 @@ namespace BPSR_ZDPS
             
             Log.Error("DEBUG: OpenGL3 backend initialized, now loading fonts...");
             LoadFonts();
+
+            RendererImpl.Init(guiContext);
 
             RendererImpl.Init(guiContext);
 
@@ -383,6 +391,11 @@ namespace BPSR_ZDPS
             }
 
             Log.Information("ZDPS has cleanly exited.");
+        }
+
+        private static void CurrentDomain_FirstChanceException(object? sender, System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs e)
+        {
+            Log.Error($"First Chance Exception:\n{e.Exception.Message}\nStack Trace:\n{e.Exception.StackTrace}");
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

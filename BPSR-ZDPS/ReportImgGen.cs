@@ -10,7 +10,7 @@ namespace BPSR_ZDPS
 {
     public static class ReportImgGen
     {
-        public static Image<Rgba32> CreateReportImg(Encounter encounter)
+        public static Image<Rgba32>? CreateReportImg(Encounter encounter)
         {
             unsafe
             {
@@ -28,6 +28,7 @@ namespace BPSR_ZDPS
                 if (tex == null)
                 {
                     Serilog.Log.Error($"Report Texture was unexpectedly rendered as Null. Encounter BattleId:{encounter.BattleId} EncounterId:{encounter.EncounterId}");
+                    return null;
                 }
 
                 var img = TextureSaveUtil.Texture2DToPng(OffscreenImGuiRenderer.D3D11Manager.Device, OffscreenImGuiRenderer.D3D11Manager.DeviceContext, tex);
@@ -35,7 +36,7 @@ namespace BPSR_ZDPS
                 if (img == null)
                 {
                     Serilog.Log.Error($"CreateReportImg Texture2DToPng returned a Null image. Aborting the Report process.");
-                    return img;
+                    return null;
                 }
 
                 if (Settings.Instance.SaveEncounterReportToFile)

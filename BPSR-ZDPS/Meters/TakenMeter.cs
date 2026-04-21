@@ -49,7 +49,7 @@ namespace BPSR_ZDPS.Meters
                     {
                         AppState.ActiveEncounter = EncounterManager.Current;
                     }
-                    else if (AppState.ActiveEncounter?.EncounterId != EncounterManager.Current?.EncounterId)
+                    else if (AppState.ActiveEncounter?.EncounterId != EncounterManager.Current?.EncounterId || AppState.ActiveEncounter?.StartTime != EncounterManager.Current?.StartTime)
                     {
                         if (EncounterManager.Current.HasStatsBeenRecorded())
                         {
@@ -59,7 +59,7 @@ namespace BPSR_ZDPS.Meters
                 }
                 else
                 {
-                    if (AppState.ActiveEncounter?.EncounterId != EncounterManager.Current?.EncounterId || AppState.ActiveEncounter?.BattleId != EncounterManager.Current?.BattleId)
+                    if (AppState.ActiveEncounter?.EncounterId != EncounterManager.Current?.EncounterId || AppState.ActiveEncounter?.BattleId != EncounterManager.Current?.BattleId || AppState.ActiveEncounter?.StartTime != EncounterManager.Current?.StartTime)
                     {
                         AppState.ActiveEncounter = EncounterManager.Current;
                     }
@@ -70,25 +70,25 @@ namespace BPSR_ZDPS.Meters
                     activeEncounter = AppState.ActiveEncounter;
                 }
 
-                var playerList = activeEncounter.Entities.AsValueEnumerable().Where(x => x.Value.EntityType == Zproto.EEntityType.EntMonster).OrderByDescending(x => x.Value.TotalTakenDamage).ToArray();
+                var entityList = activeEncounter.Entities.AsValueEnumerable().Where(x => x.Value.EntityType == Zproto.EEntityType.EntMonster && (!Settings.Instance.ShowPlayerSummonsInMeters ? x.Value.SummonerEntityType != Zproto.EEntityType.EntChar : true)).OrderByDescending(x => x.Value.TotalTakenDamage).ToArray();
 
                 ulong topTotalValue = 0;
 
-                if (playerList.Count() > 0)
+                if (entityList.Count() > 0)
                 {
                     if (Settings.Instance.NormalizeMeterContributions)
                     {
-                        topTotalValue = playerList.First().Value.TotalTakenDamage;
+                        topTotalValue = entityList.First().Value.TotalTakenDamage;
                     }
                 }
 
                 ImGuiListClipper clipper = new();
-                clipper.Begin(playerList.Count());
+                clipper.Begin(entityList.Count());
                 while (clipper.Step())
                 {
                     for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
                     {
-                        var player = playerList[i];
+                        var player = entityList[i];
 
                         var entity = player.Value;
 
@@ -158,7 +158,7 @@ namespace BPSR_ZDPS.Meters
                             }
                         }
 
-                        if (!Settings.Instance.MeterSettingsNpcTakenUseHpMeter || !hasHpData)
+                        if (!Settings.Instance.MeterSettingsNpcTakenUseHpMeter)
                         {
                             ImGui.ProgressBar((float)contributionProgressBar / 100.0f, new Vector2(-1, 0), $"##TakenEntryContribution_{i}");
                         }
@@ -169,7 +169,7 @@ namespace BPSR_ZDPS.Meters
                         if (SelectableWithHint($"{name} [{entity.UID.ToString()}]##TakenEntry_{i}", format.ToString()))
                         {
                             mainWindow.entityInspector = new EntityInspector();
-                            mainWindow.entityInspector.LoadEntity(entity, activeEncounter.StartTime);
+                            mainWindow.entityInspector.LoadEntity(entity, activeEncounter.StartTime, activeEncounter.ExData.FirstDamageTimeStamp);
                             mainWindow.entityInspector.Open();
                         }
 

@@ -488,7 +488,8 @@
     "2201":
     {
         "Name": "Bullseye",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_atk"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_atk",
+        "SkillLevelGroup": 2201
     },
     "2240":
     {
@@ -519,7 +520,8 @@
     "2294":
     {
         "Name": "Quadraflare (Second Arrow)",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg03"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg03",
+        "SkillLevelGroup": 2220
     },
     "2295":
     {
@@ -884,7 +886,8 @@
     "55405":
     {
         "Name": "Aegis Ward",
-        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx06"
+        "Icon": "ui/atlas/skill_weapon_jd/weapon_jd-01_kx06",
+        "SkillLevelGroup": 2415
     },
     "2416":
     {
@@ -970,6 +973,12 @@
         "Desc": "",
         "Icon": ""
     },
+    "3400":
+    {
+        "Name": "Edge Blade - Basic",
+        "Desc": "",
+        "Icon": ""
+    },
     "3501":
     {
         "Name": "Spreading Calamity Wave",
@@ -1009,6 +1018,12 @@
     "3701":
     {
         "Name": "Throw Thunder Arrows",
+        "Desc": "",
+        "Icon": ""
+    },
+    "3800":
+    {
+        "Name": "Shatterstone Shock",
         "Desc": "",
         "Icon": ""
     },
@@ -1211,7 +1226,8 @@
     "20301":
     {
         "Name": "Life Bloom",
-        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh_skill_passive"
+        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh_skill_passive",
+        "SkillLevelGroup": 1518
     },
     "21402":
     {
@@ -1221,12 +1237,14 @@
     "21404":
     {
         "Name": "Nourish",
-        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx04"
+        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx04",
+        "SkillLevelGroup": 1522
     },
     "21406":
     {
         "Name": "Grove Wish",
-        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx02"
+        "Icon": "ui/atlas/skill_weapon_fh/weapon_fh-01_kx02",
+        "SkillLevelGroup": 1521
     },
     "21414":
     {
@@ -1357,12 +1375,14 @@
     "55231":
     {
         "Name": "Blast Shot (Buff Explosion)",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_kx08"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_kx08",
+        "SkillLevelGroup": 2238
     },
     "55235":
     {
         "Name": "Photon Reforge - Quadraflare (AOE)",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg03"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg03",
+        "SkillLevelGroup": 2220
     },
     "55236":
     {
@@ -1419,7 +1439,15 @@
     },
     "55355":
     {
-        "Name": "Healing of Stillness"
+        "Name": "Healing of Stillness - Stage 1/2"
+    },
+    "55356":
+    {
+        "Name": "Healing of Stillness - Stage 3"
+    },
+    "55357":
+    {
+        "Name": "Healing of Stillness - Stage 4"
     },
     "55432":
     {
@@ -1434,6 +1462,10 @@
     "100105":
     {
         "Name": "Goblin Cudgel - Basic"
+    },
+    "100110":
+    {
+        "Name": "Goblin Cudgel - Smash"
     },
     "100301":
     {
@@ -1450,6 +1482,10 @@
     "100309":
     {
         "Name": "Goblin Slash - Heroic"
+    },
+    "100324":
+    {
+        "Name": "Goblin Cudgel - Charge"
     },
     "100412":
     {
@@ -1699,7 +1735,7 @@
     },
     "111055":
     {
-        "Name": "315 Degree AOE"
+        "Name": "315° AOE"
     },
     "111058":
     {
@@ -2074,22 +2110,26 @@
     "220101":
     {
         "Name": "Bullseye",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_atk"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_atk",
+        "SkillLevelGroup": 2201
     },
     "220102":
     {
         "Name": "Torrent Volley",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_kx01"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_kx01",
+        "SkillLevelGroup": 2230
     },
     "220103":
     {
         "Name": "Bullseye - Final Blow",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_atk"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_atk",
+        "SkillLevelGroup": 2201
     },
     "220104":
     {
         "Name": "Storm Arrow",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg01"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg01",
+        "SkillLevelGroup": 2220
     },
     "220105":
     {
@@ -2098,7 +2138,8 @@
     "220106":
     {
         "Name": "Double Arrow",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg02"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg02",
+        "SkillLevelGroup": 2220
     },
     "220107":
     {
@@ -2111,17 +2152,20 @@
     "220109":
     {
         "Name": "Deter Shot",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_kx06"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_kx06",
+        "SkillLevelGroup": 2235
     },
     "220110":
     {
         "Name": "Blast Shot",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_kx08"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_kx08",
+        "SkillLevelGroup": 2238
     },
     "220111":
     {
         "Name": "Photon Refroge - Quadraflare",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg03"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg03",
+        "SkillLevelGroup": 2220
     },
     "220112":
     {
@@ -2134,7 +2178,8 @@
     "220203":
     {
         "Name": "Quadraflare (First Arrow)",
-        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg03"
+        "Icon": "ui/atlas/skill_weapon_gj/weapon_gj-01_tg03",
+        "SkillLevelGroup": 2220
     },
     "220301":
     {
@@ -2143,11 +2188,13 @@
     },
     "221101":
     {
-        "Name": "Bullseye - Lethal Skill Counter"
+        "Name": "Bullseye - Lethal Skill Counter",
+        "SkillLevelGroup": 2201
     },
     "230501":
     {
-        "Name": "Passive Effect Encore Damage"
+        "Name": "Passive Effect Encore Damage",
+        "SkillLevelGroup": 2315
     },
     "230801":
     {
@@ -2380,6 +2427,10 @@
     {
         "Name": "Void Stomp (Basic)"
     },
+    "420105":
+    {
+        "Name": "Eagle - Tornado"
+    },
     "420126":
     {
         "Name": "Void Punch Combo - Hands"
@@ -2409,6 +2460,10 @@
     "420136":
     {
         "Name": "Void Line Cleave"
+    },
+    "420160":
+    {
+        "Name": "Void Ring AOE"
     },
     "420163":
     {
@@ -2441,6 +2496,10 @@
     "700006":
     {
         "Name": "Void Meteor 2"
+    },
+    "700008":
+    {
+        "Name": "Dreamflood Nappo Explosion"
     },
     "700013":
     {
@@ -2506,9 +2565,64 @@
     {
         "Name": "Flame Aftermath"
     },
+    "823213":
+    {
+        "Name": "Touch of Darkness"
+    },
     "823225":
     {
         "Name": "Watcher Attack"
+    },
+    "827136":
+    {
+        "Name": "Sunfire Link AOE"
+    },
+    "827137":
+    {
+        "Name": "Moonstrike Link AOE"
+    },
+    "827184":
+    {
+        "Name": "Vote Outsider Damage"
+    },
+    "827209":
+    {
+        "Name": "Electrical Shock"
+    },
+    "827234":
+    {
+        "Name": "Path of Advance - Earth Pulse"
+    },
+    "827238":
+    {
+        "Name": "Illusory Bloom Small Explosion"
+    },
+    "827239":
+    {
+        "Name": "Illusory Bloom Large Explosion"
+    },
+    "827268":
+    {
+        "Name": "Device Locked (Stack)"
+    },
+    "828108":
+    {
+        "Name": "Erosion Bloom Wound",
+        "Desc": "Lose HP every second"
+    },
+    "828123":
+    {
+        "Name": "Erosion Bloom Brand",
+        "Desc": "Lose HP every second"
+    },
+    "828142":
+    {
+        "Name": "Lotus Dance - Meteor Rain",
+        "Desc": ""
+    },
+    "833018":
+    {
+        "Name": "Nappo Bomb Self Destruct"
     },
     "840012":
     {
@@ -2624,11 +2738,15 @@
     },
     "883102":
     {
-        "Name": "Sand Break"
+        "Name": "Sand Breath"
+    },
+    "883112":
+    {
+        "Name": "Stun Beam"
     },
     "883114":
     {
-        "Name": "Mutant Yeti - Eclipse Zone"
+        "Name": "Eclipse Zone"
     },
     "883205":
     {
@@ -2661,6 +2779,18 @@
     "920211":
     {
         "Name": "Caprahorn - Headbutt (Master)"
+    },
+    "920212":
+    {
+        "Name": "Nether Caprahorn - Nether Fire"
+    },
+    "920213":
+    {
+        "Name": "Light-Prayer Caprahorn - Light Spirit"
+    },
+    "920215":
+    {
+        "Name": "Light-Prayer Caprahorn - Stun Beam"
     },
     "965430":
     {
@@ -2708,6 +2838,46 @@
     "995270":
     {
         "Name": "Thunder Suppress"
+    },
+    "997403":
+    {
+        "Name": "Brutality: Crit Storm",
+        "Desc": "Deals AOE DMG equal to 200% ATK at target location.\nThis AOE DMG will always Crit.\nFor each 'Brutality' Sigil owned, increase this final DMG by 50%"
+    },
+    "997404":
+    {
+        "Name": "Brutality: Crit Storm AoE",
+        "Desc": "Deals AOE DMG equal to 200% ATK at target location (CD: 1s).\nThis AOE DMG will always Crit.\nFor each 'Brutality' Sigil owned, increase this final DMG by 50%"
+    },
+    "997419":
+    {
+        "Name": "Brutality: Lucky Crit",
+        "Desc": "When landing a Crit hit, deals additional AOE DMG equal to 200% ATK at target location (CD: 1s).\nThis AOE DMG will always be a Lucky Strike"
+    },
+    "997441":
+    {
+        "Name": "Torrent of Fate",
+        "Desc": "Deals AOE DMG equal to 200% ATK at target location.\nFor each 'Luck' Sigil owned, increase this final DMG by 50%"
+    },
+    "997532":
+    {
+        "Name": "Synergy Healing Wave - Healing Aura",
+        "Desc": "After an Ultimate Skill is cast, a Healing Aura that lasts 10s is created.\nEvery second, it will heal allies within 15m by 100% of ATK (CD: 30s)"
+    },
+    "997820":
+    {
+        "Name": "Slumberdream Role Effect",
+        "Desc": "Passive effect while in Slumberdream Valley based on Role"
+    },
+    "998221":
+    {
+        "Name": "Bloodwrath: Blood Surge",
+        "Desc": "Landing a Lucky Strike triggers Fireball Explosion, dealing DMG equal to 20% of your lost HP"
+    },
+    "998172":
+    {
+        "Name": "Chain Lightning",
+        "Desc": "Landing a Lucky Strike triggers Lightning Chain, dealing DMG equal to 1% Max HP (CD: 1s)"
     },
     "1000106":
     {
@@ -2813,11 +2983,19 @@
     },
     "1004804":
     {
-        "Name": "[S2] Rift-Hidden Yeti - Right Punch"
+        "Name": "Yeti - Right Punch"
+    },
+    "1004805":
+    {
+        "Name": "Yeti - Left Punch"
+    },
+    "1004807":
+    {
+        "Name": "Yeti - Triple Cone Cleave"
     },
     "1004808":
     {
-        "Name": "Mutant Yeti - Eclipse Zone"
+        "Name": "Yeti - Eclipse Zone"
     },
     "1004810":
     {
@@ -3191,6 +3369,10 @@
     {
         "Name": "Guard - Cleave Attack"
     },
+    "1010801":
+    {
+        "Name": "Block and Counterattack"
+    },
     "1010804":
     {
         "Name": "Front Slash"
@@ -3206,6 +3388,25 @@
             8
         ]
     },
+    "1011214":
+    {
+        "Name": "Stunt! Cabbage Blitz",
+        "Desc": "Ruthless Cabbage",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_065",
+        "SkillLevelGroup": 3965,
+        "SlotPositionId": [
+            7,
+            8
+        ]
+    },
+    "1011222":
+    {
+        "Name": "Spearblade Combo"
+    },
+    "1011224":
+    {
+        "Name": "Lightning Explosion AOE"
+    },
     "1011301":
     {
         "Name": "Whirlwind Slash"
@@ -3213,6 +3414,29 @@
     "1011304":
     {
         "Name": "Cabbage Swordsman Swing"
+    },
+    "1011307":
+    {
+        "Name": "Piercing Slash"
+    },
+    "1011309":
+    {
+        "Name": "Piercing Stab"
+    },
+    "1011312":
+    {
+        "Name": "Stunt! Cabbage Boomerang",
+        "Desc": "Gloomy Cabbage",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_064",
+        "SkillLevelGroup": 3964,
+        "SlotPositionId": [
+            7,
+            8
+        ]
+    },
+    "1011403":
+    {
+        "Name": "Breakthrough Charge"
     },
     "1011601":
     {
@@ -3222,14 +3446,33 @@
     {
         "Name": "Lightning Strike"
     },
+    "1011604":
+    {
+        "Name": "Cabbage Boss - Basic Attack"
+    },
     "1011605":
     {
         "Name": "Lightning Kit (Light Pillar Buff)",
         "Desc": "Periodically strikes a random nearby enemy with lightning."
     },
+    "1011606":
+    {
+        "Name": "Cabbage Boss - Hammer Smash (Shockwave)"
+    },
     "1011805":
     {
         "Name": "Lethal Skill: Hammer Spin"
+    },
+    "1011806":
+    {
+        "Name": "Arcane! Cabbage Hammer",
+        "Desc": "Cabbage Kingpin",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_066",
+        "SkillLevelGroup": 3955,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1011810":
     {
@@ -3250,6 +3493,10 @@
     {
         "Name": "Lance Charged Thrust"
     },
+    "1090001":
+    {
+        "Name": "Nappo Dream Bomb"
+    },
     "1100101":
     {
         "Name": "Void Blast"
@@ -3261,6 +3508,25 @@
     "1100106":
     {
         "Name": "Flame Charge"
+    },
+    "1100501":
+    {
+        "Name": "Bite"
+    },
+    "1100504":
+    {
+        "Name": "Stunt! Frost Breath",
+        "Desc": "Bluespine Lizard",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_056",
+        "SkillLevelGroup": 3958,
+        "SlotPositionId": [
+            7,
+            8
+        ]
+    },
+    "1100530":
+    {
+        "Name": "Leap and Breath"
     },
     "1100599":
     {
@@ -3274,9 +3540,31 @@
     {
         "Name": "Petrifying Breath"
     },
+    "1100740":
+    {
+        "Name": "Arcane! Fatal Spiral",
+        "Desc": "Basilisk",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_057",
+        "SkillLevelGroup": 3957,
+        "SlotPositionId": [
+            7,
+            8
+        ]
+    },
     "1100799":
     {
         "Name": "Petrification Spike"
+    },
+    "1101204":
+    {
+        "Name": "Stunt! Carpet Bombing",
+        "Desc": "Goblin Trickster",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_061",
+        "SkillLevelGroup": 3961,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1101304":
     {
@@ -3304,6 +3592,29 @@
     "1102003":
     {
         "Name": "Nether Caprahorn - Charge Attack"
+    },
+    "1102113":
+    {
+        "Name": "Netherworld Caprahorn - Basic Attack"
+    },
+    "1102114":
+    {
+        "Name": "Glimmer Caprahorn - Charge"
+    },
+    "1102121":
+    {
+        "Name": "Flamehorn - Horn Swipe"
+    },
+    "1102205":
+    {
+        "Name": "Stunt! Twin Fangs",
+        "Desc": "Emerald Caprahorn",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_069",
+        "SkillLevelGroup": 3966,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1102301":
     {
@@ -3455,6 +3766,17 @@
     {
         "Name": "Foxen - Scratch Basic Attack"
     },
+    "1700718":
+    {
+        "Name": "Stunt! Kinetic Strike",
+        "Desc": "Blackfire Foxen",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_067",
+        "SkillLevelGroup": 3963,
+        "SlotPositionId": [
+            7,
+            8
+        ]
+    },
     "1700750":
     {
         "Name": "Crimson Foxen - Group Explosion"
@@ -3478,6 +3800,17 @@
     "1700827":
     {
         "Name": "Wild Wolf - Basic Attack"
+    },
+    "1700829":
+    {
+        "Name": "Arcane! Phantom Ambush",
+        "Desc": "Crimson Foxen",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_068",
+        "SkillLevelGroup": 3954,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "1700852":
     {
@@ -3908,7 +4241,14 @@
     },
     "2110099":
     {
-        "Name": "Toxic Hive (Persistent)"
+        "Name": "Arcane! Poison Explosion (Persistent)",
+        "Desc": "Venobzzar Incubator",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_046",
+        "SkillLevelGroup": 3942,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "2110111":
     {
@@ -4022,7 +4362,7 @@
     },
     "2202262":
     {
-        "Name": "Recovery Aura Health Buff"
+        "Name": "Wings of Revival"
     },
     "2202271":
     {
@@ -4173,9 +4513,85 @@
         "Name": "Sonic Surge",
         "Desc": "From Spiral Flame talent, restores HP equal to 20% ATK for allies every 0.5s for 5s"
     },
+    "2300070":
+    {
+        "Name": "Life Condense (Module)",
+        "Desc": "When your HP is above a threshold, every additional threshold increases your Healing by a percentage"
+    },
+    "2300080":
+    {
+        "Name": "Life Steal (Module)",
+        "Desc": "When your Class Skill deals DMG, you restore HP based on that DMG up to a percentage of your Max HP"
+    },
+    "2300620":
+    {
+        "Name": "DMG Stack (Module)",
+        "Desc": "When dealing DMG, you have a chance to increase your DMG dealt to that target for 8s, stacking up to 4 times"
+    },
+    "2300621":
+    {
+        "Name": "DMG Stack",
+        "Desc": "Your DMG dealt to the target is increased for 8s, stacking up to 4 times"
+    },
+    "2300820":
+    {
+        "Name": "Final Protection (Module)",
+        "Desc": "You gain Resistance. If your HP is below a threshold, you gain additional Resistance based on missing HP from that threshold. Stacking up to 3 times"
+    },
+    "2302020":
+    {
+        "Name": "Agile (Module)",
+        "Desc": "After entering combat, Speed increased and ATK increased, removed upon taking damage.\nIf no damage is taken within 5s, regain the buff"
+    },
+    "2302021":
+    {
+        "Name": "Agile",
+        "Desc": "After entering combat, Speed increased and ATK increased, removed upon taking damage.\nIf no damage is taken within 5s, regain the buff"
+    },
+    "2302120":
+    {
+        "Name": "Team Luck and Crit (Module)",
+        "Desc": "Entire team deals more Crit DMG and more Lucky DMG.\nThis effect is doubled on yourself"
+    },
+    "2302121":
+    {
+        "Name": "Team Luck and Crit",
+        "Desc": "Entire team deals more Crit DMG and more Lucky DMG.\nThis effect is doubled on yourself"
+    },
+    "2302320":
+    {
+        "Name": "First Aid (Module)",
+        "Desc": "When HP drops below a limit, receiving damage grants a healing aura that heals you and up to 10 nearby allies per second for 5s (CD: 30s)"
+    },
+    "2302321":
+    {
+        "Name": "First Aid",
+        "Desc": "When HP drops below a limit, receiving damage grants a healing aura that heals you and up to 10 nearby allies per second for 5s (CD: 30s)"
+    },
+    "2302420":
+    {
+        "Name": "Life Wave (Module)",
+        "Desc": "When HP changes, the highest attribute among Crit, Mastery, Haste, Versatility, or Luck increased for 5s"
+    },
+    "2302421":
+    {
+        "Name": "Life Wave",
+        "Desc": "Highest attribute among Crit, Mastery, Haste, Versatility, or Luck increased"
+    },
     "2406140":
     {
         "Name": "Causes AoE when gaining a shield (Set)"
+    },
+    "2900340":
+    {
+        "Name": "Arcane! Time Decree",
+        "Desc": "Tina",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_016",
+        "SkillLevelGroup": 3921,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "2900441":
     {
@@ -4199,6 +4615,28 @@
             8
         ]
     },
+    "2900640":
+    {
+        "Name": "Arcane! Heart of Flame",
+        "Desc": "Tatta",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_042",
+        "SkillLevelGroup": 3911,
+        "SlotPositionId": [
+            7,
+            8
+        ]
+    },
+    "2900740":
+    {
+        "Name": "Arcane! Allscape Sublimation",
+        "Desc": "Boyce",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_055",
+        "SkillLevelGroup": 3950,
+        "SlotPositionId": [
+            7,
+            8
+        ]
+    },
     "2900840":
     {
         "Name": "Arcane! Divine Reliance (Active)",
@@ -4210,11 +4648,16 @@
             8
         ]
     },
-    "3002215":
+    "2900940":
     {
-        "Name": "Phantom Execution",
-        "Desc": "Season 2 Skill",
-        "Icon": "ui/atlas/skill/season/s2talent02_01sel"
+        "Name": "Arcane! Guardian's Boundary",
+        "Desc": "Fafala",
+        "Icon": "ui/textures/skill_aoyi/skill_aoyi_skill_icon_054",
+        "SkillLevelGroup": 3951,
+        "SlotPositionId": [
+            7,
+            8
+        ]
     },
     "3001031":
     {
@@ -4223,6 +4666,18 @@
     "3001170":
     {
         "Name": "Void Wave Health Recovery"
+    },
+    "3002215":
+    {
+        "Name": "Phantom Execution",
+        "Desc": "Season 2 Skill",
+        "Icon": "ui/atlas/skill/season/s2talent02_01sel"
+    },
+    "3002671":
+    {
+        "Name": "Mirage Dream - Immortal Stance (Life Steal)",
+        "Desc": "Season 2 Skill",
+        "Icon": "ui/atlas/skill/season/s2talent04_01sel"
     },
     "3003213":
     {
@@ -4272,6 +4727,10 @@
     {
         "Name": "Dark Mist Legion Shield Countercrush (Heroic)"
     },
+    "3057111":
+    {
+        "Name": "(Factor) Beat Performer X11"
+    },
     "3059050":
     {
         "Name": "(Factor) Stasis X5"
@@ -4287,6 +4746,10 @@
     "3059080":
     {
         "Name": "(Factor) Stasis X8"
+    },
+    "3059101":
+    {
+        "Name": "(Factor) Stormblade Stasis X1 (Buff)"
     },
     "3059180":
     {
@@ -4451,9 +4914,25 @@
     {
         "Name": "Corrosive Poison Bomb"
     },
+    "3330101":
+    {
+        "Name": "Slash"
+    },
+    "3330102":
+    {
+        "Name": "Slash 2"
+    },
     "3330103":
     {
         "Name": "Summon Cross"
+    },
+    "3330104":
+    {
+        "Name": "Teleport Combo Downward Slash"
+    },
+    "3330105":
+    {
+        "Name": "Stomp (Tankbuster)"
     },
     "3330106":
     {
@@ -4463,13 +4942,18 @@
     {
         "Name": "Anti-gravity Waves"
     },
+    "3330109":
+    {
+        "Name": "Apply Pulse Fountain Debuff"
+    },
     "3330110":
     {
-        "Name": "Desolate Star + Sky-Shattering Slash"
+        "Name": "Malice Combo",
+        "Desc": "Desolate Star + Sky-Shattering Slash"
     },
     "3330112":
     {
-        "Name": "Jump Strike - AOE"
+        "Name": "Jump Strike (AOE)"
     },
     "3330177":
     {
@@ -4479,13 +4963,24 @@
     {
         "Name": "Purification Pulse"
     },
+    "3330183":
+    {
+        "Name": "Floating Sword Cleave 1"
+    },
+    "3340102":
+    {
+        "Name": "Piercing Arrow",
+        "Desc": "Plague Nappo - Bow Shot"
+    },
     "3340106":
     {
-        "Name": "Sweeping Spear Slam"
+        "Name": "Sweeping Spear Slam",
+        "Desc": "Plague Nappo"
     },
     "3340107":
     {
-        "Name": "Guitar Barrage"
+        "Name": "Guitar Barrage",
+        "Desc": "Plague Nappo"
     },
     "3340110":
     {
@@ -4497,11 +4992,13 @@
     },
     "3340130":
     {
-        "Name": "Hide and Seek"
+        "Name": "Hide and Seek",
+        "Desc": "Plague Nappo"
     },
     "3340131":
     {
-        "Name": "Guess Where I Am!"
+        "Name": "Guess Where I Am!",
+        "Desc": "Plague Nappo"
     },
     "3340152":
     {
@@ -4529,7 +5026,8 @@
     },
     "3340199":
     {
-        "Name": "Blade Rift"
+        "Name": "Blade Rift",
+        "Desc": "Plague Nappo"
     },
     "3350105":
     {
@@ -4557,19 +5055,92 @@
     },
     "3350133":
     {
-        "Name": "Forgotten Floor (45 Degrees)"
+        "Name": "Forgotten Floor (45°)"
     },
     "3350134":
     {
-        "Name": "Forgotten Floor (90 Degrees)"
+        "Name": "Forgotten Floor (90°)"
     },
     "3350135":
     {
         "Name": "Forgotten Floor (Half Room)"
     },
+    "3350141":
+    {
+        "Name": "Nightmare Illusion - Black Sphere",
+        "Desc": "From Nightmare Illusion map event"
+    },
+    "3350142":
+    {
+        "Name": "Nightmare Illusion - Forgotten Floor (45°)",
+        "Desc": "From Nightmare Illusion map event"
+    },
     "3350154":
     {
         "Name": "Summon Inner Demon E1"
+    },
+    "3350155":
+    {
+        "Name": "Nightmare Illusion - Summon 45° Clockwise"
+    },
+    "3350156":
+    {
+        "Name": "Nightmare Illusion - Event Complete"
+    },
+    "3360102":
+    {
+        "Name": "Illusory 12-Burst Strike",
+        "Desc": "Slumbering Scholar"
+    },
+    "3360105":
+    {
+        "Name": "Illusory Staged Ring",
+        "Desc": "Slumbering Scholar"
+    },
+    "3360106":
+    {
+        "Name": "Illusory Forward Explosion F1",
+        "Desc": "Slumbering Scholar"
+    },
+    "3360110":
+    {
+        "Name": "Illusory Plague",
+        "Desc": "Slumbering Scholar"
+    },
+    "3360111":
+    {
+        "Name": "Illusory Flare",
+        "Desc": "Slumbering Scholar"
+    },
+    "3360151":
+    {
+        "Name": "Illusory Orb Beam",
+        "Desc": "Slumbering Scholar"
+    },
+    "3360152":
+    {
+        "Name": "Illusory Eye Laser",
+        "Desc": "Slumbering Scholar"
+    },
+    "3360156":
+    {
+        "Name": "Illusory Super Meteor",
+        "Desc": "Slumbering Scholar"
+    },
+    "3360157":
+    {
+        "Name": "Illusory Dual Lasers - Inner Circle",
+        "Desc": "Slumbering Scholar"
+    },
+    "3360158":
+    {
+        "Name": "Illusory Dual Lasers - Center Circle",
+        "Desc": "Slumbering Scholar"
+    },
+    "3360160":
+    {
+        "Name": "Illusory Tracking Explosion",
+        "Desc": "Slumbering Scholar"
     },
     "3913001":
     {
@@ -4780,11 +5351,15 @@
     },
     "6910210":
     {
-        "Name": "Flame Breath (Continous)"
+        "Name": "Flame Breath (Continuous)"
     },
     "8035624":
     {
         "Name": "Burrowing Rock Serpent"
+    },
+    "8110903":
+    {
+        "Name": "Dreamflood Spinning Ray"
     },
     "10010301":
     {
@@ -4833,6 +5408,226 @@
     "10100102":
     {
         "Name": "Boar Charge V2"
+    },
+    "10290102":
+    {
+        "Name": "Basic Attack Combo",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290103":
+    {
+        "Name": "Double Fist Slam (Cone)",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290105":
+    {
+        "Name": "Uppercut (Tankbuster)",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290106":
+    {
+        "Name": "Withered Bloomshard - Enrage",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290111":
+    {
+        "Name": "Earthshatter Fist (Line Stack)",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290112":
+    {
+        "Name": "Rock Ring (AOE)",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290113":
+    {
+        "Name": "Shatterstone Storm",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290115":
+    {
+        "Name": "Ground Slam AOE",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290123":
+    {
+        "Name": "Rock Storm Repulsion",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290124":
+    {
+        "Name": "Earthshatter Fist - Combo",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290151":
+    {
+        "Name": "Rockfall",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290152":
+    {
+        "Name": "Earth Explosion",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290153":
+    {
+        "Name": "Earth Mantle",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290154":
+    {
+        "Name": "Rockfall (Team Stack)",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290156":
+    {
+        "Name": "Terra",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290157":
+    {
+        "Name": "Earthshatter Fist (Rockfall)",
+        "Desc": "Withered Bloomshard"
+    },
+    "10290158":
+    {
+        "Name": "Earthshatter Fist (Crag Ring)",
+        "Desc": "Withered Bloomshard"
+    },
+    "10300101":
+    {
+        "Name": "Erosion Bloom - Basic Attack",
+        "Desc": "Erosion Bloom Afterimage"
+    },
+    "10300102":
+    {
+        "Name": "Erosion Bloom - Ground Smash AOE",
+        "Desc": "Erosion Bloom Afterimage"
+    },
+    "10300103":
+    {
+        "Name": "Erosion Bloom - Stomp (Tankbuster)",
+        "Desc": "Erosion Bloom Afterimage"
+    },
+    "10300105":
+    {
+        "Name": "Erosion Bloom - Cinderfall Trail",
+        "Desc": "Erosion Bloom Afterimage"
+    },
+    "10300106":
+    {
+        "Name": "Erosion Bloom - Inferno Ring",
+        "Desc": "Erosion Bloom Afterimage"
+    },
+    "10300107":
+    {
+        "Name": "Erosion Bloom - Bewilderment",
+        "Desc": "Erosion Bloom Afterimage"
+    },
+    "10300108":
+    {
+        "Name": "Avatar of the End",
+        "Desc": "Erosion Bloom Afterimage"
+    },
+    "10300113":
+    {
+        "Name": "Erosion Bloom - Great Inferno Ring",
+        "Desc": "Erosion Bloom Afterimage"
+    },
+    "10300151":
+    {
+        "Name": "Erosion Bloom - Cinderfall Trail",
+        "Desc": "Erosion Bloom Afterimage"
+    },
+    "10300201":
+    {
+        "Name": "Basic Attack 1 - Left Sweep (Phase 3)",
+        "Desc": "Erosion Bloom Afterimage"
+    },
+    "10300202":
+    {
+        "Name": "Basic Attack 2 - Right Sweep (Phase 3)",
+        "Desc": "Erosion Bloom Afterimage"
+    },
+    "10300203":
+    {
+        "Name": "Lotus Dance Tankbuster (Phase 3)",
+        "Desc": "Erosion Bloom Afterimage"
+    },
+    "10300204":
+    {
+        "Name": "Arc Slash (Phase 3)",
+        "Desc": "Erosion Bloom Afterimage"
+    },
+    "10300205":
+    {
+        "Name": "Scarlet Swordshade Marker (Phase 3)",
+        "Desc": "Erosion Bloom Afterimage"
+    },
+    "10300206":
+    {
+        "Name": "Sword Stab Fire Explosion (Phase 3)",
+        "Desc": "Erosion Bloom Afterimage"
+    },
+    "10300207":
+    {
+        "Name": "Lotus Dance Line Stack (Phase 3)",
+        "Desc": "Erosion Bloom Afterimage"
+    },
+    "10300250":
+    {
+        "Name": "Lotus Dance Damage Spread (Phase 3)",
+        "Desc": "Erosion Bloom Afterimage"
+    },
+    "10300301":
+    {
+        "Name": "Scarlet Abyss - Basic Attack",
+        "Desc": "Scarlet Abyss"
+    },
+    "10300302":
+    {
+        "Name": "Scarlet Abyss - Cleave",
+        "Desc": "Scarlet Abyss"
+    },
+    "10300303":
+    {
+        "Name": "Lethal Skill: Scarlet Abyss",
+        "Desc": "Scarlet Abyss"
+    },
+    "10300305":
+    {
+        "Name": "Scarlet Abyss - Abyssal Seal",
+        "Desc": "Scarlet Abyss"
+    },
+    "10300306":
+    {
+        "Name": "Erosion Bloom's Seal",
+        "Desc": "Erosion Bloom Afterimage - Scarlet Swordshade"
+    },
+    "10300350":
+    {
+        "Name": "Slasher Echo Explosion (Phase 1)",
+        "Desc": "Erosion Bloom Afterimage - Slasher Echo"
+    },
+    "10300351":
+    {
+        "Name": "Swordshade Explosion (Phase 1)",
+        "Desc": "Erosion Bloom Afterimage - Scarlet Swordshade"
+    },
+    "10300352":
+    {
+        "Name": "Slasher Echo Explosion (Phase 3)",
+        "Desc": "Erosion Bloom Afterimage - Slasher Echo"
+    },
+    "10300353":
+    {
+        "Name": "Swordshade Explosion (Phase 3)",
+        "Desc": "Erosion Bloom Afterimage - Scarlet Swordshade"
+    },
+    "10300355":
+    {
+        "Name": "Phase 2 Floor Damage",
+        "Desc": "Erosion Bloom Afterimage"
     },
     "11010101":
     {
@@ -4938,13 +5733,18 @@
     {
         "Name": "Kanamia Archer"
     },
+    "998381":
+    {
+        "Name": "Seismic Strike"
+    },
     "998410":
     {
         "Name": "Brambleblood Armor"
     },
-    "998381":
+    "998461":
     {
-        "Name": "Seismic Strike"
+        "Name": "Battle Starfall (Curse)",
+        "Desc": "ATK +25%, HP -1% per second"
     },
     "998960":
     {

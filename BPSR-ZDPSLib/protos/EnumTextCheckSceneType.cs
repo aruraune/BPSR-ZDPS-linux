@@ -24,7 +24,7 @@ namespace Zproto {
     static EnumTextCheckSceneTypeReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "CiBlbnVtX3RleHRfY2hlY2tfc2NlbmVfdHlwZS5wcm90bxIGenByb3RvKqIM",
+            "CiBlbnVtX3RleHRfY2hlY2tfc2NlbmVfdHlwZS5wcm90bxIGenByb3RvKoYN",
             "ChJUZXh0Q2hlY2tTY2VuZVR5cGUSEgoOVGV4dENoZWNrRXJyb3IQABIbChdU",
             "ZXh0Q2hlY2tDcmVhdGVSb2xlTmFtZRBlEhwKGFRleHRDaGVja0NyZWF0ZVVu",
             "aW9uTmFtZRBmEhsKF1RleHRDaGVja1VuaW9uTWFuaWZlc3RvEGcSGQoVVGV4",
@@ -48,19 +48,21 @@ namespace Zproto {
             "VW5pb25SZWNydWl0EIABEisKJlRleHRDaGVja0NoYW5nZVVuaW9uUmVjcnVp",
             "dERlc2NyaXB0aW9uEIEBEiMKHlRleHRDaGVja1VuaW9uQWxidW1VcGxvYWRQ",
             "aG90bxCCARIpCiRUZXh0Q2hlY2tQcm9mZXNzaW9uUHJvamVjdEN1c3RvbU5h",
-            "bWUQgwESIwoeVGV4dENoZWNrQWN0aW9uR3JvdXBDdXN0b21OYW1lEIQBEh4K",
-            "GVRleHRDaGVja0NoYXRXb3JsZENoYW5uZWwQ6QcSHgoZVGV4dENoZWNrQ2hh",
-            "dFVuaW9uQ2hhbm5lbBDqBxIdChhUZXh0Q2hlY2tDaGF0VGVhbUNoYW5uZWwQ",
-            "6wcSIAobVGV4dENoZWNrQ2hhdFByaXZhdGVDaGFubmVsEO0HEh4KGVRleHRD",
-            "aGVja0NoYXRTY2VuZUNoYW5uZWwQ7gcSGgoVVGV4dENoZWNrRnJpZW5kUmVt",
-            "YXJrENEPEhwKF1RleHRDaGVja1RlYW1UYXJnZXRJbmZvENIPEiMKHlRleHRD",
-            "aGVja0ZyaWVuZEdyb3VwTmFtZUNyZWF0ZRDTDxIjCh5UZXh0Q2hlY2tGcmll",
-            "bmRHcm91cE5hbWVDaGFuZ2UQ1A8SIAobVGV4dENoZWNrVGVhbVRhcmdldFF1",
-            "aWNrU2F5ENUPEhoKFVRleHRDaGVja1NlYXJjaEZyaWVuZBChHxIfChpUZXh0",
-            "Q2hlY2tTZWFyY2hVbmlvbk1lbWJlchCiHxIZChRUZXh0Q2hlY2tTZWFyY2hV",
-            "bmlvbhCjHxIlCiBUZXh0Q2hlY2tIb21lbGFuZE91dGVyU3RydWN0dXJlcxDR",
-            "KBIlCiBUZXh0Q2hlY2tIb21lbGFuZElubmVyU3RydWN0dXJlcxDSKGIGcHJv",
-            "dG8z"));
+            "bWUQgwESIwoeVGV4dENoZWNrQWN0aW9uR3JvdXBDdXN0b21OYW1lEIQBEh8K",
+            "GlRleHRDaGVja0hvbWVCbHVlUHJpbnROYW1lEIUBEh4KGVRleHRDaGVja0No",
+            "YXRXb3JsZENoYW5uZWwQ6QcSHgoZVGV4dENoZWNrQ2hhdFVuaW9uQ2hhbm5l",
+            "bBDqBxIdChhUZXh0Q2hlY2tDaGF0VGVhbUNoYW5uZWwQ6wcSIAobVGV4dENo",
+            "ZWNrQ2hhdFByaXZhdGVDaGFubmVsEO0HEh4KGVRleHRDaGVja0NoYXRTY2Vu",
+            "ZUNoYW5uZWwQ7gcSHQoYVGV4dENoZWNrQ2hhdFBsYXlDaGFubmVsEO8HEhoK",
+            "FVRleHRDaGVja0ZyaWVuZFJlbWFyaxDRDxIcChdUZXh0Q2hlY2tUZWFtVGFy",
+            "Z2V0SW5mbxDSDxIjCh5UZXh0Q2hlY2tGcmllbmRHcm91cE5hbWVDcmVhdGUQ",
+            "0w8SIwoeVGV4dENoZWNrRnJpZW5kR3JvdXBOYW1lQ2hhbmdlENQPEiAKG1Rl",
+            "eHRDaGVja1RlYW1UYXJnZXRRdWlja1NheRDVDxIaChVUZXh0Q2hlY2tTZWFy",
+            "Y2hGcmllbmQQoR8SHwoaVGV4dENoZWNrU2VhcmNoVW5pb25NZW1iZXIQoh8S",
+            "GQoUVGV4dENoZWNrU2VhcmNoVW5pb24Qox8SJQogVGV4dENoZWNrSG9tZWxh",
+            "bmRPdXRlclN0cnVjdHVyZXMQ0SgSJQogVGV4dENoZWNrSG9tZWxhbmRJbm5l",
+            "clN0cnVjdHVyZXMQ0igSIgodVGV4dENoZWNrVXBsb2FkQmx1ZVByaW50Q292",
+            "ZXIQ8S5iBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Zproto.TextCheckSceneType), }, null, null));
@@ -102,11 +104,13 @@ namespace Zproto {
     [pbr::OriginalName("TextCheckUnionAlbumUploadPhoto")] TextCheckUnionAlbumUploadPhoto = 130,
     [pbr::OriginalName("TextCheckProfessionProjectCustomName")] TextCheckProfessionProjectCustomName = 131,
     [pbr::OriginalName("TextCheckActionGroupCustomName")] TextCheckActionGroupCustomName = 132,
+    [pbr::OriginalName("TextCheckHomeBluePrintName")] TextCheckHomeBluePrintName = 133,
     [pbr::OriginalName("TextCheckChatWorldChannel")] TextCheckChatWorldChannel = 1001,
     [pbr::OriginalName("TextCheckChatUnionChannel")] TextCheckChatUnionChannel = 1002,
     [pbr::OriginalName("TextCheckChatTeamChannel")] TextCheckChatTeamChannel = 1003,
     [pbr::OriginalName("TextCheckChatPrivateChannel")] TextCheckChatPrivateChannel = 1005,
     [pbr::OriginalName("TextCheckChatSceneChannel")] TextCheckChatSceneChannel = 1006,
+    [pbr::OriginalName("TextCheckChatPlayChannel")] TextCheckChatPlayChannel = 1007,
     [pbr::OriginalName("TextCheckFriendRemark")] TextCheckFriendRemark = 2001,
     [pbr::OriginalName("TextCheckTeamTargetInfo")] TextCheckTeamTargetInfo = 2002,
     [pbr::OriginalName("TextCheckFriendGroupNameCreate")] TextCheckFriendGroupNameCreate = 2003,
@@ -117,6 +121,7 @@ namespace Zproto {
     [pbr::OriginalName("TextCheckSearchUnion")] TextCheckSearchUnion = 4003,
     [pbr::OriginalName("TextCheckHomelandOuterStructures")] TextCheckHomelandOuterStructures = 5201,
     [pbr::OriginalName("TextCheckHomelandInnerStructures")] TextCheckHomelandInnerStructures = 5202,
+    [pbr::OriginalName("TextCheckUploadBluePrintCover")] TextCheckUploadBluePrintCover = 6001,
   }
 
   #endregion

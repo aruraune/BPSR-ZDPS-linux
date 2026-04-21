@@ -5960,7 +5960,7 @@
     "Param": [],
     "TargetPos": [],
     "IsTeamShare": false,
-    "TargetDes": "Activate all star source hubs within [60s]",
+    "TargetDes": "Activate all Star Core Hubs within [60s]",
     "IsShowProgress": false,
     "SpVariable": [],
     "SpVariableLimit": [],
@@ -7901,6 +7901,185 @@
     "SpVariableName": [
       "Crimson Marrow"
     ],
+    "IsShowSpVariableProgress": [],
+    "ShowChange": []
+  },
+  "581201": {
+    "Id": 581201,
+    "TargetType": 10,
+    "Num": 1,
+    "SceneId": 5812,
+    "Param": [],
+    "TargetPos": [
+      [
+        4,
+        7
+      ]
+    ],
+    "IsTeamShare": false,
+    "TargetDes": "Listen to the voice ahead.",
+    "IsShowProgress": false,
+    "SpVariable": [],
+    "SpVariableLimit": [],
+    "SpVariableName": [],
+    "IsShowSpVariableProgress": [],
+    "ShowChange": []
+  },
+  "581202": {
+    "Id": 581202,
+    "TargetType": 10,
+    "Num": 1,
+    "SceneId": 5812,
+    "Param": [],
+    "TargetPos": [
+      [
+        3,
+        10
+      ]
+    ],
+    "IsTeamShare": false,
+    "TargetDes": "Defeat the Ice Dragon.",
+    "IsShowProgress": false,
+    "SpVariable": [],
+    "SpVariableLimit": [],
+    "SpVariableName": [],
+    "IsShowSpVariableProgress": [],
+    "ShowChange": []
+  },
+  "581203": {
+    "Id": 581203,
+    "TargetType": 10,
+    "Num": 1,
+    "SceneId": 5812,
+    "Param": [],
+    "TargetPos": [],
+    "IsTeamShare": false,
+    "TargetDes": "Listen to Horrace's voice.",
+    "IsShowProgress": false,
+    "SpVariable": [],
+    "SpVariableLimit": [],
+    "SpVariableName": [],
+    "IsShowSpVariableProgress": [],
+    "ShowChange": []
+  },
+  "581204": {
+    "Id": 581204,
+    "TargetType": 10,
+    "Num": 1,
+    "SceneId": 5812,
+    "Param": [],
+    "TargetPos": [
+      [
+        3,
+        10
+      ]
+    ],
+    "IsTeamShare": false,
+    "TargetDes": "Defeat the Ice Dragon.",
+    "IsShowProgress": false,
+    "SpVariable": [],
+    "SpVariableLimit": [],
+    "SpVariableName": [],
+    "IsShowSpVariableProgress": [],
+    "ShowChange": []
+  },
+  "581205": {
+    "Id": 581205,
+    "TargetType": 10,
+    "Num": 1,
+    "SceneId": 5812,
+    "Param": [],
+    "TargetPos": [
+      [
+        4,
+        22
+      ]
+    ],
+    "IsTeamShare": false,
+    "TargetDes": "Listen to conviction.",
+    "IsShowProgress": false,
+    "SpVariable": [],
+    "SpVariableLimit": [],
+    "SpVariableName": [],
+    "IsShowSpVariableProgress": [],
+    "ShowChange": []
+  },
+  "581206": {
+    "Id": 581206,
+    "TargetType": 10,
+    "Num": 1,
+    "SceneId": 5812,
+    "Param": [],
+    "TargetPos": [
+      [
+        4,
+        23
+      ]
+    ],
+    "IsTeamShare": false,
+    "TargetDes": "Listen to courage.",
+    "IsShowProgress": false,
+    "SpVariable": [],
+    "SpVariableLimit": [],
+    "SpVariableName": [],
+    "IsShowSpVariableProgress": [],
+    "ShowChange": []
+  },
+  "581207": {
+    "Id": 581207,
+    "TargetType": 10,
+    "Num": 1,
+    "SceneId": 5812,
+    "Param": [],
+    "TargetPos": [
+      [
+        4,
+        24
+      ]
+    ],
+    "IsTeamShare": false,
+    "TargetDes": "Listen to wisdom.",
+    "IsShowProgress": false,
+    "SpVariable": [],
+    "SpVariableLimit": [],
+    "SpVariableName": [],
+    "IsShowSpVariableProgress": [],
+    "ShowChange": []
+  },
+  "581208": {
+    "Id": 581208,
+    "TargetType": 10,
+    "Num": 1,
+    "SceneId": 5812,
+    "Param": [],
+    "TargetPos": [
+      [
+        4,
+        25
+      ]
+    ],
+    "IsTeamShare": false,
+    "TargetDes": "Listen to trust.",
+    "IsShowProgress": false,
+    "SpVariable": [],
+    "SpVariableLimit": [],
+    "SpVariableName": [],
+    "IsShowSpVariableProgress": [],
+    "ShowChange": []
+  },
+  "581209": {
+    "Id": 581209,
+    "TargetType": 10,
+    "Num": 1,
+    "SceneId": 5812,
+    "Param": [],
+    "TargetPos": [],
+    "IsTeamShare": false,
+    "TargetDes": "Defeat the Ice Dragon.",
+    "IsShowProgress": false,
+    "SpVariable": [],
+    "SpVariableLimit": [],
+    "SpVariableName": [],
     "IsShowSpVariableProgress": [],
     "ShowChange": []
   },
@@ -10717,7 +10896,7 @@
       ]
     ],
     "SpVariableName": [
-      "Enter the number of machines in Andra"
+      "The number of machines entering Andra"
     ],
     "IsShowSpVariableProgress": [],
     "ShowChange": []
@@ -12864,11 +13043,13 @@
     "IsShowProgress": false,
     "SpVariable": [
       [
+        "1",
         "endless_time"
       ]
     ],
     "SpVariableLimit": [
       [
+        "1",
         "endless_time_max"
       ]
     ],

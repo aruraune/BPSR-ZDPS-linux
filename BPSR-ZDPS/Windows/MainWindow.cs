@@ -56,6 +56,7 @@ namespace BPSR_ZDPS.Windows
             SettingsWindow.Draw(this);
             EncounterHistoryWindow.Draw(this);
             entityInspector.Draw(this);
+            GearInspector.Draw(this);
             NetDebug.Draw();
             DebugDungeonTracker.Draw(this);
             RaidManagerCooldownsWindow.Draw(this);
@@ -67,6 +68,8 @@ namespace BPSR_ZDPS.Windows
             RaidManagerCountdownWindow.Draw(this);
             RaidManagerThreatWindow.Draw(this);
             ChatWindow.Draw(this);
+            EventTrackerWindow.Draw(this);
+            SkillCastTimelineWindow.Draw(this);
         }
 
         static bool p_open = true;
@@ -131,6 +134,12 @@ namespace BPSR_ZDPS.Windows
             if (AppState.MousePassthrough && windowSettings.TopMost)
             {
                 exWindowFlags |= ImGuiWindowFlags.NoInputs;
+            }
+
+            bool modifiedBackground = windowSettings.BackgroundOpacity != 100;
+            if (modifiedBackground)
+            {
+                exWindowFlags |= ImGuiWindowFlags.NoBackground;
             }
 
             ImGuiWindowFlags window_flags = ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoDocking | exWindowFlags;
@@ -367,6 +376,12 @@ namespace BPSR_ZDPS.Windows
                 ImGui.PopStyleColor();
             }
 
+            if (modifiedBackground)
+            {
+                ImGui.PushStyleColor(ImGuiCol.FrameBg, new Vector4(0, 0, 0, 0));
+                ImGui.PushStyleColor(ImGuiCol.ChildBg, new Vector4(0, 0, 0, windowSettings.BackgroundOpacity * 0.01f));
+            }
+            
             ImGui.BeginChild("MeterChild", new Vector2(0, - ImGui.GetFrameHeightWithSpacing()));
 
             if (SelectedTabIndex > -1)
@@ -375,6 +390,11 @@ namespace BPSR_ZDPS.Windows
             }
 
             ImGui.EndChild();
+
+            if (modifiedBackground)
+            {
+                ImGui.PopStyleColor(2);
+            }
 
             DrawStatusBar();
 
@@ -399,7 +419,36 @@ namespace BPSR_ZDPS.Windows
                     ImGui.TextDisabled($"v{Utils.AppVersion}");
                 }
 
-                if (Settings.Instance.AllowEncounterSavingPausingInOpenWorld && BattleStateMachine.DungeonStateHistory.Count > 0 && BattleStateMachine.DungeonStateHistory.LastOrDefault().Key == EDungeonState.DungeonStateNull)
+                bool showForcehideContainersBtn = Settings.Instance.WindowSettings.EventTracker.ShowForceHideContainersBtnOnMainWindow;
+                bool showPauseEncounterSavingBtn = Settings.Instance.AllowEncounterSavingPausingInOpenWorld && BattleStateMachine.DungeonStateHistory.Count > 0 && BattleStateMachine.DungeonStateHistory.LastOrDefault().Key == EDungeonState.DungeonStateNull;
+                if (showForcehideContainersBtn)
+                {
+                    int btnIdx = 5;
+                    if (showPauseEncounterSavingBtn)
+                    {
+                        btnIdx = 6;
+                    }
+
+                    ImGui.SetCursorPosX(MainMenuBarSize.X - (settingsWidth * btnIdx));
+                    ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
+                    ImGui.PushStyleColor(ImGuiCol.Text, EventTrackerWindow.ForceHideAllContainers ? Colors.Red * new Vector4(1, 1, 1, 0.75f) : Colors.White);
+                    if (ImGui.MenuItem($"{(EventTrackerWindow.ForceHideAllContainers ? FASIcons.EyeSlash : FASIcons.Eye)}##ForceToggleVisibilityBtn"))
+                    {
+                        EventTrackerWindow.ToggleForceHideAllContainers(!EventTrackerWindow.ForceHideAllContainers);
+                    }
+                    ImGui.PopStyleColor();
+                    ImGui.PopFont();
+                    if (EventTrackerWindow.ForceHideAllContainers)
+                    {
+                        ImGui.SetItemTooltip("Disables forcefully hiding Containers.");
+                    }
+                    else
+                    {
+                        ImGui.SetItemTooltip("Forcefully hide all Containers.");
+                    }
+                }
+
+                if (showPauseEncounterSavingBtn)
                 {
                     ImGui.BeginDisabled(AppState.IsBenchmarkMode);
 
@@ -530,6 +579,16 @@ namespace BPSR_ZDPS.Windows
                             RaidManagerThreatWindow.Open();
                         }
 
+                        if (ImGui.MenuItem("Event Tracker"))
+                        {
+                            EventTrackerWindow.Open();
+                        }
+
+                        if (ImGui.MenuItem("Skill Cast Timeline"))
+                        {
+                            SkillCastTimelineWindow.Open();
+                        }
+
                         ImGui.EndMenu();
                     }
 
@@ -585,6 +644,7 @@ namespace BPSR_ZDPS.Windows
                                 AppState.BenchmarkSingleTargetUUID = 0;
                                 AppState.IsBenchmarkMode = true;
                                 CreateNewEncounter();
+                                ImGui.CloseCurrentPopup();
                             }
                             ImGui.EndDisabled();
                             if (AppState.BenchmarkTime < 5)
@@ -697,9 +757,9 @@ namespace BPSR_ZDPS.Windows
             ImGui.SameLine();
             // Duration of current encounter
             string duration = "00:00:00";
-            if (EncounterManager.Current?.GetDuration().TotalSeconds > 0)
+            if (EncounterManager.Current?.GetDuration(true).TotalSeconds > 0)
             {
-                duration = EncounterManager.Current.GetDuration().ToString("hh\\:mm\\:ss");
+                duration = EncounterManager.Current.GetDuration(true).ToString("hh\\:mm\\:ss");
             }
 
             if (AppState.IsBenchmarkMode && !AppState.HasBenchmarkBegun)
@@ -718,8 +778,14 @@ namespace BPSR_ZDPS.Windows
                     subName = $" ({EncounterManager.Current.SceneSubName})";
                 }
 
+                string difficulty = "";
+                if (EncounterManager.Current.ExData.DungeonDifficulty > 0)
+                {
+                    difficulty = $" (Master {EncounterManager.Current.ExData.DungeonDifficulty})";
+                }
+
                 // We don't need to prefix with a space due to actual item spacing handling it for us
-                ImGui.TextUnformatted($"- {EncounterManager.Current.SceneName}{subName}");
+                ImGui.TextUnformatted($"- {EncounterManager.Current.SceneName}{subName}{difficulty}");
             }
 
             if (Settings.Instance.ShowChannelLineNumberInStatus)
@@ -747,6 +813,15 @@ namespace BPSR_ZDPS.Windows
 
         public void CreateNewEncounter()
         {
+            if (AppState.IsBenchmarkMode && AppState.HasBenchmarkBegun)
+            {
+                AppState.HasBenchmarkBegun = false;
+                AppState.IsBenchmarkMode = false;
+                Log.Information($"Manual early ending of Benchmark at {DateTime.Now}");
+                EncounterManager.StartEncounter(false, EncounterStartReason.BenchmarkEnd);
+                return;
+            }
+
             if (AppState.IsEncounterSavingPaused)
             {
                 Log.Information("Tried to create a new manual Encounter but Encounter Saving is currently Paused.");
@@ -760,14 +835,35 @@ namespace BPSR_ZDPS.Windows
                 //Log.Information($"Requesting new manual encounter at {DateTime.Now}");
                 //BattleStateMachine.SetDeferredEncounterEndFinalData(DateTime.Now, new EncounterEndFinalData() { BattleId = EncounterManager.CurrentBattleId, Encounter = EncounterManager.Current, EncounterId = EncounterManager.Current.EncounterId, Reason = EncounterStartReason.Force });
                 //EncounterManager.StopEncounter();
-                Log.Information($"Starting new manual encounter at {DateTime.Now}");
-                EncounterManager.StartEncounter(true, EncounterStartReason.Force);
+                if (AppState.IsBenchmarkMode)
+                {
+                    Log.Information($"Starting new Benchmark encounter at {DateTime.Now}");
+                    EncounterManager.StartEncounter(true, EncounterStartReason.BenchmarkStart);
+                }
+                else
+                {
+                    Log.Information($"Starting new manual encounter at {DateTime.Now}");
+                    EncounterManager.StartEncounter(true, EncounterStartReason.Force);
+                } 
             });
         }
 
         public void ToggleMouseClickthrough()
         {
             AppState.MousePassthrough = !AppState.MousePassthrough;
+        }
+
+        public void ToggleWindowMinimize()
+        {
+            if (Utils.IsWindowMinimized(HelperMethods.MainWindowPlatformHandleRaw))
+            {
+                Utils.RestoreWindow(HelperMethods.MainWindowPlatformHandleRaw);
+                Utils.BringWindowToFront(HelperMethods.MainWindowPlatformHandleRaw);
+            }
+            else
+            {
+                Utils.MinimizeWindow(HelperMethods.MainWindowPlatformHandleRaw);
+            }
         }
 
         public void SetDbWorkComplete()
@@ -779,5 +875,6 @@ namespace BPSR_ZDPS.Windows
     public class MainWindowWindowSettings : WindowSettingsBase
     {
         public float MeterBarScale = 1.0f;
+        public int BackgroundOpacity = 100;
     }
 }

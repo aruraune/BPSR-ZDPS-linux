@@ -28,6 +28,8 @@ namespace BPSR_ZDPS.Windows
         static string EntityNameFilter = "";
         static KeyValuePair<long, EntityCacheLine>[]? EntityFilterMatches = [];
 
+        static int LastSetOpacity = 100;
+
         static ChatWindow()
         {
             if (Settings.Instance.WindowSettings.ChatWindow.ChatTabs == null || Settings.Instance.WindowSettings.ChatWindow.ChatTabs.Count() == 0)
@@ -120,7 +122,7 @@ namespace BPSR_ZDPS.Windows
             ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(17 / 255.0f, 17 / 255.0f, 17 / 255.0f, 0.0f));
             ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
             if (ImGui.Begin($"Chat##ChatWindow", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse |
-                                    ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoScrollbar))
+                                    ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground))
             {
                 if (RunOnceDelayed == 0)
                 {
@@ -139,6 +141,12 @@ namespace BPSR_ZDPS.Windows
                     if (windowSettings.TopMost)
                     {
                         Utils.SetWindowTopmost();
+                    }
+
+                    if (windowSettings.Opacity != LastSetOpacity)
+                    {
+                        Utils.SetWindowOpacity(windowSettings.Opacity * 0.01f);
+                        LastSetOpacity = windowSettings.Opacity;
                     }
                 }
 
@@ -277,7 +285,7 @@ namespace BPSR_ZDPS.Windows
             var windowViewport = ImGui.GetWindowViewport();
             bool openBlockedUsersPopup = false;
 
-            ImGui.SetCursorPosX(ImGui.GetWindowSize().X - (25));
+            ImGui.SetCursorPosX(ImGui.GetWindowSize().X - (ImGui.GetFontSize() + ImGui.GetStyle().FramePadding.X));
             ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
             if (ImGui.Button($"{FASIcons.Gear}##OptionsMenu"))
             {
@@ -293,7 +301,7 @@ namespace BPSR_ZDPS.Windows
                 ImGui.TextUnformatted("Chat Settings");
                 ImGui.Separator();
 
-                /*
+                
                 //ImGui.SetCursorPosX(ImGui.GetCursorPosX() - 200);
                 float backgroundOpacity = chatWindowSettings.BackgroundOpacity;
                 ImGui.AlignTextToFramePadding();
@@ -307,7 +315,7 @@ namespace BPSR_ZDPS.Windows
                     chatWindowSettings.BackgroundOpacity = MathF.Round(backgroundOpacity, 2);
                 }
                 ImGui.PopStyleColor(2);
-                */
+                
                 int opacity = chatWindowSettings.Opacity;
                 ImGui.AlignTextToFramePadding();
                 ImGui.TextUnformatted("Window Opacity:");
@@ -320,7 +328,7 @@ namespace BPSR_ZDPS.Windows
                 if (ImGui.SliderInt("##Opacity", ref opacity, 10, 100, $"{opacity}%%", ImGuiSliderFlags.ClampOnInput))
                 {
                     chatWindowSettings.Opacity = opacity;
-                    //Utils.SetWindowOpacity(chatWindowSettings.Opacity * 0.01f, windowViewport);
+                    Utils.SetWindowOpacity(chatWindowSettings.Opacity * 0.01f, windowViewport);
                 }
                 ImGui.PopStyleColor(2);
 
@@ -706,7 +714,7 @@ namespace BPSR_ZDPS.Windows
                 {
                     ChatManager.BlockUser(sender);
                 }
-                ImGui.SetItemTooltip($"Blocks this users ({sender.Info.Name}) messages from showing in your ZDPS chat.");
+                ImGui.SetItemTooltip($"Blocks this user's ({sender.Info.Name}) messages from showing in your ZDPS chat.");
 
                 ImGui.EndPopup();
             }

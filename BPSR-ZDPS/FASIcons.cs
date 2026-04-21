@@ -12,6 +12,8 @@ namespace BPSR_ZDPS
         public static char Pause = '\uF04C'; // F04C
         public static char Stop = '\uF04D'; // F04D
         public static char Ban = '\uF05E'; // F05E
+        public static char Eye = '\uF06E'; // F06E
+        public static char EyeSlash = '\uF070'; // F070
         public static char Folder = '\uF07B'; // F07B, F114, 01F4C1, 01F5BF
         public static char FolderOpen = '\uF07C'; // F07C, F115, 01F4C2, 01F5C1
         public static char File = '\uF016'; // F016, F15B, 01F4C4, 01F5CB
@@ -44,6 +46,7 @@ namespace BPSR_ZDPS
         public static char AngleUp = '\uF106'; // F106
         public static char AngleDown = '\uF107'; // F107
         public static char Crop = '\uF125'; // F125
+        public static char Bullseye = '\uF140'; // F140
         public static char ArrowDownAZ = '\uF15D'; // F15D
         public static char ArrowDown19 = '\uF162'; // F162
         public static char ArrowDownLong = '\uF175'; // F175
@@ -60,6 +63,7 @@ namespace BPSR_ZDPS
         public static char FileCode = '\uF1C9'; // F1C9
         public static char Sliders = '\uF1DE'; // F1DE
         public static char ClockRotateLeft = '\uF1DA'; // F1DA
+        public static char EyeDropper = '\uF1FB'; // F1FB
         public static char Server = '\uF233'; // F233
         public static char Clone = '\uF24D'; // F24D
         public static char CirclePause = '\uF28B'; // F28B

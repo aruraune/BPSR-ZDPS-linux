@@ -25,15 +25,15 @@ namespace Zproto {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "CihzdHJ1X2dldF9yZWNvbW1lbmRfcGxheV9kYXRhX3JlcGx5LnByb3RvEgZ6",
-            "cHJvdG8aF2VudW1fZV9lcnJvcl9jb2RlLnByb3RvGh5zdHJ1X3JlY29tbWVu",
-            "ZF9wbGF5X2RhdGEucHJvdG8i7QEKGUdldFJlY29tbWVuZFBsYXlEYXRhUmVw",
-            "bHkSVQoTcmVjb21tZW5kX3BsYXlfZGF0YRgBIAMoCzI4Lnpwcm90by5HZXRS",
-            "ZWNvbW1lbmRQbGF5RGF0YVJlcGx5LlJlY29tbWVuZFBsYXlEYXRhRW50cnkS",
-            "JAoIZXJyX2NvZGUYAiABKA4yEi56cHJvdG8uRUVycm9yQ29kZRpTChZSZWNv",
-            "bW1lbmRQbGF5RGF0YUVudHJ5EgsKA2tleRgBIAEoBRIoCgV2YWx1ZRgCIAEo",
-            "CzIZLnpwcm90by5SZWNvbW1lbmRQbGF5RGF0YToCOAFiBnByb3RvMw=="));
+            "cHJvdG8aF2VudW1fZV9lcnJvcl9jb2RlLnByb3RvGhVzdHJ1X3RpbWVyX2lu",
+            "Zm8ucHJvdG8i5QEKGUdldFJlY29tbWVuZFBsYXlEYXRhUmVwbHkSVQoTcmVj",
+            "b21tZW5kX3BsYXlfZGF0YRgBIAMoCzI4Lnpwcm90by5HZXRSZWNvbW1lbmRQ",
+            "bGF5RGF0YVJlcGx5LlJlY29tbWVuZFBsYXlEYXRhRW50cnkSJAoIZXJyX2Nv",
+            "ZGUYAiABKA4yEi56cHJvdG8uRUVycm9yQ29kZRpLChZSZWNvbW1lbmRQbGF5",
+            "RGF0YUVudHJ5EgsKA2tleRgBIAEoBRIgCgV2YWx1ZRgCIAEoCzIRLnpwcm90",
+            "by5UaW1lckluZm86AjgBYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Zproto.EnumEErrorCodeReflection.Descriptor, global::Zproto.StruRecommendPlayDataReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Zproto.EnumEErrorCodeReflection.Descriptor, global::Zproto.StruTimerInfoReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Zproto.GetRecommendPlayDataReply), global::Zproto.GetRecommendPlayDataReply.Parser, new[]{ "RecommendPlayData", "ErrCode" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, })
           }));
@@ -90,12 +90,12 @@ namespace Zproto {
 
     /// <summary>Field number for the "recommend_play_data" field.</summary>
     public const int RecommendPlayDataFieldNumber = 1;
-    private static readonly pbc::MapField<int, global::Zproto.RecommendPlayData>.Codec _map_recommendPlayData_codec
-        = new pbc::MapField<int, global::Zproto.RecommendPlayData>.Codec(pb::FieldCodec.ForInt32(8, 0), pb::FieldCodec.ForMessage(18, global::Zproto.RecommendPlayData.Parser), 10);
-    private readonly pbc::MapField<int, global::Zproto.RecommendPlayData> recommendPlayData_ = new pbc::MapField<int, global::Zproto.RecommendPlayData>();
+    private static readonly pbc::MapField<int, global::Zproto.TimerInfo>.Codec _map_recommendPlayData_codec
+        = new pbc::MapField<int, global::Zproto.TimerInfo>.Codec(pb::FieldCodec.ForInt32(8, 0), pb::FieldCodec.ForMessage(18, global::Zproto.TimerInfo.Parser), 10);
+    private readonly pbc::MapField<int, global::Zproto.TimerInfo> recommendPlayData_ = new pbc::MapField<int, global::Zproto.TimerInfo>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::MapField<int, global::Zproto.RecommendPlayData> RecommendPlayData {
+    public pbc::MapField<int, global::Zproto.TimerInfo> RecommendPlayData {
       get { return recommendPlayData_; }
     }
 

@@ -44,6 +44,8 @@ namespace BPSR_ZDPS.Windows
                 HasInitBindings = true;
                 EncounterManager.EncounterStart += ThreatTracker_EncounterStart;
                 EncounterManager.EncounterEndFinal += ThreatTracker_EncounterEndFinal;
+
+                BindCurrentEncounterEvents();
             }
         }
 

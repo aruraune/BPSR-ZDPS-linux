@@ -23,6 +23,8 @@ public class Settings
     public bool ShowAbilityScoreInMeters { get; set; } = true;
     public bool ShowSeasonStrengthInMeters { get; set; } = false;
     public bool ShowSubProfessionNameInMeters { get; set; } = true;
+    public bool ShowPlayerSummonsInMeters { get; set; } = false;
+    public bool ShowPlayerImaginesInMeters { get; set; } = false;
     public bool UseAutomaticWipeDetection { get; set; } = true;
     public bool SkipTeleportStateCheckInAutomaticWipeDetection { get; set; } = false;
     public bool DisableWipeRecalculationOverwriting { get; set; } = false;
@@ -40,6 +42,7 @@ public class Settings
     public bool AllowEncounterSavingPausingInOpenWorld { get; set; } = false;
     public bool PersistEncounterSavingPauseStateBetweenMaps { get; set; } = false;
     public bool MinimalProcessingWhileEncounterSavingPaused { get; set; } = false;
+    public bool IncludeHealEventsOutsideOfCombat { get; set; } = false;
 
     public bool MeterSettingsTankingShowDeaths { get; set; } = false;
     public bool MeterSettingsNpcTakenShowHpData { get; set; } = false;
@@ -84,8 +87,13 @@ public class Settings
 
     public uint HotkeysEncounterReset { get; set; }
     public uint HotkeysPinnedWindowClickthrough { get; set; }
+    public uint HotkeysToggleWindowMinimize { get; set; }
 
     public uint FixedFramerateScale { get; set; } = 1;
+
+    public bool EnableGDIBackBufferCopyCompatibility { get; set; } = false;
+
+    public bool AggressiveExceptionDebugLogging = false;
 
     public ChatSettings Chat { get; set; } = new();
 
@@ -106,6 +114,11 @@ public class Settings
         if (HotkeysPinnedWindowClickthrough > 0)
         {
             HotKeyManager.RegisterKey("PinnedWindowClickthrough", mainWindow.ToggleMouseClickthrough, HotkeysPinnedWindowClickthrough);
+        }
+
+        if (HotkeysToggleWindowMinimize > 0)
+        {
+            HotKeyManager.RegisterKey("ToggleWindowMinimize", mainWindow.ToggleWindowMinimize, HotkeysToggleWindowMinimize);
         }
     }
 
@@ -181,6 +194,8 @@ public class WindowSettings : ICloneable
     public RaidManagerCountdownWindowSettings RaidManagerCountdown { get; set; } = new();
     public RaidManagerThreatWindowSettings RaidManagerThreat { get; set; } = new();
     public ChatWindowSettings ChatWindow { get; set; } = new();
+    public EventTrackerWindowSettings EventTracker { get; set; } = new();
+    public SkillCastTimelineWindowSettings SkillCastTimeline { get; set; } = new();
 
     public object Clone()
     {
@@ -191,6 +206,8 @@ public class WindowSettings : ICloneable
         cloned.EntityCacheViewer = (EntityCacheViewerWindowSettings)this.EntityCacheViewer.Clone();
         cloned.SpawnTracker = (SpawnTrackerWindowSettings)this.SpawnTracker.Clone();
         cloned.ChatWindow = (ChatWindowSettings)this.ChatWindow.Clone();
+        cloned.EventTracker = (EventTrackerWindowSettings)this.EventTracker.Clone();
+        cloned.SkillCastTimeline = (SkillCastTimelineWindowSettings)this.SkillCastTimeline.Clone();
         return cloned;
     }
 }

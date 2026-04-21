@@ -291,9 +291,34 @@ namespace BPSR_ZDPS
             return false;
         }
 
+        public static IntPtr GetMonitorForWindow(ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            return User32.MonitorFromWindow((IntPtr)viewport.Value.PlatformHandleRaw, User32.MONITOR_DEFAULTTONEAREST);
+        }
+
         public static void SetCurrentPlatformWindowVisible()
         {
             GLFW.SetWindowAttrib((GLFWwindowPtr)ImGui.GetWindowViewport().PlatformHandle, GLFW.GLFW_VISIBLE, 1);
+        }
+
+        public static bool CheckIfViewportValid(ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            unsafe
+            {
+                if (viewport != null && !viewport.Value.IsNull && viewport.Value.PlatformHandle != null && viewport.Value.PlatformHandleRaw != null)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static void SetWindowTitle(string title, ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            GLFW.SetWindowTitle((GLFWwindowPtr)viewport.Value.PlatformHandle, title);
         }
 
         /// <summary>
@@ -332,7 +357,29 @@ namespace BPSR_ZDPS
             User32.SetForegroundWindow((IntPtr)viewport.Value.PlatformHandleRaw);
 #endif
         }
-        
+
+        public static void BringWindowToFront(IntPtr platformHandleRaw)
+        {
+            User32.SetForegroundWindow(platformHandleRaw);
+        }
+
+        public static bool IsWindowMinimized_GLFW(ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            return GLFW.GetWindowAttrib((GLFWwindowPtr)viewport.Value.PlatformHandle, GLFW.GLFW_ICONIFIED) > 0 ? true : false;
+        }
+
+        public static bool IsWindowMinimized(ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            return User32.IsIconic((IntPtr)viewport.Value.PlatformHandleRaw);
+        }
+
+        public static bool IsWindowMinimized(IntPtr platformHandleRaw)
+        {
+            return User32.IsIconic(platformHandleRaw);
+        }
+
         public static void MinimizeWindow(ImGuiViewportPtr? viewport = null)
         {
 #if WINDOWS
@@ -341,12 +388,22 @@ namespace BPSR_ZDPS
 #endif
         }
 
+        public static void MinimizeWindow(IntPtr platformHandleRaw)
+        {
+            User32.ShowWindow(platformHandleRaw, User32.SW_MINIMIZE);
+        }
+
         public static void RestoreWindow(ImGuiViewportPtr? viewport = null)
         {
 #if WINDOWS
             viewport = viewport ?? ImGui.GetWindowViewport();
             User32.ShowWindow((IntPtr)viewport.Value.PlatformHandleRaw, User32.SW_RESTORE);
 #endif
+        }
+
+        public static void RestoreWindow(IntPtr platformHandleRaw)
+        {
+            User32.ShowWindow(platformHandleRaw, User32.SW_RESTORE);
         }
 
         public static void SetWindowTopmost(IntPtr hWnd)
@@ -412,6 +469,90 @@ namespace BPSR_ZDPS
             if (rdata != null)
             {
                 rdata->LimitFPS = limitFps;
+            }
+        }
+
+        public static ViewportRendererData* GetViewportRenderData(ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
+            return rdata;
+        }
+
+        public static void SetViewportRenderData(Func<ViewportRendererData, ViewportRendererData> func, ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
+            if (rdata != null)
+            {
+                *rdata = func(*rdata);
+            }
+        }
+
+        public static bool IsApplicationFocused()
+        {
+            IntPtr foregroundWindow = User32.GetForegroundWindow();
+
+            if (foregroundWindow == IntPtr.Zero)
+            {
+                return false;
+            }
+
+            User32.GetWindowThreadProcessId(foregroundWindow, out int activeProcessId);
+            return activeProcessId == System.Diagnostics.Process.GetCurrentProcess().Id;
+        }
+
+        public static void SetWindowClearColor(Vector4 clearColor, ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
+            if (rdata != null)
+            {
+                clearColor.X *= clearColor.W;
+                clearColor.Y *= clearColor.W;
+                clearColor.Z *= clearColor.W;
+
+                rdata->ClearColor = clearColor;
+            }
+        }
+
+        public static void SetWindowDesiredRenderFPS(int fps, ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
+            if (rdata != null)
+            {
+                rdata->DesiredRenderFPS = fps;
+            }
+        }
+
+        public static void SetWindowSyncInterval(uint syncInterval, ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
+            if (rdata != null)
+            {
+                rdata->SyncInterval = syncInterval;
+            }
+        }
+
+        public static void SetWindowLimitFPS(bool limitFps, ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
+            if (rdata != null)
+            {
+                rdata->LimitFPS = limitFps;
+            }
+        }
+
+        public static void SetWindowCopyToGDIEveryNthFrame(int frameNum, ImGuiViewportPtr? viewport = null)
+        {
+            viewport = viewport ?? ImGui.GetWindowViewport();
+            var rdata = (ViewportRendererData*)viewport.Value.RendererUserData;
+            if (rdata != null)
+            {
+                rdata->CopyToGDIEveryNthFrame = frameNum;
             }
         }
 

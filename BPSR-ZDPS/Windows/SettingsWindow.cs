@@ -27,6 +27,8 @@ namespace BPSR_ZDPS.Windows
         static bool showAbilityScoreInMeters;
         static bool showSeasonStrengthInMeters;
         static bool showSubProfessionNameInMeters;
+        static bool showPlayerSummonsInMeters;
+        static bool showPlayerImaginesInMeters;
         static bool useAutomaticWipeDetection;
         static bool skipTeleportStateCheckInAutomaticWipeDetection;
         static bool disableWipeRecalculationOverwriting;
@@ -44,6 +46,7 @@ namespace BPSR_ZDPS.Windows
         static bool allowEncounterSavingPausingInOpenWorld;
         static bool persistEncounterSavingPauseStateBetweenMaps;
         static bool minimalProcessingWhileEncounterSavingPaused;
+        static bool includeHealEventsOutsideOfCombat;
 
         static bool meterSettingsTankingShowDeaths;
         static bool meterSettingsNpcTakenShowHpData;
@@ -67,6 +70,9 @@ namespace BPSR_ZDPS.Windows
         static bool IsBindingPinnedWindowClickthroughKey = false;
         static uint PinnedWindowClickthroughKey;
         static string PinnedWindowClickthroughKeyName = "";
+        static bool IsBindingToggleWindowMinimizeKey = false;
+        static uint ToggleWindowMinimizeKey;
+        static string ToggleWindowMinimizeKeyName = "";
 
         static SharpPcap.LibPcap.LibPcapLiveDeviceList? NetworkDevices;
         static EGameCapturePreference GameCapturePreference;
@@ -88,6 +94,10 @@ namespace BPSR_ZDPS.Windows
 
         static bool lowPerformanceMode;
         static int fixedFramerate;
+
+        static bool enableGDIBackBufferCopyCompatibility;
+
+        static bool aggressiveExceptionDebugLogging;
 
         // External Settings
         static bool externalBPTimerEnabled;
@@ -361,6 +371,13 @@ namespace BPSR_ZDPS.Windows
                         ImGui.EndDisabled();
                         ImGui.Unindent();
 
+                        RebindKeyButton("Toggle Window Minimize", ref ToggleWindowMinimizeKey, ref ToggleWindowMinimizeKeyName, ref IsBindingToggleWindowMinimizeKey);
+                        ImGui.Indent();
+                        ImGui.BeginDisabled(true);
+                        ImGui.TextWrapped("This will let you minimize, or restore, the Main Window with a key press.");
+                        ImGui.EndDisabled();
+                        ImGui.Unindent();
+
                         ImGui.Unindent();
 
                         ImGui.SeparatorText("ZDPS Update Checking");
@@ -529,15 +546,7 @@ namespace BPSR_ZDPS.Windows
                         ImGui.EndDisabled();
                         ImGui.Unindent();
 
-                        ImGui.AlignTextToFramePadding();
-                        ImGui.Text("Skip Teleport State Check In Automatic Wipe Detection: ");
-                        ImGui.SameLine();
-                        ImGui.Checkbox("##SkipTeleportStateCheckInAutomaticWipeDetection", ref skipTeleportStateCheckInAutomaticWipeDetection);
-                        ImGui.Indent();
-                        ImGui.BeginDisabled(true);
-                        ImGui.TextWrapped("When enabled, the 'Teleport' Player State requirement in Automatic Wipe Detection is not performed.\nYou probably want this Disabled.");
-                        ImGui.EndDisabled();
-                        ImGui.Unindent();
+                        ImGui.BeginDisabled(!useAutomaticWipeDetection);
 
                         ImGui.AlignTextToFramePadding();
                         ImGui.Text("Use Legacy Wipe Detection: ");
@@ -545,7 +554,24 @@ namespace BPSR_ZDPS.Windows
                         ImGui.Checkbox("##UseLegacyWipeDetection", ref useLegacyWipeDetection);
                         ImGui.Indent();
                         ImGui.BeginDisabled(true);
-                        ImGui.TextWrapped("When enabled, uses the old legacy methods for detecting wipes. You probably do not want to enable this.");
+                        ImGui.TextWrapped("When enabled, uses the old legacy methods for detecting wipes.\nYou probably want this Disabled.");
+                        if (useLegacyWipeDetection)
+                        {
+                            ImGui.PushStyleColor(ImGuiCol.Text, Colors.Red);
+                            ImGui.TextWrapped("Note: [Legacy Wipe Detection] is known to not always correctly detect wipes. You likely do not want this old behavior Enabled.");
+                            ImGui.PopStyleColor();
+                        }
+                        ImGui.EndDisabled();
+                        ImGui.Unindent();
+
+                        ImGui.BeginDisabled(!useLegacyWipeDetection);
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.Text("Skip Teleport State Check In Automatic Wipe Detection: ");
+                        ImGui.SameLine();
+                        ImGui.Checkbox("##SkipTeleportStateCheckInAutomaticWipeDetection", ref skipTeleportStateCheckInAutomaticWipeDetection);
+                        ImGui.Indent();
+                        ImGui.BeginDisabled(true);
+                        ImGui.TextWrapped("When enabled, the 'Teleport' Player State requirement in Automatic Wipe Detection is not performed.\nYou probably want this Disabled.");
                         ImGui.EndDisabled();
                         ImGui.Unindent();
 
@@ -559,6 +585,9 @@ namespace BPSR_ZDPS.Windows
                         ImGui.TextWrapped("When enabled, the new Wipe Recalcuation logic will be Disabled and the original method will be used (if 'Use Automatic Wipe Detection' if still Enabled).");
                         ImGui.EndDisabled();
                         ImGui.Unindent();
+                        ImGui.EndDisabled();
+
+                        ImGui.EndDisabled();
 
                         ImGui.AlignTextToFramePadding();
                         ImGui.Text("Split Encounters On New Phases: ");
@@ -566,7 +595,7 @@ namespace BPSR_ZDPS.Windows
                         ImGui.Checkbox("##SplitEncountersOnNewPhases", ref splitEncountersOnNewPhases);
                         ImGui.Indent();
                         ImGui.BeginDisabled(true);
-                        ImGui.TextWrapped("When enabled, encounters are automatically split across phase changes. This allows bosses to be split from the rest of a dungeon. It also splits raid boss phases. This probably should be enabled.");
+                        ImGui.TextWrapped("When enabled, encounters are automatically split across phase changes. This allows bosses to be split from the rest of a dungeon. It also splits raid boss phases.\nThis probably should be Enabled.");
                         ImGui.EndDisabled();
                         ImGui.Unindent();
 
@@ -577,6 +606,16 @@ namespace BPSR_ZDPS.Windows
                         ImGui.Indent();
                         ImGui.BeginDisabled(true);
                         ImGui.TextWrapped("When enabled, the Damage, Healing, and Taken Per Second value shown in the Meters will have the 'Active' Per Second value, shown in square brackets, in addition to the normal 'Encounter Per Second' value. This means it is recalculated every second while taking down time and late starts into account instead of ignoring down time and calculating based on when the first damage event in the Encounter was dealt.\nNote: Both values are accurate, they are just two different metrics.");
+                        ImGui.EndDisabled();
+                        ImGui.Unindent();
+
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.Text("Include Heal Events Outside Of Combat: ");
+                        ImGui.SameLine();
+                        ImGui.Checkbox("##IncludeHealEventsOutsideOfCombat", ref includeHealEventsOutsideOfCombat);
+                        ImGui.Indent();
+                        ImGui.BeginDisabled(true);
+                        ImGui.TextWrapped("When enabled, Healing events that occur outside of an Active Encounter Combat section will still be included in the calculations.\nThis means if a player performs healing before a boss is pulled, the Encounter will be considered started before attacks began in the fight.");
                         ImGui.EndDisabled();
                         ImGui.Unindent();
 
@@ -672,6 +711,26 @@ namespace BPSR_ZDPS.Windows
                         ImGui.Unindent();
 
                         ImGui.AlignTextToFramePadding();
+                        ImGui.Text("Show Player Summons In 'NPC Taken' Meter: ");
+                        ImGui.SameLine();
+                        ImGui.Checkbox("##ShowPlayerSummonsInMeters", ref showPlayerSummonsInMeters);
+                        ImGui.Indent();
+                        ImGui.BeginDisabled(true);
+                        ImGui.TextWrapped("When enabled, Summons (such as Battle Imagine entities or specific skill entities) will be shown in the NPC Taken Meter.\nNote: This does not impact any data recording or Entity Inspector data.");
+                        ImGui.EndDisabled();
+                        ImGui.Unindent();
+
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.Text("Show Player Imagines In Meters: ");
+                        ImGui.SameLine();
+                        ImGui.Checkbox("##ShowPlayerImaginesInMeters", ref showPlayerImaginesInMeters);
+                        ImGui.Indent();
+                        ImGui.BeginDisabled(true);
+                        ImGui.TextWrapped("When enabled, shows the currently equipped imagines for players in the DPS Meter UI.");
+                        ImGui.EndDisabled();
+                        ImGui.Unindent();
+
+                        ImGui.AlignTextToFramePadding();
                         ImGui.Text("Allow Gamepad Navigation Input In ZDPS: ");
                         ImGui.SameLine();
                         ImGui.Checkbox("##AllowGamepadNavigationInputInZDPS", ref allowGamepadNavigationInputInZDPS);
@@ -718,6 +777,20 @@ namespace BPSR_ZDPS.Windows
                             ImGui.Indent();
                             ImGui.BeginDisabled(true);
                             ImGui.TextWrapped("How transparent the Main Window is while pinned.");
+                            ImGui.EndDisabled();
+                            ImGui.Unindent();
+
+                            ImGui.SetNextItemWidth(-1);
+                            ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
+                            ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
+                            if (ImGui.SliderInt("##MainWindowBackgroundOpacity", ref windowSettings.MainWindow.BackgroundOpacity, 0, 100, $"{windowSettings.MainWindow.BackgroundOpacity}%%", ImGuiSliderFlags.ClampOnInput))
+                            {
+                                windowSettings.MainWindow.BackgroundOpacity = windowSettings.MainWindow.BackgroundOpacity;
+                            }
+                            ImGui.PopStyleColor(2);
+                            ImGui.Indent();
+                            ImGui.BeginDisabled(true);
+                            ImGui.TextWrapped("How transparent the Main Window Background is. Applied even when not pinned.");
                             ImGui.EndDisabled();
                             ImGui.Unindent();
 
@@ -996,6 +1069,20 @@ namespace BPSR_ZDPS.Windows
                         ImGui.Unindent();
                         ImGui.EndDisabled();
 
+                        ShowRestartRequiredNotice(Settings.Instance.EnableGDIBackBufferCopyCompatibility != enableGDIBackBufferCopyCompatibility, "Enable GDI Back Buffer Copy Compatibility");
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.Text("Enable GDI Back Buffer Copy Compatibility: ");
+                        ImGui.SameLine();
+                        ImGui.Checkbox("##EnableGDIBackBufferCopyCompatibility", ref enableGDIBackBufferCopyCompatibility);
+                        ImGui.Indent();
+                        ImGui.BeginDisabled(true);
+                        ImGui.TextUnformatted("(OBS BitBlt Capture Compatibility Mode)");
+                        ImGui.TextWrapped("When enabled, Screen Recording programs, like OBS, can perform 'Window Captures' on ZDPS using the (Default) 'BitBlt Capture Method'.");
+                        ImGui.TextWrapped("Note: This uses more GPU resources to perform. If this is disabled, 'Desktop Captures' and the 'Window Capture Method' labeled 'Windows 10/11' will still function without issue.");
+                        ImGui.TextWrapped("Note: This setting requires a ZDPS restart to fully take effect.");
+                        ImGui.EndDisabled();
+                        ImGui.Unindent();
+
                         ImGui.EndChild();
                         ImGui.EndTabItem();
                     }
@@ -1056,7 +1143,7 @@ namespace BPSR_ZDPS.Windows
                         ImGui.SetNextItemWidth(-1);
                         ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
                         ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
-                        if (ImGui.SliderFloat("##MatchmakeNotificationVolume", ref matchmakeNotificationVolume, 0.10f, 3.0f, $"{(int)(matchmakeNotificationVolume * 100)}%%"))
+                        if (ImGui.SliderFloat("##MatchmakeNotificationVolume", ref matchmakeNotificationVolume, 0.02f, 3.0f, $"{(int)(matchmakeNotificationVolume * 100)}%%"))
                         {
                             matchmakeNotificationVolume = MathF.Round(matchmakeNotificationVolume, 2);
                         }
@@ -1120,7 +1207,7 @@ namespace BPSR_ZDPS.Windows
                         ImGui.SetNextItemWidth(-1);
                         ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
                         ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
-                        if (ImGui.SliderFloat("##ReadyCheckNotificationVolume", ref readyCheckNotificationVolume, 0.10f, 3.0f, $"{(int)(readyCheckNotificationVolume * 100)}%%"))
+                        if (ImGui.SliderFloat("##ReadyCheckNotificationVolume", ref readyCheckNotificationVolume, 0.02f, 3.0f, $"{(int)(readyCheckNotificationVolume * 100)}%%"))
                         {
                             readyCheckNotificationVolume = MathF.Round(readyCheckNotificationVolume, 2);
                         }
@@ -1458,6 +1545,18 @@ namespace BPSR_ZDPS.Windows
                         ImGui.EndDisabled();
                         ImGui.Unindent();
 
+                        ShowRestartRequiredNotice(Settings.Instance.AggressiveExceptionDebugLogging != aggressiveExceptionDebugLogging, "Aggressive Exception Debug Logging");
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.Text("Aggressive Exception Debug Logging: ");
+                        ImGui.SameLine();
+                        ImGui.Checkbox("##AggressiveExceptionDebugLogging", ref aggressiveExceptionDebugLogging);
+                        ImGui.Indent();
+                        ImGui.BeginDisabled(true);
+                        ImGui.TextWrapped("When enabled, captures more exception data for when systems break or ZDPS crashes. Applies after restarting ZDPS.");
+                        ImGui.TextWrapped("Note: This has a chance to make ZDPS run slower.\nOnly turn this on when you encounter broken systems or crashes. Reproduce the issue to have a more useful ZDPS_log.txt and then turn off this setting.");
+                        ImGui.EndDisabled();
+                        ImGui.Unindent();
+
                         if (ImGui.Button("Open GitHub Project Page"))
                         {
                             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
@@ -1516,6 +1615,16 @@ namespace BPSR_ZDPS.Windows
                         PinnedWindowClickthroughKeyName = ImGui.GetKeyNameS(HotKeyManager.VirtualKeyToImGuiKey((int)PinnedWindowClickthroughKey));
                     }
 
+                    ToggleWindowMinimizeKey = Settings.Instance.HotkeysToggleWindowMinimize;
+                    if (ToggleWindowMinimizeKey == 0)
+                    {
+                        ToggleWindowMinimizeKeyName = "[UNBOUND]";
+                    }
+                    else
+                    {
+                        ToggleWindowMinimizeKeyName = ImGui.GetKeyNameS(HotKeyManager.VirtualKeyToImGuiKey((int)ToggleWindowMinimizeKey));
+                    }
+
                     RegisterAllHotkeys(mainWindow);
 
                     ImGui.CloseCurrentPopup();
@@ -1541,6 +1650,8 @@ namespace BPSR_ZDPS.Windows
             showAbilityScoreInMeters = Settings.Instance.ShowAbilityScoreInMeters;
             showSeasonStrengthInMeters = Settings.Instance.ShowSeasonStrengthInMeters;
             showSubProfessionNameInMeters = Settings.Instance.ShowSubProfessionNameInMeters;
+            showPlayerSummonsInMeters = Settings.Instance.ShowPlayerSummonsInMeters;
+            showPlayerImaginesInMeters = Settings.Instance.ShowPlayerImaginesInMeters;
             useAutomaticWipeDetection = Settings.Instance.UseAutomaticWipeDetection;
             skipTeleportStateCheckInAutomaticWipeDetection = Settings.Instance.SkipTeleportStateCheckInAutomaticWipeDetection;
             disableWipeRecalculationOverwriting = Settings.Instance.DisableWipeRecalculationOverwriting;
@@ -1559,6 +1670,8 @@ namespace BPSR_ZDPS.Windows
             allowEncounterSavingPausingInOpenWorld = Settings.Instance.AllowEncounterSavingPausingInOpenWorld;
             persistEncounterSavingPauseStateBetweenMaps = Settings.Instance.PersistEncounterSavingPauseStateBetweenMaps;
             minimalProcessingWhileEncounterSavingPaused = Settings.Instance.MinimalProcessingWhileEncounterSavingPaused;
+
+            includeHealEventsOutsideOfCombat = Settings.Instance.IncludeHealEventsOutsideOfCombat;
 
             meterSettingsTankingShowDeaths = Settings.Instance.MeterSettingsTankingShowDeaths;
             meterSettingsNpcTakenShowHpData = Settings.Instance.MeterSettingsNpcTakenShowHpData;
@@ -1597,6 +1710,10 @@ namespace BPSR_ZDPS.Windows
 
             lowPerformanceMode = Settings.Instance.LowPerformanceMode;
             fixedFramerate = (int)Settings.Instance.FixedFramerateScale;
+
+            enableGDIBackBufferCopyCompatibility = Settings.Instance.EnableGDIBackBufferCopyCompatibility;
+
+            aggressiveExceptionDebugLogging = Settings.Instance.AggressiveExceptionDebugLogging;
 
             // External
             externalBPTimerEnabled = Settings.Instance.External.BPTimerSettings.ExternalBPTimerEnabled;
@@ -1647,6 +1764,8 @@ namespace BPSR_ZDPS.Windows
             Settings.Instance.ShowAbilityScoreInMeters = showAbilityScoreInMeters;
             Settings.Instance.ShowSeasonStrengthInMeters = showSeasonStrengthInMeters;
             Settings.Instance.ShowSubProfessionNameInMeters = showSubProfessionNameInMeters;
+            Settings.Instance.ShowPlayerSummonsInMeters = showPlayerSummonsInMeters;
+            Settings.Instance.ShowPlayerImaginesInMeters = showPlayerImaginesInMeters;
             Settings.Instance.UseAutomaticWipeDetection = useAutomaticWipeDetection;
             Settings.Instance.SkipTeleportStateCheckInAutomaticWipeDetection = skipTeleportStateCheckInAutomaticWipeDetection;
             Settings.Instance.DisableWipeRecalculationOverwriting = disableWipeRecalculationOverwriting;
@@ -1664,6 +1783,8 @@ namespace BPSR_ZDPS.Windows
             Settings.Instance.SkipSkillSnapshotSavingInOpenWorld = skipSkillSnapshotSavingInOpenWorld;
             Settings.Instance.PersistEncounterSavingPauseStateBetweenMaps = persistEncounterSavingPauseStateBetweenMaps;
             Settings.Instance.MinimalProcessingWhileEncounterSavingPaused = minimalProcessingWhileEncounterSavingPaused;
+
+            Settings.Instance.IncludeHealEventsOutsideOfCombat = includeHealEventsOutsideOfCombat;
 
             Settings.Instance.MeterSettingsTankingShowDeaths = meterSettingsTankingShowDeaths;
             Settings.Instance.MeterSettingsNpcTakenShowHpData = meterSettingsNpcTakenShowHpData;
@@ -1699,6 +1820,11 @@ namespace BPSR_ZDPS.Windows
 
             Settings.Instance.LowPerformanceMode = lowPerformanceMode;
             Settings.Instance.FixedFramerateScale = (uint)fixedFramerate;
+
+            Settings.Instance.EnableGDIBackBufferCopyCompatibility = enableGDIBackBufferCopyCompatibility;
+            RendererImpl.EnableGDIBackBufferCopyCompatibility = enableGDIBackBufferCopyCompatibility;
+
+            Settings.Instance.AggressiveExceptionDebugLogging = aggressiveExceptionDebugLogging;
 
             // External
             Settings.Instance.External.BPTimerSettings.ExternalBPTimerEnabled = externalBPTimerEnabled;
@@ -1770,6 +1896,16 @@ namespace BPSR_ZDPS.Windows
             {
                 PinnedWindowClickthroughKeyName = ImGui.GetKeyNameS(HotKeyManager.VirtualKeyToImGuiKey((int)PinnedWindowClickthroughKey));
             }
+
+            ToggleWindowMinimizeKey = Settings.Instance.HotkeysToggleWindowMinimize;
+            if (ToggleWindowMinimizeKey == 0)
+            {
+                ToggleWindowMinimizeKeyName = "[UNBOUND]";
+            }
+            else
+            {
+                ToggleWindowMinimizeKeyName = ImGui.GetKeyNameS(HotKeyManager.VirtualKeyToImGuiKey((int)ToggleWindowMinimizeKey));
+            }
         }
 
         static void RegisterAllHotkeys(MainWindow mainWindow)
@@ -1785,6 +1921,12 @@ namespace BPSR_ZDPS.Windows
                 HotKeyManager.RegisterKey("PinnedWindowClickthrough", mainWindow.ToggleMouseClickthrough, PinnedWindowClickthroughKey);
             }
             Settings.Instance.HotkeysPinnedWindowClickthrough = PinnedWindowClickthroughKey;
+
+            if (ToggleWindowMinimizeKey != 0)
+            {
+                HotKeyManager.RegisterKey("ToggleWindowMinimize", mainWindow.ToggleWindowMinimize, ToggleWindowMinimizeKey);
+            }
+            Settings.Instance.HotkeysToggleWindowMinimize = ToggleWindowMinimizeKey;
         }
 
         public static void RebindKeyButton(string bindingName, ref uint bindingVariable, ref string bindingVariableName, ref bool bindingState)

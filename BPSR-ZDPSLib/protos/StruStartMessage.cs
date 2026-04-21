@@ -25,14 +25,16 @@ namespace Zproto {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChhzdHJ1X3N0YXJ0X21lc3NhZ2UucHJvdG8SBnpwcm90bxoec3RydV9tYWhq",
-            "b25nX2NvbmZpZ19pbmZvLnByb3RvGh5zdHJ1X3BsYXllcl9tYWhqb25nX2Rh",
-            "dGEucHJvdG8iZQoMU3RhcnRNZXNzYWdlEioKB3BsYXllcnMYASADKAsyGS56",
-            "cHJvdG8uUGxheWVyTWFoam9uZ0RhdGESKQoGY29uZmlnGAIgAygLMhkuenBy",
-            "b3RvLk1haGpvbmdDb25maWdJbmZvYgZwcm90bzM="));
+            "b25nX2NvbmZpZ19pbmZvLnByb3RvGiBzdHJ1X21haGpvbmdfc2V0dGxlX3Bh",
+            "cmFtcy5wcm90bxoec3RydV9wbGF5ZXJfbWFoam9uZ19kYXRhLnByb3RvIqEB",
+            "CgxTdGFydE1lc3NhZ2USKgoHcGxheWVycxgBIAMoCzIZLnpwcm90by5QbGF5",
+            "ZXJNYWhqb25nRGF0YRIpCgZjb25maWcYAiADKAsyGS56cHJvdG8uTWFoam9u",
+            "Z0NvbmZpZ0luZm8SOgoVbWFoam9uZ19zZXR0bGVfcGFyYW1zGAMgASgLMhsu",
+            "enByb3RvLk1haGpvbmdTZXR0bGVQYXJhbXNiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Zproto.StruMahjongConfigInfoReflection.Descriptor, global::Zproto.StruPlayerMahjongDataReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Zproto.StruMahjongConfigInfoReflection.Descriptor, global::Zproto.StruMahjongSettleParamsReflection.Descriptor, global::Zproto.StruPlayerMahjongDataReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Zproto.StartMessage), global::Zproto.StartMessage.Parser, new[]{ "Players", "Config" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Zproto.StartMessage), global::Zproto.StartMessage.Parser, new[]{ "Players", "Config", "MahjongSettleParams" }, null, null, null, null)
           }));
     }
     #endregion
@@ -76,6 +78,7 @@ namespace Zproto {
     public StartMessage(StartMessage other) : this() {
       players_ = other.players_.Clone();
       config_ = other.config_.Clone();
+      mahjongSettleParams_ = other.mahjongSettleParams_ != null ? other.mahjongSettleParams_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -107,6 +110,18 @@ namespace Zproto {
       get { return config_; }
     }
 
+    /// <summary>Field number for the "mahjong_settle_params" field.</summary>
+    public const int MahjongSettleParamsFieldNumber = 3;
+    private global::Zproto.MahjongSettleParams mahjongSettleParams_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Zproto.MahjongSettleParams MahjongSettleParams {
+      get { return mahjongSettleParams_; }
+      set {
+        mahjongSettleParams_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -124,6 +139,7 @@ namespace Zproto {
       }
       if(!players_.Equals(other.players_)) return false;
       if(!config_.Equals(other.config_)) return false;
+      if (!object.Equals(MahjongSettleParams, other.MahjongSettleParams)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -133,6 +149,7 @@ namespace Zproto {
       int hash = 1;
       hash ^= players_.GetHashCode();
       hash ^= config_.GetHashCode();
+      if (mahjongSettleParams_ != null) hash ^= MahjongSettleParams.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -153,6 +170,10 @@ namespace Zproto {
     #else
       players_.WriteTo(output, _repeated_players_codec);
       config_.WriteTo(output, _repeated_config_codec);
+      if (mahjongSettleParams_ != null) {
+        output.WriteRawTag(26);
+        output.WriteMessage(MahjongSettleParams);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -165,6 +186,10 @@ namespace Zproto {
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       players_.WriteTo(ref output, _repeated_players_codec);
       config_.WriteTo(ref output, _repeated_config_codec);
+      if (mahjongSettleParams_ != null) {
+        output.WriteRawTag(26);
+        output.WriteMessage(MahjongSettleParams);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -177,6 +202,9 @@ namespace Zproto {
       int size = 0;
       size += players_.CalculateSize(_repeated_players_codec);
       size += config_.CalculateSize(_repeated_config_codec);
+      if (mahjongSettleParams_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(MahjongSettleParams);
+      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -191,6 +219,12 @@ namespace Zproto {
       }
       players_.Add(other.players_);
       config_.Add(other.config_);
+      if (other.mahjongSettleParams_ != null) {
+        if (mahjongSettleParams_ == null) {
+          MahjongSettleParams = new global::Zproto.MahjongSettleParams();
+        }
+        MahjongSettleParams.MergeFrom(other.MahjongSettleParams);
+      }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -218,6 +252,13 @@ namespace Zproto {
             config_.AddEntriesFrom(input, _repeated_config_codec);
             break;
           }
+          case 26: {
+            if (mahjongSettleParams_ == null) {
+              MahjongSettleParams = new global::Zproto.MahjongSettleParams();
+            }
+            input.ReadMessage(MahjongSettleParams);
+            break;
+          }
         }
       }
     #endif
@@ -243,6 +284,13 @@ namespace Zproto {
           }
           case 18: {
             config_.AddEntriesFrom(ref input, _repeated_config_codec);
+            break;
+          }
+          case 26: {
+            if (mahjongSettleParams_ == null) {
+              MahjongSettleParams = new global::Zproto.MahjongSettleParams();
+            }
+            input.ReadMessage(MahjongSettleParams);
             break;
           }
         }

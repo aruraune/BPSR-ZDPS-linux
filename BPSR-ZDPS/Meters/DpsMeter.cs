@@ -45,7 +45,7 @@ namespace BPSR_ZDPS.Meters
                     {
                         AppState.ActiveEncounter = EncounterManager.Current;
                     }
-                    else if (AppState.ActiveEncounter?.EncounterId != EncounterManager.Current?.EncounterId)
+                    else if (AppState.ActiveEncounter?.EncounterId != EncounterManager.Current?.EncounterId || AppState.ActiveEncounter?.StartTime != EncounterManager.Current?.StartTime)
                     {
                         if (EncounterManager.Current.HasStatsBeenRecorded())
                         {
@@ -55,7 +55,7 @@ namespace BPSR_ZDPS.Meters
                 }
                 else
                 {
-                    if (AppState.ActiveEncounter?.EncounterId != EncounterManager.Current?.EncounterId || AppState.ActiveEncounter?.BattleId != EncounterManager.Current?.BattleId)
+                    if (AppState.ActiveEncounter?.EncounterId != EncounterManager.Current?.EncounterId || AppState.ActiveEncounter?.BattleId != EncounterManager.Current?.BattleId || AppState.ActiveEncounter?.StartTime != EncounterManager.Current?.StartTime)
                     {
                         AppState.ActiveEncounter = EncounterManager.Current;
                     }
@@ -214,14 +214,58 @@ namespace BPSR_ZDPS.Meters
                             nameFormat.Append($" ({entity.SeasonStrength})");
                         }
 
-                        ImGui.SetCursorPos(startPoint);
-                        if (SelectableWithHintImage($" {(i + 1).ToString().PadLeft((entityList.Count() < 101 ? 2 : 3), '0')}.", $"{nameFormat}##DpsEntry_{i}", dps_format, entity.ProfessionId))
-                        //if (SelectableWithHint($" {(i + 1).ToString().PadLeft((playerList.Count() < 101 ? 2 : 3), '0')}. {name}-{profession} ({entity.AbilityScore})##DpsEntry_{i}", dps_format))
-                        //if (ImGui.Selectable($"{name}-{profession} ({entity.AbilityScore}) [{entity.UID.ToString()}] ({entity.TotalDamage})##DpsEntry_{i}"))
+
+                        List<MeterImagine> imagines = new();
+                        if (Settings.Instance.ShowPlayerImaginesInMeters)
                         {
-                            mainWindow.entityInspector = new EntityInspector();
-                            mainWindow.entityInspector.LoadEntity(entity, activeEncounter.StartTime);
-                            mainWindow.entityInspector.Open();
+                            var skillLevelIdList = entity.GetAttrKV("AttrSkillLevelIdList");
+                            if (skillLevelIdList != null)
+                            {
+                                if (skillLevelIdList is Newtonsoft.Json.Linq.JArray)
+                                {
+                                    // This is a Historical Entity, need to restore the original object type
+                                    skillLevelIdList = ((Newtonsoft.Json.Linq.JArray)skillLevelIdList).ToObject<List<DataTypes.Skills.SkillLevelInfo>>();
+                                }
+
+                                if (skillLevelIdList is List<DataTypes.Skills.SkillLevelInfo>)
+                                {
+                                    var list = (List<DataTypes.Skills.SkillLevelInfo>)skillLevelIdList;
+                                    foreach (var item in list)
+                                    {
+                                        if (item.IsImagineSlot())
+                                        {
+                                            var skillIconName = item.GetIconName();
+                                            int tier = item.Tier;
+                                            imagines.Add(new MeterImagine()
+                                            {
+                                                Name = item.Name,
+                                                Tier = tier,
+                                                IconPath = skillIconName,
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+
+                            ImGui.SetCursorPos(startPoint);
+                            if (SelectableWithHintImageImagines($" {(i + 1).ToString().PadLeft((entityList.Count() < 101 ? 2 : 3), '0')}.", $"{nameFormat}##DpsEntry_{i}", dps_format, entity.ProfessionId, imagines))
+                            {
+                                mainWindow.entityInspector = new EntityInspector();
+                                mainWindow.entityInspector.LoadEntity(entity, activeEncounter.StartTime, activeEncounter.ExData.FirstDamageTimeStamp);
+                                mainWindow.entityInspector.Open();
+                            }
+                        }
+                        else
+                        {
+                            ImGui.SetCursorPos(startPoint);
+                            if (SelectableWithHintImage($" {(i + 1).ToString().PadLeft((entityList.Count() < 101 ? 2 : 3), '0')}.", $"{nameFormat}##DpsEntry_{i}", dps_format, entity.ProfessionId))
+                            //if (SelectableWithHint($" {(i + 1).ToString().PadLeft((playerList.Count() < 101 ? 2 : 3), '0')}. {name}-{profession} ({entity.AbilityScore})##DpsEntry_{i}", dps_format))
+                            //if (ImGui.Selectable($"{name}-{profession} ({entity.AbilityScore}) [{entity.UID.ToString()}] ({entity.TotalDamage})##DpsEntry_{i}"))
+                            {
+                                mainWindow.entityInspector = new EntityInspector();
+                                mainWindow.entityInspector.LoadEntity(entity, activeEncounter.StartTime, activeEncounter.ExData.FirstDamageTimeStamp);
+                                mainWindow.entityInspector.Open();
+                            }
                         }
 
                         ImGui.PopFont();

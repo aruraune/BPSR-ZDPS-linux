@@ -26,16 +26,20 @@ namespace Zproto {
           string.Concat(
             "CiZzdHJ1X2NvbW1vbl90YXJnZXRfYWN0aXZpdHlfbGlzdC5wcm90bxIGenBy",
             "b3RvGiFzdHJ1X2NvbW1vbl90YXJnZXRfYWN0aXZpdHkucHJvdG8aFXN0cnVf",
-            "ZGlydHlfbWFzay5wcm90byLsAQoYQ29tbW9uVGFyZ2V0QWN0aXZpdHlMaXN0",
+            "ZGlydHlfbWFzay5wcm90byKGAwoYQ29tbW9uVGFyZ2V0QWN0aXZpdHlMaXN0",
             "EmEKGmNvbW1vbl90YXJnZXRfYWN0aXZpdHlfbWFwGAEgAygLMj0uenByb3Rv",
             "LkNvbW1vblRhcmdldEFjdGl2aXR5TGlzdC5Db21tb25UYXJnZXRBY3Rpdml0",
-            "eU1hcEVudHJ5Eg8KB3ZlcnNpb24YAiABKAQaXAocQ29tbW9uVGFyZ2V0QWN0",
-            "aXZpdHlNYXBFbnRyeRILCgNrZXkYASABKA0SKwoFdmFsdWUYAiABKAsyHC56",
-            "cHJvdG8uQ29tbW9uVGFyZ2V0QWN0aXZpdHk6AjgBYgZwcm90bzM="));
+            "eU1hcEVudHJ5Eg8KB3ZlcnNpb24YAiABKAQSWwoXcGVyaW9kX3JlZnJlc2hf",
+            "dGltZV9tYXAYAyADKAsyOi56cHJvdG8uQ29tbW9uVGFyZ2V0QWN0aXZpdHlM",
+            "aXN0LlBlcmlvZFJlZnJlc2hUaW1lTWFwRW50cnkaXAocQ29tbW9uVGFyZ2V0",
+            "QWN0aXZpdHlNYXBFbnRyeRILCgNrZXkYASABKA0SKwoFdmFsdWUYAiABKAsy",
+            "HC56cHJvdG8uQ29tbW9uVGFyZ2V0QWN0aXZpdHk6AjgBGjsKGVBlcmlvZFJl",
+            "ZnJlc2hUaW1lTWFwRW50cnkSCwoDa2V5GAEgASgFEg0KBXZhbHVlGAIgASgD",
+            "OgI4AWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Zproto.StruCommonTargetActivityReflection.Descriptor, global::Zproto.StruDirtyMaskReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Zproto.CommonTargetActivityList), global::Zproto.CommonTargetActivityList.Parser, new[]{ "CommonTargetActivityMap", "Version" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, })
+            new pbr::GeneratedClrTypeInfo(typeof(global::Zproto.CommonTargetActivityList), global::Zproto.CommonTargetActivityList.Parser, new[]{ "CommonTargetActivityMap", "Version", "PeriodRefreshTimeMap" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, null, })
           }));
     }
     #endregion
@@ -79,6 +83,7 @@ namespace Zproto {
     public CommonTargetActivityList(CommonTargetActivityList other) : this() {
       commonTargetActivityMap_ = other.commonTargetActivityMap_.Clone();
       version_ = other.version_;
+      periodRefreshTimeMap_ = other.periodRefreshTimeMap_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -111,6 +116,17 @@ namespace Zproto {
       }
     }
 
+    /// <summary>Field number for the "period_refresh_time_map" field.</summary>
+    public const int PeriodRefreshTimeMapFieldNumber = 3;
+    private static readonly pbc::MapField<int, long>.Codec _map_periodRefreshTimeMap_codec
+        = new pbc::MapField<int, long>.Codec(pb::FieldCodec.ForInt32(8, 0), pb::FieldCodec.ForInt64(16, 0L), 26);
+    private readonly pbc::MapField<int, long> periodRefreshTimeMap_ = new pbc::MapField<int, long>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::MapField<int, long> PeriodRefreshTimeMap {
+      get { return periodRefreshTimeMap_; }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -128,6 +144,7 @@ namespace Zproto {
       }
       if (!CommonTargetActivityMap.Equals(other.CommonTargetActivityMap)) return false;
       if (Version != other.Version) return false;
+      if (!PeriodRefreshTimeMap.Equals(other.PeriodRefreshTimeMap)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -137,6 +154,7 @@ namespace Zproto {
       int hash = 1;
       hash ^= CommonTargetActivityMap.GetHashCode();
       if (Version != 0UL) hash ^= Version.GetHashCode();
+      hash ^= PeriodRefreshTimeMap.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -160,6 +178,7 @@ namespace Zproto {
         output.WriteRawTag(16);
         output.WriteUInt64(Version);
       }
+      periodRefreshTimeMap_.WriteTo(output, _map_periodRefreshTimeMap_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -175,6 +194,7 @@ namespace Zproto {
         output.WriteRawTag(16);
         output.WriteUInt64(Version);
       }
+      periodRefreshTimeMap_.WriteTo(ref output, _map_periodRefreshTimeMap_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -189,6 +209,7 @@ namespace Zproto {
       if (Version != 0UL) {
         size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Version);
       }
+      size += periodRefreshTimeMap_.CalculateSize(_map_periodRefreshTimeMap_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -205,6 +226,7 @@ namespace Zproto {
       if (other.Version != 0UL) {
         Version = other.Version;
       }
+      periodRefreshTimeMap_.MergeFrom(other.periodRefreshTimeMap_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -232,6 +254,10 @@ namespace Zproto {
             Version = input.ReadUInt64();
             break;
           }
+          case 26: {
+            periodRefreshTimeMap_.AddEntriesFrom(input, _map_periodRefreshTimeMap_codec);
+            break;
+          }
         }
       }
     #endif
@@ -257,6 +283,10 @@ namespace Zproto {
           }
           case 16: {
             Version = input.ReadUInt64();
+            break;
+          }
+          case 26: {
+            periodRefreshTimeMap_.AddEntriesFrom(ref input, _map_periodRefreshTimeMap_codec);
             break;
           }
         }

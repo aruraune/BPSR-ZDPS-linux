@@ -29,7 +29,7 @@ namespace Zproto {
             "dHRlcl9nZW5lcmF0aW9uX3JlY29yZC5wcm90bxohc3RydV9ob21lX2xhbmRf",
             "Y2x1dHRlcl9pbmZvLnByb3RvGiJzdHJ1X2hvbWVfbGFuZF9pdGVtX2luc3Rh",
             "bmNlLnByb3RvGiNzdHJ1X2hvbWVfbGFuZF9zZWxsX3Nob3BfaW5mby5wcm90",
-            "bxoec3RydV9ob21lbGFuZF92aXNpdF9pbmZvLnByb3RvIqQGChBIb21lbGFu",
+            "bxoec3RydV9ob21lbGFuZF92aXNpdF9pbmZvLnByb3RvItwGChBIb21lbGFu",
             "ZEJhc2VJbmZvEi0KCnZpc2l0X2luZm8YASABKAsyGS56cHJvdG8uSG9tZWxh",
             "bmRWaXNpdEluZm8SCwoDZXhwGAIgASgDEhUKDWhvbWVfcmVzb3VyY2UYAyAB",
             "KAMSIwobbGFzdHN1YnRyYWN0Y2xlYW5saW5lc3N0aW1lGAQgASgDEjYKEWhv",
@@ -43,15 +43,17 @@ namespace Zproto {
             "X3Nsb3QYCiADKAsyKC56cHJvdG8uSG9tZWxhbmRCYXNlSW5mby5JdGVtVG9T",
             "bG90RW50cnkSEAoIY2FwYWNpdHkYCyABKAMSEgoKdXNlZF9zbG90cxgMIAEo",
             "AxIYChBjaGVja19pbl9jb250ZW50GA0gASgJEjUKEnRyYW5zZmVyX2NvbW11",
-            "bml0eRgOIAEoCzIZLnpwcm90by5Db21tdW5pdHlUcmFuc2ZlchpKCgpJdGVt",
-            "c0VudHJ5EgsKA2tleRgBIAEoAxIrCgV2YWx1ZRgCIAEoCzIcLnpwcm90by5I",
-            "b21lTGFuZEl0ZW1JbnN0YW5jZToCOAEaLAoKU2xvdHNFbnRyeRILCgNrZXkY",
-            "ASABKAMSDQoFdmFsdWUYAiABKAM6AjgBGjEKD0l0ZW1Ub1Nsb3RFbnRyeRIL",
-            "CgNrZXkYASABKAMSDQoFdmFsdWUYAiABKAM6AjgBYgZwcm90bzM="));
+            "bml0eRgOIAEoCzIZLnpwcm90by5Db21tdW5pdHlUcmFuc2ZlchIaChJpbm5l",
+            "cl9maW5pc2hfdGFza3MYDyADKAUSGgoSb3V0ZXJfZmluaXNoX3Rhc2tzGBAg",
+            "AygFGkoKCkl0ZW1zRW50cnkSCwoDa2V5GAEgASgDEisKBXZhbHVlGAIgASgL",
+            "MhwuenByb3RvLkhvbWVMYW5kSXRlbUluc3RhbmNlOgI4ARosCgpTbG90c0Vu",
+            "dHJ5EgsKA2tleRgBIAEoAxINCgV2YWx1ZRgCIAEoAzoCOAEaMQoPSXRlbVRv",
+            "U2xvdEVudHJ5EgsKA2tleRgBIAEoAxINCgV2YWx1ZRgCIAEoAzoCOAFiBnBy",
+            "b3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Zproto.StruCommunityTransferReflection.Descriptor, global::Zproto.StruHomeLandClutterGenerationRecordReflection.Descriptor, global::Zproto.StruHomeLandClutterInfoReflection.Descriptor, global::Zproto.StruHomeLandItemInstanceReflection.Descriptor, global::Zproto.StruHomeLandSellShopInfoReflection.Descriptor, global::Zproto.StruHomelandVisitInfoReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Zproto.HomelandBaseInfo), global::Zproto.HomelandBaseInfo.Parser, new[]{ "VisitInfo", "Exp", "HomeResource", "Lastsubtractcleanlinesstime", "HomeLandClutter", "HomeLandClutterGenerationRecord", "HomeLandSellShopInfo", "Items", "Slots", "ItemToSlot", "Capacity", "UsedSlots", "CheckInContent", "TransferCommunity" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, null, null, })
+            new pbr::GeneratedClrTypeInfo(typeof(global::Zproto.HomelandBaseInfo), global::Zproto.HomelandBaseInfo.Parser, new[]{ "VisitInfo", "Exp", "HomeResource", "Lastsubtractcleanlinesstime", "HomeLandClutter", "HomeLandClutterGenerationRecord", "HomeLandSellShopInfo", "Items", "Slots", "ItemToSlot", "Capacity", "UsedSlots", "CheckInContent", "TransferCommunity", "InnerFinishTasks", "OuterFinishTasks" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, null, null, })
           }));
     }
     #endregion
@@ -107,6 +109,8 @@ namespace Zproto {
       usedSlots_ = other.usedSlots_;
       checkInContent_ = other.checkInContent_;
       transferCommunity_ = other.transferCommunity_ != null ? other.transferCommunity_.Clone() : null;
+      innerFinishTasks_ = other.innerFinishTasks_.Clone();
+      outerFinishTasks_ = other.outerFinishTasks_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -281,6 +285,28 @@ namespace Zproto {
       }
     }
 
+    /// <summary>Field number for the "inner_finish_tasks" field.</summary>
+    public const int InnerFinishTasksFieldNumber = 15;
+    private static readonly pb::FieldCodec<int> _repeated_innerFinishTasks_codec
+        = pb::FieldCodec.ForInt32(122);
+    private readonly pbc::RepeatedField<int> innerFinishTasks_ = new pbc::RepeatedField<int>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<int> InnerFinishTasks {
+      get { return innerFinishTasks_; }
+    }
+
+    /// <summary>Field number for the "outer_finish_tasks" field.</summary>
+    public const int OuterFinishTasksFieldNumber = 16;
+    private static readonly pb::FieldCodec<int> _repeated_outerFinishTasks_codec
+        = pb::FieldCodec.ForInt32(130);
+    private readonly pbc::RepeatedField<int> outerFinishTasks_ = new pbc::RepeatedField<int>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<int> OuterFinishTasks {
+      get { return outerFinishTasks_; }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -310,6 +336,8 @@ namespace Zproto {
       if (UsedSlots != other.UsedSlots) return false;
       if (CheckInContent != other.CheckInContent) return false;
       if (!object.Equals(TransferCommunity, other.TransferCommunity)) return false;
+      if(!innerFinishTasks_.Equals(other.innerFinishTasks_)) return false;
+      if(!outerFinishTasks_.Equals(other.outerFinishTasks_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -331,6 +359,8 @@ namespace Zproto {
       if (UsedSlots != 0L) hash ^= UsedSlots.GetHashCode();
       if (CheckInContent.Length != 0) hash ^= CheckInContent.GetHashCode();
       if (transferCommunity_ != null) hash ^= TransferCommunity.GetHashCode();
+      hash ^= innerFinishTasks_.GetHashCode();
+      hash ^= outerFinishTasks_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -396,6 +426,8 @@ namespace Zproto {
         output.WriteRawTag(114);
         output.WriteMessage(TransferCommunity);
       }
+      innerFinishTasks_.WriteTo(output, _repeated_innerFinishTasks_codec);
+      outerFinishTasks_.WriteTo(output, _repeated_outerFinishTasks_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -453,6 +485,8 @@ namespace Zproto {
         output.WriteRawTag(114);
         output.WriteMessage(TransferCommunity);
       }
+      innerFinishTasks_.WriteTo(ref output, _repeated_innerFinishTasks_codec);
+      outerFinishTasks_.WriteTo(ref output, _repeated_outerFinishTasks_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -499,6 +533,8 @@ namespace Zproto {
       if (transferCommunity_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(TransferCommunity);
       }
+      size += innerFinishTasks_.CalculateSize(_repeated_innerFinishTasks_codec);
+      size += outerFinishTasks_.CalculateSize(_repeated_outerFinishTasks_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -562,6 +598,8 @@ namespace Zproto {
         }
         TransferCommunity.MergeFrom(other.TransferCommunity);
       }
+      innerFinishTasks_.Add(other.innerFinishTasks_);
+      outerFinishTasks_.Add(other.outerFinishTasks_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -652,6 +690,16 @@ namespace Zproto {
             input.ReadMessage(TransferCommunity);
             break;
           }
+          case 122:
+          case 120: {
+            innerFinishTasks_.AddEntriesFrom(input, _repeated_innerFinishTasks_codec);
+            break;
+          }
+          case 130:
+          case 128: {
+            outerFinishTasks_.AddEntriesFrom(input, _repeated_outerFinishTasks_codec);
+            break;
+          }
         }
       }
     #endif
@@ -740,6 +788,16 @@ namespace Zproto {
               TransferCommunity = new global::Zproto.CommunityTransfer();
             }
             input.ReadMessage(TransferCommunity);
+            break;
+          }
+          case 122:
+          case 120: {
+            innerFinishTasks_.AddEntriesFrom(ref input, _repeated_innerFinishTasks_codec);
+            break;
+          }
+          case 130:
+          case 128: {
+            outerFinishTasks_.AddEntriesFrom(ref input, _repeated_outerFinishTasks_codec);
             break;
           }
         }

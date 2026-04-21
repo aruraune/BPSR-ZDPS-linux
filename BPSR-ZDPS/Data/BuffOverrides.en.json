@@ -640,11 +640,41 @@
         "Desc": "Just revived and is locked from actions briefly",
         "BuffType": 0
     },
+    "500113":
+    {
+        "Name": "Revive Invincibility",
+        "Desc": "Damage immunity",
+        "BuffType": 1
+    },
     "500114":
     {
         "Name": "Revive Buff",
         "Desc": "Revive Buff",
         "BuffType": 0
+    },
+    "501706":
+    {
+        "Name": "Power Seal",
+        "Desc": "Release all power after time ends (360s)",
+        "BuffType": 1
+    },
+    "501710":
+    {
+        "Name": "Power Seal",
+        "Desc": "Release all power after time ends (390s)",
+        "BuffType": 1
+    },
+    "501712":
+    {
+        "Name": "Power Sealed",
+        "Desc": "Unleah all power when the time runs out (480s)",
+        "BuffType": 1
+    },
+    "501714":
+    {
+        "Name": "Power Seal",
+        "Desc": "Release all power after time ends (180s)",
+        "BuffType": 1
     },
     "510072":
     {
@@ -672,45 +702,59 @@
     "680101":
     {
         "Name": "Air Float",
+        "Desc": "Slowly ascend in mid-air",
         "BuffType": 1
     },
     "680201":
     {
         "Name": "Dash Jump",
+        "Desc": "Gain the ability to leap forward with special movement",
         "BuffType": 1
     },
     "680401":
     {
         "Name": "Wall Jump",
+        "Desc": "Kick walls to jump higher, consumes Stamina",
         "BuffType": 1
     },
     "680501":
     {
         "Name": "Wall Running",
+        "Desc": "Gain ability to run on walls.\nRunning slowly consumes Stamina, standing still consumes no Stamina",
         "BuffType": 1
     },
     "680701":
     {
         "Name": "Auto Vault",
+        "Desc": "Automatically climb over obstacles without Stamina cost",
         "BuffType": 1
     },
     "681701":
     {
         "Name": "Skills Disabled In City"
     },
+    "682201":
+    {
+        "Name": "Dash Jump Timing Gauge",
+        "Desc": "After landing, a Timing Gauge appears",
+        "BuffType": 1
+    },
     "682501":
     {
         "Name": "Chain Jump",
+        "Desc": "Gain 1 extra air jump, up to 3 jumps",
         "BuffType": 1
     },
     "682503":
     {
         "Name": "Chain Jump",
+        "Desc": "Gain 1 extra air jump, up to 4 jumps",
         "BuffType": 1
     },
     "682505":
     {
         "Name": "Chain Jump",
+        "Desc": "Gain 1 extra air jump, up to 5 jumps",
         "BuffType": 1
     },
     "683104":
@@ -746,15 +790,216 @@
     {
         "Name": "Skills Disabled"
     },
+    "827200":
+    {
+        "Name": "Uppercut (Tankbuster)",
+        "Desc": "Player is marked to be hit with a tankbuster attack"
+    },
+    "827206":
+    {
+        "Name": "Transporting Device",
+        "Desc": "You are transporting a legacy device. Avoid the Stone Golem's attacks!",
+        "BuffType": 1
+    },
+    "827207":
+    {
+        "Name": "Transporting Device (Visibility Range Alert)",
+        "Desc": "Displays range alert only to the holder of the device",
+        "BuffType": 1
+    },
+    "827208":
+    {
+        "Name": "Legacy Device Hit",
+        "Desc": "Legacy Device has been hit and released defense system Electrical Shocks"
+    },
+    "827210":
+    {
+        "Name": "Earthshatter Marked",
+        "Desc": "Assigned to shared points and priority reduced"
+    },
+    "827213":
+    {
+        "Name": "Rock Storm Repulsion (Cast)",
+        "Desc": "Withered Bloomshard casts Rock Storm Repulsion"
+    },
+    "827214":
+    {
+        "Name": "Legacy Device (Acceleration Field)",
+        "Desc": "Affected by the Legacy Device generating an Acceleration Field to resist the Rock Storm Repulsion",
+        "BuffType": 1
+    },
+    "827215":
+    {
+        "Name": "Acceleration Field Buff",
+        "Desc": "Resisting the Rock Storm Repulsion",
+        "BuffType": 1
+    },
+    "827219":
+    {
+        "Name": "Rockfall",
+        "Desc": "At the end of the timer, a heavy rock will fall at the current position"
+    },
+    "827225":
+    {
+        "Name": "Rockfall (P1)(P3)",
+        "Desc": "Withered Bloomshard targets enemies with Rockfall markers"
+    },
+    "827226":
+    {
+        "Name": "Legacy Device (Purification)",
+        "Desc": "Device is working correctly",
+        "BuffType": 1
+    },
+    "827227":
+    {
+        "Name": "Legacy Device (Interference)",
+        "Desc": "Device is malfunctioning",
+        "BuffType": 0
+    },
+    "827244":
+    {
+        "Name": "Player Platform Jump (Phase 2)",
+        "Desc": "Player is jumping from Phase 2 to Phase 3",
+        "BuffType": 1
+    },
+    "827246":
+    {
+        "Name": "Rockfall (Team Stack)",
+        "Desc": "At the end of the timer, a very heavy rock will fall at the current position that requires multiple players to mitigate the damage"
+    },
+    "827251":
+    {
+        "Name": "Knock-Back and Stun",
+        "Desc": "Knocked back and temporarily stunned"
+    },
+    "827259":
+    {
+        "Name": "Fracture",
+        "Desc": "The Stonehusk's attack shatters your armor, greatly increasing damage taken from Basic Attacks",
+        "BuffType": 0
+    },
+    "827204":
+    {
+        "Name": "Legacy Device - Locked (Movement Disabled)",
+        "Desc": "Locked in place and unable to move"
+    },
+    "827260":
+    {
+        "Name": "Rock Storm Repulsion - Player Camera",
+        "Desc": ""
+    },
+    "827265":
+    {
+        "Name": "Earthshatter Rockfall (Marked)",
+        "Desc": "Triggering a delayed Rockfall at end of duration"
+    },
+    "827268":
+    {
+        "Name": "Legacy Device - Locked (Team Stack)",
+        "Desc": "Locked in place, needing other players to stack and soak the damage"
+    },
+    "827269":
+    {
+        "Name": "Legacy Device - Team Stack",
+        "Desc": "Waiting for players to stack and soak damage"
+    },
+    "828105":
+    {
+        "Name": "Cinderfall Trail",
+        "Desc": "Erosion Bloom Afterimage targets players to unleash Flame Shockwaves at.\nFlame Shockwaves erase all Echoes of Erosion they hit.\nHit Echoes of Erosion explode into Erosion Energy, inflicting Erosion Bloom Wound on hit players and leaving an AOE in their place"
+    },
+    "828107":
+    {
+        "Name": "Abyssal Seal Marker (Phase 1)",
+        "Desc": "Erosion Bloom Afterimage marks the player with a Scarlet Swordshade, dropping at their location after a few seconds"
+    },
+    "828108":
+    {
+        "Name": "Erosion Bloom Wound",
+        "Desc": "Lose HP every second"
+    },
+    "828124":
+    {
+        "Name": "Abyssal Seal Marker (Phase 3)",
+        "Desc": "Erosion Bloom Afterimage marks the player with a Scarlet Swordshade, dropping at their location after a few seconds"
+    },
+    "828133":
+    {
+        "Name": "Spacetime Rift Teleport (Phase 2)",
+        "Desc": "During Erosion Bloom Afterimage fight, teleports the player from Phase 2 platform over to Phase 3 platform"
+    },
+    "880630":
+    {
+        "Name": "Darkness Layers",
+        "Desc": "Dark Layer stacks from Touch of Darkness"
+    },
+    "880641":
+    {
+        "Name": "Boss Ring AOE Marker",
+        "Desc": "The Light Devourer marks the player with a ring AOE to explode in a few seconds",
+        "BuffType": 1
+    },
+    "880672":
+    {
+        "Name": "Darkness DMG Reduction",
+        "Desc": "ATK significantly reduced"
+    },
     "881803":
     {
         "Name": "Learn Throw Bomb",
         "BuffType": 1
     },
+    "882403":
+    {
+        "Name": "Lock-On",
+        "Desc": "Drops an Edgeblade Bombardment at the target's location with the timer ends"
+    },
+    "882404":
+    {
+        "Name": "Edgeblade Bombardment",
+        "Desc": "An Edgeblade has hit the ground"
+    },
     "882576":
     {
         "Name": "Deploy Pulse Fountain",
         "Desc": "Place a Pulse Fountain that launches players into the air"
+    },
+    "882591":
+    {
+        "Name": "Summon Lightning Strike",
+        "Desc": ""
+    },
+    "882634":
+    {
+        "Name": "Boss - Lock HP",
+        "Desc": "The boss lock's their HP and becomes immune to damage",
+        "BuffType": 1
+    },
+    "882651":
+    {
+        "Name": "Illusory Orb Summon Marker",
+        "Desc": "Summons a floating Illusory Orb at the current location when marker ends"
+    },
+    "882653":
+    {
+        "Name": "Summon Illusory Tracking Explosion",
+        "Desc": ""
+    },
+    "882655":
+    {
+        "Name": "Illusory Plague - Death Countdown",
+        "Desc": "When the Plague completes it's corruption, you die"
+    },
+    "882657":
+    {
+        "Name": "Illusory Performance",
+        "Desc": "The boss enters a phase change",
+        "BuffType": 1
+    },
+    "882659":
+    {
+        "Name": "Slumberdream Valley Cross-Region Screen Effect",
+        "Desc": ""
     },
     "882811":
     {
@@ -769,7 +1014,22 @@
     "883102":
     {
         "Name": "Lizard Armor",
-        "Desc": "Deals damage with Sand Break to gain Shield"
+        "Desc": "Deals damage with Sand Breath to gain Shield"
+    },
+    "883109":
+    {
+        "Name": "Dream Spirit 100% Shield",
+        "Desc": "Applies a Shield equal to 100% HP to self"
+    },
+    "883112":
+    {
+        "Name": "Stun Beam",
+        "Desc": "Stunned from the Light-Prayer Caprahorn's attack"
+    },
+    "883118":
+    {
+        "Name": "Nightmare Illusion - Floor Marker",
+        "Desc": ""
     },
     "900122":
     {
@@ -780,6 +1040,231 @@
     {
         "Name": "End of Dungeon (Invincibility)",
         "BuffType": 1
+    },
+    "995022":
+    {
+        "Name": "Dragon Claw Valley - Wall Running Boost",
+        "Desc": "Boosts the character for enhanced wall running",
+        "BuffType": 1
+    },
+    "997200":
+    {
+        "Name": "Slumberdream Value (Tracker)",
+        "Desc": "Tracks how much Slumberdream Value there is",
+        "BuffType": 1
+    },
+    "997201":
+    {
+        "Name": "Slumberdream Valley Region 1",
+        "Desc": "",
+        "BuffType": 1
+    },
+    "997202":
+    {
+        "Name": "Slumberdream Valley Region 2",
+        "Desc": "",
+        "BuffType": 1
+    },
+    "997206":
+    {
+        "Name": "Slumberdream Materialization",
+        "Desc": "You become effected by the high amount of Slumberdream, starting to wake up.\nApplies the color change to the player",
+        "BuffType": 1
+    },
+    "997222":
+    {
+        "Name": "Slumberdream Valley - Cargo Pickup",
+        "Desc": ""
+    },
+    "997263":
+    {
+        "Name": "Increase Chance of Legendary Sigil by 1000%",
+        "Desc": "",
+        "BuffType": 1
+    },
+    "997264":
+    {
+        "Name": "Slumberdream Sigil Interaction",
+        "Desc": "Interacting with the Sigil selection system",
+        "BuffType": 1
+    },
+    "997281":
+    {
+        "Name": "Slumberdream Valley - Cargo Remove",
+        "Desc": ""
+    },
+    "997285":
+    {
+        "Name": "Dungeon Marker - Slumberdream Valley",
+        "Desc": ""
+    },
+    "997309":
+    {
+        "Name": "Slumberdream Value - 30% Removed",
+        "Desc": "Reduces the Slumberdream Value by 30%",
+        "BuffType": 1
+    },
+    "997403":
+    {
+        "Name": "Brutality: Crit Storm",
+        "Desc": "When landing a Crit hit, deals additional AOE DMG equal to 200% ATK at target location.\nThis AOE DMG will always Crit.\nFor each 'Brutality' Sigil owned, increase this final DMG by 50%",
+        "BuffType": 1
+    },
+    "997404":
+    {
+        "Name": "Brutality: Crit Storm (AOE)",
+        "Desc": "Deals AOE DMG equal to 200% ATK at target location (CD: 1s).\nThis AOE DMG will always Crit.\nFor each 'Brutality' Sigil owned, increase this final DMG by 50%"
+    },
+    "997411":
+    {
+        "Name": "Revenge Crit",
+        "Desc": "When damage dealt is not a crit hit, Crit increases by 50% until the next crit hit",
+        "BuffType": 1
+    },
+    "997416":
+    {
+        "Name": "Brutality: Crit on Kill",
+        "Desc": "For every enemy defeated, Crit increases by 0.3% (up to 100 stacks)",
+        "BuffType": 1
+    },
+    "997419":
+    {
+        "Name": "Brutality: Lucky Crit",
+        "Desc": "When landing a Crit hit, deals additional AOE DMG equal to 200% ATK at target location (CD: 1s).\nThis AOE DMG will always be a Lucky Strike",
+        "BuffType": 1
+    },
+    "997447":
+    {
+        "Name": "Luck: Time's Favor",
+        "Desc": "For every 50 Lucky Strikes on the primary target, increases the cooldown recovery speed of all skills for a period of time (paused while active)",
+        "BuffType": 1
+    },
+    "997458":
+    {
+        "Name": "Luck: Tempest Flow",
+        "Desc": "Every 15s, Lucky Strike Damage increases by 40% for 8s",
+        "BuffType": 1
+    },
+    "997459":
+    {
+        "Name": "Luck: Tempest Flow - Lucky Strike DMG",
+        "Desc": "Lucky Strike Damage increased",
+        "BuffType": 1
+    },
+    "997462":
+    {
+        "Name": "Luck: Wind King's Pact",
+        "Desc": "When dealing damage triggers a Lucky Strike, summon a Wind Goblin King (CD: 20s)",
+        "BuffType": 1
+    },
+    "997475":
+    {
+        "Name": "Imagine: Imagine Resonance",
+        "Desc": "Every Battle Imagine permanently increases ATK by 0.5% (up to 60 stacks)",
+        "BuffType": 1
+    },
+    "997485":
+    {
+        "Name": "Imagine: King's Reinforcements",
+        "Desc": "When HP falls below 50%, summons a Muku King Imagine",
+        "BuffType": 1
+    },
+    "997486":
+    {
+        "Name": "Imagine: Tina's Blessing",
+        "Desc": "Automatically summons a Tina Imagine every 60s",
+        "BuffType": 1
+    },
+    "997488":
+    {
+        "Name": "Imagine: Lucky Phantom",
+        "Desc": "When dealing damage or healing triggers a Lucky Strike, random summons a Luck Imagine",
+        "BuffType": 1
+    },
+    "997514":
+    {
+        "Name": "Attribute Transfer",
+        "Desc": "When Crit/Luck/Haste/Mastery/Versatility changes, nearby allies gain a 10% increase of the corresponding stat for 10s",
+        "BuffType": 1
+    },
+    "997516":
+    {
+        "Name": "Team: Join Forces",
+        "Desc": "For each ally within 15m, damage increases and damage taken is reduced",
+        "BuffType": 1
+    },
+    "997523":
+    {
+        "Name": "Coordinated Suppress",
+        "Desc": "Reduces damage dealt by enemies within 10m by 10%",
+        "BuffType": 1
+    },
+    "997531":
+    {
+        "Name": "Synergy Healing Wave",
+        "Desc": "After an Ultimate Skill is cast, a Healing Aura that lasts 10s is created.\nEvery second, it will heal allies within 15m by 100% of ATK (CD: 30s)",
+        "BuffType": 1
+    },
+    "997544":
+    {
+        "Name": "Guardian Synergy - Swarm",
+        "Desc": "When healing is applied, summons a Beehive",
+        "BuffType": 1
+    },
+    "998040":
+    {
+        "Name": "Cooldown: Hourglass of Time",
+        "Desc": "Special Attacks reduce the remaining Expertise Skill CD by 0.5s",
+        "Icon": "ui/atlas/affix/com_affix_hechongji",
+        "BuffType": 1
+    },
+    "998150":
+    {
+        "Name": "Luck - Blade Storm",
+        "Desc": "Landing a Lucky Strike triggers Blade Storm. CD: 1s",
+        "BuffType": 1
+    },
+    "998170":
+    {
+        "Name": "Luck: Chain Lightning",
+        "Desc": "Landing a Lucky Strike triggers Lightning Chain, dealing DMG equal to 1% Max HP (CD: 1s)",
+        "BuffType": 1
+    },
+    "998201":
+    {
+        "Name": "Blood Pact (Cursed)",
+        "Desc": "ATK +25%. If HP is above 30%, each attack consumes 2.5% HP",
+        "BuffType": 1
+    },
+    "998220":
+    {
+        "Name": "Bloodwrath: Blood Surge",
+        "Desc": "Landing a Lucky Strike triggers Fireball Explosion, dealing DMG equal to 20% of your lost HP",
+        "Icon": "ui/atlas/affix/com_affix_dot_ignite",
+        "BuffType": 1
+    },
+    "998221":
+    {
+        "Name": "Bloodwrath: Blood Surge (Target)",
+        "Desc": "",
+        "Icon": "ui/atlas/affix/com_affix_dot_ignite"
+    },
+    "998381":
+    {
+        "Name": "Seismic Strike",
+        "Desc": "Deals AoE DMG equal to 20% of Max HP every 3s",
+        "BuffType": 1
+    },
+    "998390":
+    {
+        "Name": "Giant's Grasp",
+        "Desc": "Gains ATK equal to 0.3% Max HP",
+        "BuffType": 1
+    },
+    "998461":
+    {
+        "Name": "Battle Starfall (Curse)",
+        "Desc": "ATK +25%, HP -1% per second"
     },
     "2031001":
     {
@@ -861,6 +1346,23 @@
         "Name": "Forest Ring - Luck",
         "BuffType": 1
     },
+    "2032001":
+    {
+        "Name": "Consume Healing Item",
+        "Desc": "Used a healing item, such as a Health Potion",
+        "BuffType": 1
+    },
+    "2032002":
+    {
+        "Name": "General Healing",
+        "BuffType": 1
+    },
+    "2033000":
+    {
+        "Name": "HP Regen",
+        "Desc": "Restore a percent of Max HP + additional fixed HP",
+        "BuffType": 1
+    },
     "2100406":
     {
         "Name": "Silent Command",
@@ -884,11 +1386,28 @@
         "Name": "Life Barrier Shield",
         "Desc": "Shield equal to 20% Support Caster's Max HP"
     },
+    "2100412":
+    {
+        "Name": "Renewal Prayer",
+        "Desc": "Being revived through a prayer"
+    },
     "2100413":
     {
         "Name": "Mocking Roar - Universal Taunt",
         "Desc": "Interrupting all targets within 10m and taunts them.\nGreatly increases Aggro against the targets for 10s",
         "BuffType": 1
+    },
+    "2110032":
+    {
+        "Name": "Heroes Never Die!",
+        "Desc": "Resurrected by Airona",
+        "BuffType": 1
+    },
+    "2110057":
+    {
+        "Name": "Weakened: Wish Sealed",
+        "Desc": "Enters the [Weakened] state. During this period, \"Arcane! Blessing of Life\" and the Renewal Prayer role skill cannot be added again.",
+        "BuffType": 0
     },
     "2110081":
     {
@@ -902,12 +1421,25 @@
     },
     "2110093":
     {
-        "Name": "Stunt! Lightning Smite",
+        "Name": "Imagine - Return To Caster",
+        "Desc": "Effect played when the Imagine returns to the summoner",
+        "BuffType": 1
+    },
+    "2110125":
+    {
+        "Name": "Highland Blood",
+        "Desc": "All-element damage increased!\nFrom Arcane! Fatal Spiral",
         "BuffType": 1
     },
     "2110130":
     {
-        "Name": "Stunt! Lightning Smite (Armor Conversion)"
+        "Name": "Stunt! Lightning Smite (Armor Conversion)",
+        "BuffType": 1
+    },
+    "2110136":
+    {
+        "Name": "Arcane! Divine Reliance (Player Tracking)",
+        "BuffType": 1
     },
     "2200020":
     {
@@ -1443,6 +1975,12 @@
         "Desc": "While shielded, use Basic Attack midair to slam down, detonating the shield and dealing damage equal to 30% Max HP to nearby enemies",
         "BuffType": 1
     },
+    "2201171":
+    {
+        "Name": "Resolute Breath",
+        "Desc": "While shielded, use Basic Attack midair to slam down, detonating the shield and dealing damage equal to 30% Max HP to nearby enemies",
+        "BuffType": 1
+    },
     "2201173":
     {
         "Name": "Resolute Breath Ready",
@@ -1528,6 +2066,12 @@
         "BuffType": 1
     },
     "2201300":
+    {
+        "Name": "Group Suppress (Talent)",
+        "Desc": "Each enemy within 3 meters enhances the effectiveness of Suppress by 3%, up to 15%. This effect is doubled against Elite or stronger enemies",
+        "BuffType": 1
+    },
+    "2201301":
     {
         "Name": "Group Suppress",
         "Desc": "Each enemy within 3 meters enhances the effectiveness of Suppress by 3%, up to 15%. This effect is doubled against Elite or stronger enemies",
@@ -2333,7 +2877,8 @@
     "2202705":
     {
         "Name": "Moonlight Solace Shield",
-        "Desc": "Shield applied from Flower Time Dance's Flower Stalk Moonlight Solace.\nAlso reduces damage taken by 10%"
+        "Desc": "Shield applied from Flower Time Dance's Flower Stalk Moonlight Solace.\nAlso reduces damage taken by 10%",
+        "BuffType": 1
     },
     "2202710":
     {
@@ -4696,9 +5241,603 @@
         "Desc": "After casting Center Stage, summon a wave of Sonic Surge, restoring HP over time",
         "BuffType": 1
     },
+    "2300070":
+    {
+        "Name": "Life Condense (Module)",
+        "Desc": "When your HP is above a threshold, every additional threshold increases your Healing by a percentage",
+        "BuffType": 1
+    },
+    "2300080":
+    {
+        "Name": "Life Steal (Module)",
+        "Desc": "When your Class Skill deals DMG, you restore HP based on that DMG up to a percentage of your Max HP",
+        "BuffType": 1
+    },
+    "2300620":
+    {
+        "Name": "DMG Stack (Module)",
+        "Desc": "When dealing DMG, you have a chance to increase your DMG dealt to that target for 8s, stacking up to 4 times",
+        "BuffType": 1
+    },
+    "2300621":
+    {
+        "Name": "DMG Stack",
+        "Desc": "DMG dealt to this target by the Caster is increased for 8s, stacking up to 4 times",
+        "BuffType": 0
+    },
+    "2300820":
+    {
+        "Name": "Final Protection (Module)",
+        "Desc": "You gain Resistance. If your HP is below a threshold, you gain additional Resistance based on missing HP from that threshold. Stacking up to 3 times",
+        "BuffType": 1
+    },
+    "2302020":
+    {
+        "Name": "Agile (Module)",
+        "Desc": "After entering combat, Speed increased and ATK increased, removed upon taking damage.\nIf no damage is taken within 5s, regain the buff",
+        "BuffType": 1
+    },
+    "2302021":
+    {
+        "Name": "Agile",
+        "Desc": "After entering combat, Speed increased and ATK increased, removed upon taking damage.\nIf no damage is taken within 5s, regain the buff",
+        "BuffType": 1
+    },
+    "2302120":
+    {
+        "Name": "Team Luck and Crit (Module)",
+        "Desc": "Entire team deals more Crit DMG and more Lucky DMG.\nThis effect is doubled on yourself",
+        "BuffType": 1
+    },
+    "2302121":
+    {
+        "Name": "Team Luck and Crit",
+        "Desc": "Entire team deals more Crit DMG and more Lucky DMG.\nThis effect is doubled on yourself",
+        "BuffType": 1
+    },
+    "2302320":
+    {
+        "Name": "First Aid (Module)",
+        "Desc": "When HP drops below a limit, receiving damage grants a healing aura that heals you and up to 10 nearby allies per second for 5s (CD: 30s)",
+        "BuffType": 1
+    },
+    "2302321":
+    {
+        "Name": "First Aid",
+        "Desc": "When HP drops below a limit, receiving damage grants a healing aura that heals you and up to 10 nearby allies per second for 5s (CD: 30s)",
+        "BuffType": 1
+    },
+    "2302420":
+    {
+        "Name": "Life Wave (Module)",
+        "Desc": "When HP changes, the highest attribute among Crit, Mastery, Haste, Versatility, or Luck increased for 5s",
+        "BuffType": 1
+    },
+    "2302421":
+    {
+        "Name": "Life Wave",
+        "Desc": "Highest attribute among Crit, Mastery, Haste, Versatility, or Luck increased",
+        "BuffType": 1
+    },
+    "2401130":
+    {
+        "Name": "S2 Set - 2 Piece (Iaido Spec)",
+        "Desc": "When your Class Skill deals Crit DMG to the current target, Crit DMG +2% for 5s, stacking up to 5 times",
+        "BuffType": 1
+    },
+    "2401131":
+    {
+        "Name": "S2 Set - 2 Piece (Iaido Spec) (Buff)",
+        "Desc": "Crit DMG +2% for 5s, stacking up to 5 times",
+        "BuffType": 1
+    },
+    "2401140":
+    {
+        "Name": "S2 Set - 4 Piece (Iaido Spec)",
+        "Desc": "While Volt Surge is inactive, Overdrive yields +1 Thunder Sigil",
+        "BuffType": 1
+    },
+    "2401260":
+    {
+        "Name": "S2 Set - 2 Piece (Moonstrike Spec)",
+        "Desc": "When Attack SPD is below 80%, Attack SPD +6%.\nWhen Attack SPD is 80% or higher, Expertise Skill Thunder DMG +7%",
+        "BuffType": 1
+    },
+    "2401261":
+    {
+        "Name": "S2 Set - 2 Piece (Moonstrike Spec) (Buff)",
+        "Desc": "When Attack SPD is below 80%, Attack SPD +6%.\nWhen Attack SPD is 80% or higher, Expertise Skill Thunder DMG +7%",
+        "BuffType": 1
+    },
+    "2401270":
+    {
+        "Name": "S2 Set - 4 Piece (Moonstrike Spec)",
+        "Desc": "After 2 uses of Divine Sickle, your next Divine Sickle triggers 1 instance of Reversal Blade, which counts as Divine Sickle",
+        "BuffType": 1
+    },
+    "2401271":
+    {
+        "Name": "S2 Set - 4 Piece (Moonstrike Spec) (Buff)",
+        "Desc": "After 2 uses of Divine Sickle, your next Divine Sickle triggers 1 instance of Reversal Blade, which counts as Divine Sickle",
+        "BuffType": 1
+    },
+    "2402140":
+    {
+        "Name": "S2 Set - 2 Piece (Icicle Spec)",
+        "Desc": "Frost Lance and Meteor Storm Crit DMG +13%.\nCasting Crystal Veil recovers 80 Ice Energy over 5s",
+        "BuffType": 1
+    },
+    "2402150":
+    {
+        "Name": "S2 Set - 4 Piece (Icicle Spec)",
+        "Desc": "On Crit or Lucky Strike, Frost Lance grants 1 stack of Phantom Ice. Grants 2 stacks if Crit and Lucky Strike are both triggered.\nAt 25 stacks of Phantom Ice, Crystal Veil is automatically cast forward (15s CD)",
+        "BuffType": 1
+    },
+    "2402151":
+    {
+        "Name": "S2 Set - 4 Piece (Icicle Spec) Buff",
+        "Desc": "On Crit or Lucky Strike, Frost Lance grants 1 stack of Phantom Ice. Grants 2 stacks if Crit and Lucky Strike are both triggered.\nAt 25 stacks of Phantom Ice, Crystal Veil is automatically cast forward (15s CD)",
+        "BuffType": 1
+    },
+    "2402260":
+    {
+        "Name": "S2 Set - 2 Piece (Frostbeam Spec)",
+        "Desc": "Ice Arrow DMG +15% (counts toward the talent 'Frost Explosion')",
+        "BuffType": 1
+    },
+    "2402270":
+    {
+        "Name": "S2 Set - 4 Piece (Frostbeam Spec)",
+        "Desc": "Tidepool DMG +28% against current target",
+        "BuffType": 1
+    },
+    "2403140":
+    {
+        "Name": "S2 Set - 2 Piece (Vanguard Spec)",
+        "Desc": "Courage-consuming Class Skills ignore 22% of the target's Armor",
+        "BuffType": 1
+    },
+    "2403150":
+    {
+        "Name": "S2 Set - 4 Piece (Vanguard Spec)",
+        "Desc": "Casting Galeform automatically triggers 1 shot of Drake Cannon. Vortex Strike now has 2 charges",
+        "BuffType": 1
+    },
+    "2403260":
+    {
+        "Desc": "6% PHY Boost while in Galeform"
+    },
+    "2403270":
+    {
+        "Name": "S2 Set - 4 Piece (Skyward Spec)",
+        "Desc": "After casting Galeform, the next Skyfall and Instant Edge gain Wind DMG +70%",
+        "BuffType": 1
+    },
+    "2403271":
+    {
+        "Name": "S2 Set - 4 Piece (Skyward Spec) (Instant Edge)",
+        "Desc": "The Instant Edge gains Wind DMG +70%",
+        "BuffType": 1
+    },
+    "2403272":
+    {
+        "Name": "S2 Set - 4 Piece (Skyward Spec) (Skyfall)",
+        "Desc": "The next Skyfall gains Wind DMG +70%",
+        "BuffType": 1
+    },
+    "2403280":
+    {
+        "Name": "S2 Set - 2 Piece (Skyward Spec)",
+        "Desc": "Triggering a Lucky Strike reduces the remaining CD of Galreform by 0.2s.\nWhile Galeform is active, casting Galeform again will immediately grant you the Courage to be recovered from the previous Galeform.",
+        "BuffType": 1
+    },
+    "2404150":
+    {
+        "Name": "S2 Set - 2 Piece (Smite Spec)",
+        "Desc": "Feral Seed CD -25% Feral Seed elemental DMG +12%",
+        "BuffType": 1
+    },
+    "2404160":
+    {
+        "Name": "S2 Set - 4 Piece (Smite Spec)",
+        "Desc": "While Nature Ward is active, overhealing is converted into a shield that can't exceed 50% of Max HP.\nNature Ward duration +5s",
+        "BuffType": 1
+    },
+    "2404260":
+    {
+        "Name": "S2 Set - 2 Piece (Lifebind Spec)",
+        "Desc": "Direct-healing Class Skills grant the target 1 stack of Spring Breeze: Max HP +2.5% for 10s. Stacks up to 5 times",
+        "BuffType": 1
+    },
+    "2404261":
+    {
+        "Name": "Spring Breeze",
+        "Desc": "Max HP +2.5% for 10s. Stacks up to 5 times",
+        "BuffType": 1
+    },
+    "2404270":
+    {
+        "Name": "S2 Set - 4 Piece (Lifebind Spec)",
+        "Desc": "At max stacks, casting any direct-healing Class Skill converts Spring Breeze into Full Bloom.\nFull Bloom: Gains a shield equal to 1200% ATK and increase the effectiveness of Inspiration by 20%. Lasts 10s",
+        "BuffType": 1
+    },
+    "2404271":
+    {
+        "Name": "Full Bloom",
+        "Desc": "Gains a shield equal to 1200% ATK and increase the effectiveness of Inspiration by 20%. Lasts 10s",
+        "BuffType": 1
+    },
+    "2405150":
+    {
+        "Name": "S2 Set - 2 Piece (Wildpack Spec)",
+        "Desc": "Each 1% Mastery grants 0.2% Crit DMG",
+        "BuffType": 1
+    },
+    "2405160":
+    {
+        "Name": "S2 Set - 4 Piece (Wildpack Spec)",
+        "Desc": "Storm Arrow grants +1.5% Agility on hit. Lasts 8s and stacks up to 5 times",
+        "BuffType": 1
+    },
+    "2405161":
+    {
+        "Name": "S2 Set - 4 Piece (Wildpack Spec) (Buff)",
+        "Desc": "Storm Arrow grants +1.5% Agility on hit. Lasts 8s and stacks up to 5 times",
+        "BuffType": 1
+    },
+    "2405250":
+    {
+        "Name": "S2 Set - 4 Piece (Falconry Spec)",
+        "Desc": "While Focus is active, Crit DMG +50%",
+        "BuffType": 1
+    },
+    "2405260":
+    {
+        "Name": "S2 Set - 2 Piece (Falconry Spec)",
+        "Desc": "Each use of Special Attacks reduces the remaining CD on Radiance Barrage by 1s.\nGreatly increases the Casting SPD of Radiance Barrage",
+        "BuffType": 1
+    },
+    "2406150":
+    {
+        "Name": "S2 Set - 2 Piece (Earthfort Spec)",
+        "Desc": "DMG of Sandshroud, Star Shatter, and Starfall +35%.\nClass Skills have a 18% chance to generate 1 Sand Crystals when dealing damage to current target",
+        "BuffType": 1
+    },
+    "2406160":
+    {
+        "Name": "S2 Set - 4 Piece (Earthfort Spec)",
+        "Desc": "DMG of Shield Bash, Rage Burst, and Terra Sunder +25%.\nOn hit, they reduce the DMG the target deals to you by 5% for 8s",
+        "BuffType": 1
+    },
+    "2406161":
+    {
+        "Name": "S2 Set - 4 Piece (Earthfort Spec) (Buff)",
+        "Desc": "DMG dealt to Caster reduced by 5% for 8s"
+    },
+    "2406270":
+    {
+        "Name": "S2 Set - 2 Piece (Block Spec)",
+        "Desc": "While Sandshroud is active, DMG of Granite Fury and Stone Fist +50%.\nWhen Sandshroud deals damage to current target, 20% chance that next Granite Fury consumes no Sand Crystals",
+        "BuffType": 1
+    },
+    "2406271":
+    {
+        "Name": "S2 Set - 2 Piece (Block Spec) (Buff)",
+        "Desc": "Next Granite Fury consumes no Sand Crystals",
+        "BuffType": 1
+    },
+    "2406280":
+    {
+        "Name": "S2 Set - 2 Piece (Block Spec)",
+        "Desc": "Casting Granite reduces the remaining CD on Sandshroud by 0.6s. If Sandshroud is active, its duration is extended by 0.6s",
+        "BuffType": 1
+    },
+    "2407140":
+    {
+        "Name": "S2 Set - 2 Piece (Recovery Spec)",
+        "Desc": "Casting Reckoning or Inferno Reckoning grants Glimmering: Damage +8%, Armor +12% for 5s",
+        "BuffType": 1
+    },
+    "2407141":
+    {
+        "Name": "S2 Set - 2 Piece (Recovery Spec) (Glimmering)",
+        "Desc": "Damage +8%, Armor +12% for 5s",
+        "BuffType": 1
+    },
+    "2407150":
+    {
+        "Name": "S2 Set - 4 Piece (Recovery Spec)",
+        "Desc": "While Aegis Ward is active, Glimmering effects are doubled and additionally convert 20% of damage dealt into a Radiant Shield",
+        "BuffType": 1
+    },
+    "2407151":
+    {
+        "Name": "S2 Set - 4 Piece (Recovery Spec) (Buff)",
+        "Desc": "While Aegis Ward is active, Glimmering effects are doubled and additionally convert 20% of damage dealt into a Radiant Shield",
+        "BuffType": 1
+    },
+    "2407250":
+    {
+        "Name": "Mythic Weapon 1",
+        "Desc": "Melee DMG Bonus +8%",
+        "BuffType": 1
+    },
+    "2407280":
+    {
+        "Name": "S2 Set - 2 Piece (Shield Spec)",
+        "Desc": "Each stack of Lightforged Barrier reduces damage taken by 0.5% and increases Strength by 1%.\nCasting Judgment immediately grants 1 stack of Lightforged Barrier",
+        "BuffType": 1
+    },
+    "2407290":
+    {
+        "Name": "S2 Set - 4 Piece (Shield Spec)",
+        "Desc": "For every 15 stacks of Lightforged Barrier consumed, gain Damage +10% and Haste +6% for 7s",
+        "BuffType": 1
+    },
+    "2407291":
+    {
+        "Name": "S2 Set - 4 Piece (Shield Spec) (Buff)",
+        "Desc": "Damage +10% and Haste +6% for 7s",
+        "BuffType": 1
+    },
+    "2407300":
+    {
+        "Name": "Mythic Weapon 1 - Alt",
+        "Desc": "Attack DMG +8%"
+    },
+    "2408130":
+    {
+        "Name": "S2 Set - 2 Piece (Dissonance Spec)",
+        "Desc": "While Heroic Melody is active, Fire Bonus +5%",
+        "BuffType": 1
+    },
+    "2408140":
+    {
+        "Name": "S2 Set - 4 Piece (Dissonance Spec)",
+        "Desc": "Amplified Beat has +1 hit count",
+        "BuffType": 1
+    },
+    "2408260":
+    {
+        "Name": "S2 Set - 2 Piece (Concerto Spec)",
+        "Desc": "Healing Melody gains +14% Fire Bonus on healing output",
+        "BuffType": 1
+    },
+    "2408270":
+    {
+        "Name": "S2 Set - 4 Piece (Concerto Spec)",
+        "Desc": "Within 5s after casting Healing Beat, the final healing of Healing Melody is increased by 8%.\nWithin 8s after casting Fivefold Crescendo, the final healing of Heroic Melody is increased by 16%",
+        "BuffType": 1
+    },
+    "2408271":
+    {
+        "Name": "S2 Set - 4 Piece (Concerto Spec) (Healing Beat)",
+        "Desc": "Within 5s after casting Healing Beat, the final healing of Healing Melody is increased by 8%.",
+        "BuffType": 1
+    },
+    "2408272":
+    {
+        "Name": "S2 Set - 4 Piece (Concerto Spec) (Fivefold Crescendo)",
+        "Desc": "Within 8s after casting Fivefold Crescendo, the final healing of Heroic Melody is increased by 16%",
+        "BuffType": 1
+    },
     "3002011":
     {
         "Name": "Fantasia Impact CD",
+        "BuffType": 1
+    },
+    "3002080":
+    {
+        "Name": "Chrono Elixir",
+        "Desc": "Food and Potion duration +30%",
+        "BuffType": 1
+    },
+    "3002090":
+    {
+        "Name": "Blink Breath",
+        "Desc": "Increases Movement Speed by 10% and Restored 35 Stamina Per Second while in combat",
+        "BuffType": 1
+    },
+    "3002210":
+    {
+        "Name": "Phantom Execution",
+        "Desc": "Within 15s, after 10 instances of casting non-Basic Attack Class Skills, your next Class Skill will trigger Phantom Execution (15s CD)",
+        "BuffType": 1
+    },
+    "3002211":
+    {
+        "Name": "Phantom Execution CD",
+        "Desc": "Within 15s, after 10 instances of casting non-Basic Attack Class Skills, your next Class Skill will trigger Phantom Execution (15s CD)",
+        "BuffType": 1
+    },
+    "3002215":
+    {
+        "Name": "Phantom Execution Actual Damage",
+        "Desc": "Deals Adaptive DMG equasl to 650% ATK and Crit DMG reaches 500%",
+        "BuffType": 0
+    },
+    "3002230":
+    {
+        "Name": "Phantom Execution - Execution Force",
+        "Desc": "For each instance your Class Skills deal Crit DMG, increases Phantom Execution Dream DMG by 6% for 8s, stacking up to 5 times",
+        "BuffType": 1
+    },
+    "3002231":
+    {
+        "Name": "Execution Force",
+        "Desc": "Increases Phantom Execution Dream DMG by 6% for 8s, stacking up to 5 times",
+        "BuffType": 1
+    },
+    "3002240":
+    {
+        "Name": "Phantom Execution - Time-Slit",
+        "Desc": "When Phantom Execution hits a single target, grants one of the following non-stacking 3 effects at random:\nIllusion: Increases main attributes by 10% for 10s\nDream: CD of Special Attack and Expertise Skill -12% for 7s\nSlumber: Dream DMG of Expertise Skill +14% for 15s",
+        "BuffType": 1
+    },
+    "3002241":
+    {
+        "Name": "Time-Slit - Illusion",
+        "Desc": "Main attributes +10% for 10s",
+        "BuffType": 1
+    },
+    "3002242":
+    {
+        "Name": "Time-Slit - Dream",
+        "Desc": "CD of Special Attack and Expertise Skill -12% for 7s",
+        "BuffType": 1
+    },
+    "3002243":
+    {
+        "Name": "Time-Slit - Slumber",
+        "Desc": "Dream DMG of Expertise Skill +14% for 15s",
+        "BuffType": 1
+    },
+    "3002270":
+    {
+        "Name": "Phantom Execution - Cinder of Reverie",
+        "Desc": "Phantom Execution unleaches an extra burst, but that burst's Dream DMG decreases by 50%",
+        "BuffType": 1
+    },
+    "3002280":
+    {
+        "Name": "Phantom Execution - Swift-Calc",
+        "Desc": "When non-Basic Attack Direct-DMG class skills deal Crit DMG, Phantom Execution trigger count +1, and internal CD -0.5s (up to once every 0.5s)",
+        "BuffType": 1
+    },
+    "3002410":
+    {
+        "Name": "Phantom Arrow",
+        "Desc": "Casting a DMG-type Expertise Skill summons Phantom Arrows, up to once every 7s.\nDuring combat, each summon of Phantom Arrow increases the number summoned next time by 1 (up to 8).\nEach use of Special Attack reduces the CD by 0.6s. If not triggered for 60s, stack count resets.\nEach 1% Mastery increases its DMG by 0.5%",
+        "BuffType": 1
+    },
+    "3002411":
+    {
+        "Name": "Phantom Arrow Stacks",
+        "Desc": "",
+        "BuffType": 1
+    },
+    "3002413":
+    {
+        "Name": "Phantom Arrow Self-Removal",
+        "Desc": "If no Phantom Arrow is triggered for 60s, stack count resets",
+        "BuffType": 0
+    },
+    "3002420":
+    {
+        "Name": "Phantom Arrow - Dual Time",
+        "Desc": "When Special Attack reduces Phantom Arrow CD, it has a 30% chance to double the reduction",
+        "BuffType": 1
+    },
+    "3002450":
+    {
+        "Name": "Phantom Arrow - Eightfold Skyflow",
+        "Desc": "Increases Phantom Arrow max stack count by 2",
+        "BuffType": 1
+    },
+    "3002470":
+    {
+        "Name": "Phantom Arrow - Phantom Pierce",
+        "Desc": "Phantom Arrow nullifies Defense (both Armor and Resistance)",
+        "BuffType": 1
+    },
+    "3002671":
+    {
+        "Name": "Mirage Dream - Immortal Stance (Sub-Buff)",
+        "Desc": "Grants 1% Life Steal and Super Armor",
+        "BuffType": 1
+    },
+    "3002480":
+    {
+        "Name": "Phantom Arrow - Expert Technique",
+        "Desc": "Dream DMG of Expertise Skill +12%",
+        "BuffType": 1
+    },
+    "3002610":
+    {
+        "Name": "Mirage Dream",
+        "Desc": "When Basic Attack or Special Attack deals 12 hits to the main target (melee skills count +1), triggers Mirage Dream for 8s, stacking up to 10 times",
+        "BuffType": 1
+    },
+    "3002611":
+    {
+        "Name": "Mirage Dream",
+        "Desc": "Increases ATK",
+        "BuffType": 1
+    },
+    "3003010":
+    {
+        "Name": "Oblivion Dream",
+        "Desc": "Applies Oblivion Dream, inflicting Oblivion on enemies within 5m",
+        "BuffType": 1
+    },
+    "3003012":
+    {
+        "Name": "Oblivion Dream Applied",
+        "Desc": "Oblivion Dream takes effect on the target"
+    },
+    "3003030":
+    {
+        "Name": "Oblivion Dream - Illusion Obsession",
+        "Desc": "Taking lethal DMG triggers Near Death for 1s, up to once every 45s",
+        "BuffType": 1
+    },
+    "3003031":
+    {
+        "Name": "Oblivion Dream - Illusion Obsession - Near Death Ready",
+        "Desc": "Taking lethal DMG triggers Near Death for 1s, up to once every 45s",
+        "BuffType": 1
+    },
+    "3003040":
+    {
+        "Name": "Oblivion Dream - Limit Extension",
+        "Desc": "Oblivion Dream range increases to 10m",
+        "BuffType": 1
+    },
+    "3003041":
+    {
+        "Name": "Oblivion Dream - Limit Extension Buff",
+        "Desc": "Oblivion Dream range increases to 10m",
+        "BuffType": 1
+    },
+    "3003050":
+    {
+        "Name": "Oblivion Dream - Harmony Grace",
+        "Desc": "Oblivion Dream erupts upon combat start, increasing the main stat of allies within range by 2% for 8s. It erupts again every 15s",
+        "BuffType": 1
+    },
+    "3003053":
+    {
+        "Name": "Oblivion Dream - Harmony Grace Boundary",
+        "Desc": "",
+        "BuffType": 1
+    },
+    "3003054":
+    {
+        "Name": "Oblivion Dream - Harmony Grace CD",
+        "Desc": "Cooldown for Harmony Grace"
+    },
+    "3003070":
+    {
+        "Name": "Oblivion Dream - Dream Obsession",
+        "Desc": "Oblivion Dream grants allies within range 5% Dream DMG Reduction.\nIf there are 3 or more enemies within range, Dream DMG Reduction additionally increases by 3%",
+        "BuffType": 1
+    },
+    "3003071":
+    {
+        "Name": "Oblivion Dream - Dream Obsession Buff",
+        "Desc": "5% Dream DMG Reduction.\nIf there are 3 or more enemies within range, Dream DMG Reduction additionally increases by 3%",
+        "BuffType": 1
+    },
+    "3003080":
+    {
+        "Name": "Oblivion Dream - Feint Strike",
+        "Desc": "Deals 6% more Dream DMG to targets affected by Oblivion Dream",
+        "BuffType": 1
+    },
+    "3003210":
+    {
+        "Name": "Shattered Illusion",
+        "Desc": "Every 5s, the next damage you deal will trigger Shattered Illusion.\nEach 1% Mastery grants it 0.65% Element Bonus",
         "BuffType": 1
     },
     "3003211":
@@ -4718,6 +5857,36 @@
         "Name": "Shattered Illusion - Sub-Buff Skill",
         "Desc": "Illusory Countershock CD",
         "BuffType": 0
+    },
+    "3003250":
+    {
+        "Name": "Shattered Illusion - Stasis Recovery",
+        "Desc": "Restores 2% Max HP every 3s. While standing still, the amount is doubled",
+        "BuffType": 1
+    },
+    "3003260":
+    {
+        "Name": "Shattered Illusion - Judgment - Heal",
+        "Desc": "When Shattered Illusion deals damage, restores 2% Max HP (only triggers once when hitting multiple targets)",
+        "BuffType": 1
+    },
+    "3003270":
+    {
+        "Name": "Shattered Illusion - Surge",
+        "Desc": "When hit, reduces the Shattered Illusion CD by 0.5 (up to once per second)",
+        "BuffType": 1
+    },
+    "3003280":
+    {
+        "Name": "Shattered Illusion - Resilience",
+        "Desc": "Armor +15%",
+        "BuffType": 1
+    },
+    "3003290":
+    {
+        "Name": "Shattered Illusion - Uplift",
+        "Desc": "When current HP is no less than 90%, every time Shattered Illusion is triggered or cast, main stats increase up to 5 stacks.\nLoses this effect when HP drops below 40%",
+        "BuffType": 1
     },
     "3003610":
     {
@@ -4742,6 +5911,12 @@
     "3003650":
     {
         "Name": "Illusion Bond 5",
+        "BuffType": 1
+    },
+    "3004410":
+    {
+        "Name": "Overload Crit",
+        "Desc": "Crit +30%. For any permanent Crit above 50%, every 2% is converted to 1% Crit DMG up to 50%",
         "BuffType": 1
     },
     "3054060":
@@ -4816,6 +5991,12 @@
         "Desc": "Max HP increased for the next few seconds",
         "BuffType": 1
     },
+    "3059101":
+    {
+        "Name": "Stormblade Stasis X1 (Buff)",
+        "Desc": "During Volt Surge and Stormflash, restores Max HP per second",
+        "BuffType": 1
+    },
     "3059221":
     {
         "Name": "Verdant Oracle Stasis X1",
@@ -4827,9 +6008,49 @@
         "Name": "Arcane! Thunderfall Grasp - Passive",
         "BuffType": 1
     },
+    "3210031":
+    {
+        "Name": "Arcane! Thunderfall Grasp - Passive Triggered",
+        "Desc": "Applying debuff from passive effect"
+    },
+    "3210032":
+    {
+        "Name": "Arcane! Thunderfall Grasp - Passive Damage Reduction To Player",
+        "Desc": "Reduces damage dealt to player that applied this debuff"
+    },
     "3210060":
     {
         "Name": "Stunt! Super Critical - Passive",
+        "BuffType": 1
+    },
+    "3210131":
+    {
+        "Name": "Arcane! Cabbage Hammer Passive - Main Stat",
+        "Desc": "Strength/Intellect/Agility increased",
+        "BuffType": 1
+    },
+    "3210132":
+    {
+        "Name": "Arcane! Cabbage Hammer Passive - Versatility",
+        "Desc": "Versatility increased",
+        "BuffType": 1
+    },
+    "3210133":
+    {
+        "Name": "Arcane! Cabbage Hammer Passive - Mastery",
+        "Desc": "Mastery increased",
+        "BuffType": 1
+    },
+    "3210134":
+    {
+        "Name": "Arcane! Cabbage Hammer Passive - Haste",
+        "Desc": "Haste increased",
+        "BuffType": 1
+    },
+    "3210135":
+    {
+        "Name": "Arcane! Cabbage Hammer Passive - All-Element DMG",
+        "Desc": "All-Element DMG increased",
         "BuffType": 1
     }
 }

@@ -25,7 +25,7 @@ namespace Zproto {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "CiJlbnVtX2VfZ2xvYmFsX2NvbmRpdGlvbl90eXBlLnByb3RvEgZ6cHJvdG8q",
-            "qx0KFEVHbG9iYWxDb25kaXRpb25UeXBlEhsKF0dsb2JhbENvbmRpdGlvblR5",
+            "wx8KFEVHbG9iYWxDb25kaXRpb25UeXBlEhsKF0dsb2JhbENvbmRpdGlvblR5",
             "cGVOb25lEAASIAocR2xvYmFsQ29uZGl0aW9uVHlwZVVzZXJMZXZlbBABEiIK",
             "Hkdsb2JhbENvbmRpdGlvblR5cGVGaW5pc2hRdWVzdBACEisKJ0dsb2JhbENv",
             "bmRpdGlvblR5cGVQbGFuQ29zdFRhbGVudFBvaW50cxADEhkKFUdsb2JhbENv",
@@ -108,7 +108,13 @@ namespace Zproto {
             "aXRpb25UeXBlT2JqTm9YWlJvdGF0aW9uEHUSKwonR2xvYmFsQ29uZGl0aW9u",
             "VHlwZVJvZ3VlRW50cnlQcm9mZXNzaW9uEHYSKAokR2xvYmFsQ29uZGl0aW9u",
             "VHlwZVJvZ3VlRW50cnlCRENvdW50EHcSKgomR2xvYmFsQ29uZGl0aW9uVHlw",
-            "ZUl0ZW1QYWNrYWdlTGVmdEdyaWQQeGIGcHJvdG8z"));
+            "ZUl0ZW1QYWNrYWdlTGVmdEdyaWQQeBIpCiVHbG9iYWxDb25kaXRpb25UeXBl",
+            "SXNNYWduZXRpY0ZvbGxvd2VyEHkSJwojR2xvYmFsQ29uZGl0aW9uVHlwZU5v",
+            "dEluVmlzdWFsTGF5ZXIQehIjCh9HbG9iYWxDb25kaXRpb25UeXBlUGFyYWRl",
+            "TGVuZ3RoEHsSKQolR2xvYmFsQ29uZGl0aW9uVHlwZUlzR2FtZVRhYmxlUGxh",
+            "eWluZxB8EicKI0dsb2JhbENvbmRpdGlvblR5cGVXb3JsZEFjdFJlZ2lzdGVy",
+            "EH0SHwobR2xvYmFsQ29uZGl0aW9uVHlwZUJwQWN0aXZlEH4SKAojR2xvYmFs",
+            "Q29uZGl0aW9uVHlwZUljaGliYW5Qb29sRW1wdHkQgQFiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Zproto.EGlobalConditionType), }, null, null));
@@ -218,6 +224,13 @@ namespace Zproto {
     [pbr::OriginalName("GlobalConditionTypeRogueEntryProfession")] GlobalConditionTypeRogueEntryProfession = 118,
     [pbr::OriginalName("GlobalConditionTypeRogueEntryBDCount")] GlobalConditionTypeRogueEntryBdcount = 119,
     [pbr::OriginalName("GlobalConditionTypeItemPackageLeftGrid")] GlobalConditionTypeItemPackageLeftGrid = 120,
+    [pbr::OriginalName("GlobalConditionTypeIsMagneticFollower")] GlobalConditionTypeIsMagneticFollower = 121,
+    [pbr::OriginalName("GlobalConditionTypeNotInVisualLayer")] GlobalConditionTypeNotInVisualLayer = 122,
+    [pbr::OriginalName("GlobalConditionTypeParadeLength")] GlobalConditionTypeParadeLength = 123,
+    [pbr::OriginalName("GlobalConditionTypeIsGameTablePlaying")] GlobalConditionTypeIsGameTablePlaying = 124,
+    [pbr::OriginalName("GlobalConditionTypeWorldActRegister")] GlobalConditionTypeWorldActRegister = 125,
+    [pbr::OriginalName("GlobalConditionTypeBpActive")] GlobalConditionTypeBpActive = 126,
+    [pbr::OriginalName("GlobalConditionTypeIchibanPoolEmpty")] GlobalConditionTypeIchibanPoolEmpty = 129,
   }
 
   #endregion

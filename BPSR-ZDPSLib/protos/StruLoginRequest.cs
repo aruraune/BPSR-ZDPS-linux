@@ -25,7 +25,7 @@ namespace Zproto {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChhzdHJ1X2xvZ2luX3JlcXVlc3QucHJvdG8SBnpwcm90bxoWc3RydV9kZXZp",
-            "Y2VfaW5mby5wcm90bxoXc3RydV9sYXVuY2hfcGFyYW0ucHJvdG8i+QMKDExv",
+            "Y2VfaW5mby5wcm90bxoXc3RydV9sYXVuY2hfcGFyYW0ucHJvdG8inQQKDExv",
             "Z2luUmVxdWVzdBIPCgdvcGVuX2lkGAIgASgJEg0KBXRva2VuGAMgASgJEhAK",
             "CHNka190eXBlGAQgASgFEhIKCmNoYW5uZWxfaWQYBSABKAUSCgoCb3MYBiAB",
             "KAUSFQoNcGxhdGZvcm1fdHlwZRgHIAEoBRInCgtkZXZpY2VfaW5mbxgIIAEo",
@@ -37,11 +37,12 @@ namespace Zproto {
             "cm90by5MYXVuY2hQYXJhbRIVCg1hcmVhX2lkX3Rva2VuGBMgASgJEhUKDWlz",
             "X2Nsb3VkX2dhbWUYFCABKAgSEwoLZGlzdGluY3RfaWQYFSABKAkSFwoPYm91",
             "bmRfcHJvdmlkZXJzGBYgAygJEhAKCGxhbmd1YWdlGBcgASgFEg0KBWdjbGlk",
-            "GBggASgJYgZwcm90bzM="));
+            "GBggASgJEiIKGnVuc2FmZV9jb250YWluZXJfc3luY19tb2RlGBkgASgIYgZw",
+            "cm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Zproto.StruDeviceInfoReflection.Descriptor, global::Zproto.StruLaunchParamReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Zproto.LoginRequest), global::Zproto.LoginRequest.Parser, new[]{ "OpenId", "Token", "SdkType", "ChannelId", "Os", "PlatformType", "DeviceInfo", "ClientVersion", "ProtocolVersion", "ConfigVersion", "AreaId", "IOsAdServiceToken", "PayExtData", "ClientResourceVersion", "LaunchParam", "AreaIdToken", "IsCloudGame", "DistinctId", "BoundProviders", "Language", "Gclid" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Zproto.LoginRequest), global::Zproto.LoginRequest.Parser, new[]{ "OpenId", "Token", "SdkType", "ChannelId", "Os", "PlatformType", "DeviceInfo", "ClientVersion", "ProtocolVersion", "ConfigVersion", "AreaId", "IOsAdServiceToken", "PayExtData", "ClientResourceVersion", "LaunchParam", "AreaIdToken", "IsCloudGame", "DistinctId", "BoundProviders", "Language", "Gclid", "UnsafeContainerSyncMode" }, null, null, null, null)
           }));
     }
     #endregion
@@ -104,6 +105,7 @@ namespace Zproto {
       boundProviders_ = other.boundProviders_.Clone();
       language_ = other.language_;
       gclid_ = other.gclid_;
+      unsafeContainerSyncMode_ = other.unsafeContainerSyncMode_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -364,6 +366,18 @@ namespace Zproto {
       }
     }
 
+    /// <summary>Field number for the "unsafe_container_sync_mode" field.</summary>
+    public const int UnsafeContainerSyncModeFieldNumber = 25;
+    private bool unsafeContainerSyncMode_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool UnsafeContainerSyncMode {
+      get { return unsafeContainerSyncMode_; }
+      set {
+        unsafeContainerSyncMode_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -400,6 +414,7 @@ namespace Zproto {
       if(!boundProviders_.Equals(other.boundProviders_)) return false;
       if (Language != other.Language) return false;
       if (Gclid != other.Gclid) return false;
+      if (UnsafeContainerSyncMode != other.UnsafeContainerSyncMode) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -428,6 +443,7 @@ namespace Zproto {
       hash ^= boundProviders_.GetHashCode();
       if (Language != 0) hash ^= Language.GetHashCode();
       if (Gclid.Length != 0) hash ^= Gclid.GetHashCode();
+      if (UnsafeContainerSyncMode != false) hash ^= UnsafeContainerSyncMode.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -527,6 +543,10 @@ namespace Zproto {
         output.WriteRawTag(194, 1);
         output.WriteString(Gclid);
       }
+      if (UnsafeContainerSyncMode != false) {
+        output.WriteRawTag(200, 1);
+        output.WriteBool(UnsafeContainerSyncMode);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -618,6 +638,10 @@ namespace Zproto {
         output.WriteRawTag(194, 1);
         output.WriteString(Gclid);
       }
+      if (UnsafeContainerSyncMode != false) {
+        output.WriteRawTag(200, 1);
+        output.WriteBool(UnsafeContainerSyncMode);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -688,6 +712,9 @@ namespace Zproto {
       }
       if (Gclid.Length != 0) {
         size += 2 + pb::CodedOutputStream.ComputeStringSize(Gclid);
+      }
+      if (UnsafeContainerSyncMode != false) {
+        size += 2 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -767,6 +794,9 @@ namespace Zproto {
       }
       if (other.Gclid.Length != 0) {
         Gclid = other.Gclid;
+      }
+      if (other.UnsafeContainerSyncMode != false) {
+        UnsafeContainerSyncMode = other.UnsafeContainerSyncMode;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -877,6 +907,10 @@ namespace Zproto {
             Gclid = input.ReadString();
             break;
           }
+          case 200: {
+            UnsafeContainerSyncMode = input.ReadBool();
+            break;
+          }
         }
       }
     #endif
@@ -984,6 +1018,10 @@ namespace Zproto {
           }
           case 194: {
             Gclid = input.ReadString();
+            break;
+          }
+          case 200: {
+            UnsafeContainerSyncMode = input.ReadBool();
             break;
           }
         }

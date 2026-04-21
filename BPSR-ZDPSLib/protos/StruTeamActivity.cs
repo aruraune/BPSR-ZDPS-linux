@@ -26,22 +26,24 @@ namespace Zproto {
           string.Concat(
             "ChhzdHJ1X3RlYW1fYWN0aXZpdHkucHJvdG8SBnpwcm90bxoec3RydV9hc3Np",
             "Z25fc2NlbmVfcGFyYW1zLnByb3RvGiBlbnVtX2VfdGVhbV9hY3Rpdml0eV9z",
-            "dGF0ZS5wcm90bxolc3RydV90ZWFtX2FjdGl2aXR5X2R1bmdlb25faW5mby5w",
-            "cm90bxogc3RydV90ZWFtX2R1bmdlb25fa2V5X2luZm8ucHJvdG8inwMKDFRl",
-            "YW1BY3Rpdml0eRITCgthY3Rpdml0eV9pZBgBIAEoDRIpCgVzdGF0ZRgCIAEo",
-            "DjIaLnpwcm90by5FVGVhbUFjdGl2aXR5U3RhdGUSDAoEdGltZRgDIAEoAxI1",
-            "CgxkdW5nZW9uX2luZm8YBCABKAsyHy56cHJvdG8uVGVhbUFjdGl2aXR5RHVu",
-            "Z2VvbkluZm8SEQoJYWdyZWVfbWVtGAUgAygDEhUKDWNoZWNrX21lbWJlcnMY",
-            "BiADKAMSEQoJcmVmdXNlX2lkGAcgASgDEjYKE2Fzc2lnbl9zY2VuZV9wYXJh",
-            "bXMYCCABKAsyGS56cHJvdG8uQXNzaWduU2NlbmVQYXJhbXMSQgoQYXdhcmRf",
-            "Y291bnRfaW5mbxgJIAMoCzIoLnpwcm90by5UZWFtQWN0aXZpdHkuQXdhcmRD",
-            "b3VudEluZm9FbnRyeRpRChNBd2FyZENvdW50SW5mb0VudHJ5EgsKA2tleRgB",
-            "IAEoAxIpCgV2YWx1ZRgCIAEoCzIaLnpwcm90by5UZWFtRHVuZ2VvbktleUlu",
-            "Zm86AjgBYgZwcm90bzM="));
+            "dGF0ZS5wcm90bxofZW51bV9lX3RlYW1fYWN0aXZpdHlfdHlwZS5wcm90bxol",
+            "c3RydV90ZWFtX2FjdGl2aXR5X2R1bmdlb25faW5mby5wcm90bxogc3RydV90",
+            "ZWFtX2R1bmdlb25fa2V5X2luZm8ucHJvdG8i0QMKDFRlYW1BY3Rpdml0eRIT",
+            "CgthY3Rpdml0eV9pZBgBIAEoDRIpCgVzdGF0ZRgCIAEoDjIaLnpwcm90by5F",
+            "VGVhbUFjdGl2aXR5U3RhdGUSDAoEdGltZRgDIAEoAxI1CgxkdW5nZW9uX2lu",
+            "Zm8YBCABKAsyHy56cHJvdG8uVGVhbUFjdGl2aXR5RHVuZ2VvbkluZm8SEQoJ",
+            "YWdyZWVfbWVtGAUgAygDEhUKDWNoZWNrX21lbWJlcnMYBiADKAMSEQoJcmVm",
+            "dXNlX2lkGAcgASgDEjYKE2Fzc2lnbl9zY2VuZV9wYXJhbXMYCCABKAsyGS56",
+            "cHJvdG8uQXNzaWduU2NlbmVQYXJhbXMSQgoQYXdhcmRfY291bnRfaW5mbxgJ",
+            "IAMoCzIoLnpwcm90by5UZWFtQWN0aXZpdHkuQXdhcmRDb3VudEluZm9FbnRy",
+            "eRIwCg1hY3Rpdml0eV90eXBlGAogASgOMhkuenByb3RvLkVUZWFtQWN0aXZp",
+            "dHlUeXBlGlEKE0F3YXJkQ291bnRJbmZvRW50cnkSCwoDa2V5GAEgASgDEikK",
+            "BXZhbHVlGAIgASgLMhouenByb3RvLlRlYW1EdW5nZW9uS2V5SW5mbzoCOAFi",
+            "BnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Zproto.StruAssignSceneParamsReflection.Descriptor, global::Zproto.EnumETeamActivityStateReflection.Descriptor, global::Zproto.StruTeamActivityDungeonInfoReflection.Descriptor, global::Zproto.StruTeamDungeonKeyInfoReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Zproto.StruAssignSceneParamsReflection.Descriptor, global::Zproto.EnumETeamActivityStateReflection.Descriptor, global::Zproto.EnumETeamActivityTypeReflection.Descriptor, global::Zproto.StruTeamActivityDungeonInfoReflection.Descriptor, global::Zproto.StruTeamDungeonKeyInfoReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Zproto.TeamActivity), global::Zproto.TeamActivity.Parser, new[]{ "ActivityId", "State", "Time", "DungeonInfo", "AgreeMem", "CheckMembers", "RefuseId", "AssignSceneParams", "AwardCountInfo" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, })
+            new pbr::GeneratedClrTypeInfo(typeof(global::Zproto.TeamActivity), global::Zproto.TeamActivity.Parser, new[]{ "ActivityId", "State", "Time", "DungeonInfo", "AgreeMem", "CheckMembers", "RefuseId", "AssignSceneParams", "AwardCountInfo", "ActivityType" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, })
           }));
     }
     #endregion
@@ -92,6 +94,7 @@ namespace Zproto {
       refuseId_ = other.refuseId_;
       assignSceneParams_ = other.assignSceneParams_ != null ? other.assignSceneParams_.Clone() : null;
       awardCountInfo_ = other.awardCountInfo_.Clone();
+      activityType_ = other.activityType_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -206,6 +209,18 @@ namespace Zproto {
       get { return awardCountInfo_; }
     }
 
+    /// <summary>Field number for the "activity_type" field.</summary>
+    public const int ActivityTypeFieldNumber = 10;
+    private global::Zproto.ETeamActivityType activityType_ = global::Zproto.ETeamActivityType.Dungeon;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Zproto.ETeamActivityType ActivityType {
+      get { return activityType_; }
+      set {
+        activityType_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -230,6 +245,7 @@ namespace Zproto {
       if (RefuseId != other.RefuseId) return false;
       if (!object.Equals(AssignSceneParams, other.AssignSceneParams)) return false;
       if (!AwardCountInfo.Equals(other.AwardCountInfo)) return false;
+      if (ActivityType != other.ActivityType) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -246,6 +262,7 @@ namespace Zproto {
       if (RefuseId != 0L) hash ^= RefuseId.GetHashCode();
       if (assignSceneParams_ != null) hash ^= AssignSceneParams.GetHashCode();
       hash ^= AwardCountInfo.GetHashCode();
+      if (ActivityType != global::Zproto.ETeamActivityType.Dungeon) hash ^= ActivityType.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -291,6 +308,10 @@ namespace Zproto {
         output.WriteMessage(AssignSceneParams);
       }
       awardCountInfo_.WriteTo(output, _map_awardCountInfo_codec);
+      if (ActivityType != global::Zproto.ETeamActivityType.Dungeon) {
+        output.WriteRawTag(80);
+        output.WriteEnum((int) ActivityType);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -328,6 +349,10 @@ namespace Zproto {
         output.WriteMessage(AssignSceneParams);
       }
       awardCountInfo_.WriteTo(ref output, _map_awardCountInfo_codec);
+      if (ActivityType != global::Zproto.ETeamActivityType.Dungeon) {
+        output.WriteRawTag(80);
+        output.WriteEnum((int) ActivityType);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -359,6 +384,9 @@ namespace Zproto {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(AssignSceneParams);
       }
       size += awardCountInfo_.CalculateSize(_map_awardCountInfo_codec);
+      if (ActivityType != global::Zproto.ETeamActivityType.Dungeon) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) ActivityType);
+      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -398,6 +426,9 @@ namespace Zproto {
         AssignSceneParams.MergeFrom(other.AssignSceneParams);
       }
       awardCountInfo_.MergeFrom(other.awardCountInfo_);
+      if (other.ActivityType != global::Zproto.ETeamActivityType.Dungeon) {
+        ActivityType = other.ActivityType;
+      }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -461,6 +492,10 @@ namespace Zproto {
             awardCountInfo_.AddEntriesFrom(input, _map_awardCountInfo_codec);
             break;
           }
+          case 80: {
+            ActivityType = (global::Zproto.ETeamActivityType) input.ReadEnum();
+            break;
+          }
         }
       }
     #endif
@@ -522,6 +557,10 @@ namespace Zproto {
           }
           case 74: {
             awardCountInfo_.AddEntriesFrom(ref input, _map_awardCountInfo_codec);
+            break;
+          }
+          case 80: {
+            ActivityType = (global::Zproto.ETeamActivityType) input.ReadEnum();
             break;
           }
         }
