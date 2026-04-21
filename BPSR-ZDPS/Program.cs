@@ -115,11 +115,9 @@ namespace BPSR_ZDPS
                 Log.Debug($"Low Performance Mode is Enabled");
             }
 
-            // Show the main window on Linux to ensure at least one window is visible
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                GLFW.ShowWindow(window);
-            }
+            // Keep the main GLFW window hidden on all platforms — it only hosts the
+            // OpenGL context / ImGui main viewport. All user-visible UI lives in
+            // secondary ImGui viewport (platform) windows.
 
             manager = new OpenGLManager(window, false);
 
@@ -146,14 +144,8 @@ namespace BPSR_ZDPS
             {
                 io.ConfigFlags |= ImGuiConfigFlags.NavEnableGamepad;  // Enable Gamepad Controls
             }
-            io.ConfigFlags |= ImGuiConfigFlags.DockingEnable;         // Enable Docking
-            
-            // On Linux, keep it simple - single window with docking, no separate viewports
-            // All windows will dock as tabs in the main window
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                io.ConfigFlags |= ImGuiConfigFlags.ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
-            }
+            //io.ConfigFlags |= ImGuiConfigFlags.DockingEnable;         // Enable Docking
+            io.ConfigFlags |= ImGuiConfigFlags.ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
             
             io.ConfigViewportsNoAutoMerge = true; // If this is false, putting an ImGui window on top of an GLFW window will dock into it even if it's not shown
             io.ConfigViewportsNoTaskBarIcon = false;
