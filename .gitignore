@@ -368,3 +368,6 @@ BPSR-ZDPS/Data/Settings.json
 BPSR-ZDPS/Data/ZDatabase.db
 BPSR-ZDPS/ZDPS_log_last_run.txt
 BPSR-ZDPS/ZDPS_log.txt
+BPSR-ZDPS/Data/EventTrackerPresetsContainersSaveData.json
+BPSR-ZDPS/Data/EventTrackerPresetsTrackersSaveData.json
+BPSR-ZDPS/Data/EventTrackerSaveData.json
