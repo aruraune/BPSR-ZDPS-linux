@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using ZLinq;
@@ -2337,9 +2338,15 @@ namespace BPSR_ZDPS.Windows
                 return;
             }
 
-            ImGuiP.PushOverrideID(ImGuiP.ImHashStr("EventTrackerPresetManager"));
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                ImGui.SetNextWindowViewport(ImGui.GetMainViewport().ID);
+            }
+
             ImGui.SetNextWindowSizeConstraints(new Vector2(400, 350), new Vector2(ImGui.GETFLTMAX()));
             ImGui.SetNextWindowSize(new Vector2(400, 450), ImGuiCond.FirstUseEver);
+
+            ImGuiP.PushOverrideID(ImGuiP.ImHashStr("EventTrackerPresetManager"));
             if (ImGui.Begin("Preset Manager###EventTrackerPresetManagerWindow", ref IsPresetManagerOpened, ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking))
             {
                 if (ShouldPresetManagerFocusNext)
@@ -2731,6 +2738,15 @@ namespace BPSR_ZDPS.Windows
             }
 
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
+
+            bool useFullViewport = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            var main_viewport = ImGui.GetMainViewport();
+
+            if (useFullViewport)
+            {
+                ImGui.SetNextWindowPos(main_viewport.WorkPos, ImGuiCond.Always);
+                ImGui.SetNextWindowSize(main_viewport.WorkSize, ImGuiCond.Appearing);
+            }
 
             ImGuiWindowFlags exWindowFlags = ImGuiWindowFlags.None;
             if (AppState.MousePassthrough && windowSettings.TopMost)

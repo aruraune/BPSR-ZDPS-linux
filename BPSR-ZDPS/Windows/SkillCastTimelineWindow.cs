@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -181,7 +182,18 @@ namespace BPSR_ZDPS.Windows
                 return;
             }
 
-            ImGui.SetNextWindowSize(new Vector2(500, 720), ImGuiCond.Appearing);
+            bool useFullViewport = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            var main_viewport = ImGui.GetMainViewport();
+
+            if (useFullViewport)
+            {
+                ImGui.SetNextWindowPos(main_viewport.WorkPos, ImGuiCond.Always);
+                ImGui.SetNextWindowSize(main_viewport.WorkSize, ImGuiCond.Appearing);
+            }
+            else
+            {
+                ImGui.SetNextWindowSize(new Vector2(500, 720), ImGuiCond.Appearing);
+            }
 
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
 
@@ -326,6 +338,15 @@ namespace BPSR_ZDPS.Windows
             if (windowSettings.TimelinePosition != new Vector2())
             {
                 ImGui.SetNextWindowPos(windowSettings.TimelinePosition, ImGuiCond.FirstUseEver);
+            }
+
+            bool useFullViewportTimeline = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            var main_viewport_timeline = ImGui.GetMainViewport();
+
+            if (useFullViewportTimeline)
+            {
+                ImGui.SetNextWindowPos(main_viewport_timeline.WorkPos, ImGuiCond.Always);
+                ImGui.SetNextWindowSize(main_viewport_timeline.WorkSize, ImGuiCond.Appearing);
             }
 
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
