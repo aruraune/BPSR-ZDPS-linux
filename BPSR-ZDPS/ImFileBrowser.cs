@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using static log4net.Appender.ColoredConsoleAppender;
@@ -135,9 +136,21 @@ namespace BPSR_ZDPS
                 return;
             }
 
-            ImGui.SetNextWindowSize(new Vector2(820, 450), ImGuiCond.Appearing);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(650, 350), new Vector2(float.PositiveInfinity, float.PositiveInfinity));
-            ImGui.SetNextWindowPos(ImGui.GetMainViewport().Size * 0.5f, ImGuiCond.Appearing, new Vector2(0.5f, 0.5f));
+            bool useFullViewport = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            var main_viewport = ImGui.GetMainViewport();
+
+            if (useFullViewport)
+            {
+                ImGui.SetNextWindowPos(main_viewport.WorkPos, ImGuiCond.Always);
+                ImGui.SetNextWindowSize(main_viewport.WorkSize, ImGuiCond.Appearing);
+            }
+            else
+            {
+                ImGui.SetNextWindowSize(new Vector2(820, 450), ImGuiCond.Appearing);
+                ImGui.SetNextWindowSizeConstraints(new Vector2(650, 350), new Vector2(float.PositiveInfinity, float.PositiveInfinity));
+                ImGui.SetNextWindowPos(main_viewport.Size * 0.5f, ImGuiCond.Appearing, new Vector2(0.5f, 0.5f));
+            }
+
             ImGuiP.PushOverrideID(ImGuiP.ImHashStr(POPUP_LAYER_ID));
             if (ImGui.BeginPopupModal($"{(string.IsNullOrEmpty(Title) ? "File Browser" : Title)}{POPUP_ID}", ref IsOpen, ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoDocking))
             {
