@@ -145,7 +145,14 @@ namespace BPSR_ZDPS.Windows
 
                             if (entry.Value.Item == null)
                             {
-                                ImGui.TextUnformatted($"Item: <UNKNOWN>");
+                                if (entry.Value.Equip?.Id > 0)
+                                {
+                                    ImGui.TextUnformatted($"Item ({entry.Value.Equip.Id}): <UNKNOWN>");
+                                }
+                                else
+                                {
+                                    ImGui.TextUnformatted($"Item: <UNKNOWN>");
+                                }
                                 ImGui.EndChild();
                                 continue;
                             }
@@ -335,7 +342,7 @@ namespace BPSR_ZDPS.Windows
                 {
                     return true;
                 }
-                if (LoadedEquipList[i].EquipId != equipInfo[i].EquipId)
+                if (LoadedEquipList[i].EquipID != equipInfo[i].EquipID)
                 {
                     return true;
                 }
@@ -364,16 +371,16 @@ namespace BPSR_ZDPS.Windows
                     continue;
                 }
 
-                if (HelperMethods.DataTables.Equips.Data.TryGetValue(equip.EquipId.ToString(), out var equipData))
+                if (HelperMethods.DataTables.Equips.Data.TryGetValue(equip.EquipID.ToString(), out var equipData))
                 {
-                    if (HelperMethods.DataTables.Items.Data.TryGetValue(equip.EquipId.ToString(), out var itemData))
+                    if (HelperMethods.DataTables.Items.Data.TryGetValue(equip.EquipID.ToString(), out var itemData))
                     {
                         
                         ResolveAttrsForEquip(equipData, Attributes[gearSlot.Value]);
                         Attributes[gearSlot.Value].Equip = equipData;
                         Attributes[gearSlot.Value].Item = itemData;
 
-                        var breakthroughs = HelperMethods.DataTables.EquipBreakThroughs.Data.Where(x => x.Value.EquipId == equip.EquipId);
+                        var breakthroughs = HelperMethods.DataTables.EquipBreakThroughs.Data.Where(x => x.Value.EquipId == equip.EquipID);
                         if (breakthroughs != null)
                         {
                             foreach (var breakthrough in breakthroughs)
@@ -401,6 +408,15 @@ namespace BPSR_ZDPS.Windows
                             }
                         }
                     }
+                }
+                else
+                {
+                    var unknownEquipData = new Equip()
+                    {
+                        Id = equip.EquipID,
+                        EquipPart = equip.Slot
+                    };
+                    Attributes[gearSlot.Value].Equip = unknownEquipData;
                 }
             }
         }

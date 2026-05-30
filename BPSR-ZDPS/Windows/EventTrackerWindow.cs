@@ -3,6 +3,7 @@ using Hexa.NET.ImGui;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -64,6 +65,9 @@ namespace BPSR_ZDPS.Windows
         static KeyValuePair<string, Skill>[]? SkillFilterMatches;
         static bool SkillFilterIncludeDescriptions = false;
 
+        static string AttributeFilterText = "";
+        static KeyValuePair<string, FAttrValueData>[]? AttributeFilterMatches;
+
         static bool ShowDebugLogWindow = false;
         static bool DebugLogAutoScroll = true;
         static ConcurrentQueue<string> DebugEventTrackerLog = new();
@@ -78,6 +82,190 @@ namespace BPSR_ZDPS.Windows
         static List<TrackerContainer> PresetContainersList = new();
 
         static string DragDropTargetName = "";
+
+        struct FAttrValueData
+        {
+            public Type Type;
+            public string OverrideName;
+
+            public FAttrValueData(Type type, string overrideName = "")
+            {
+                Type = type;
+                OverrideName = overrideName;
+            }
+        }
+
+        static ImmutableSortedDictionary<string, FAttrValueData> AttrSupported = new SortedDictionary<string, FAttrValueData>(StringComparer.OrdinalIgnoreCase)
+        {
+            { Zproto.EAttrType.AttrId.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrHatedName.ToString(), new FAttrValueData(typeof(string)) },
+            { Zproto.EAttrType.AttrLevel.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrFightPoint.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrRankLevel.ToString(), new FAttrValueData(typeof(int)) },
+            
+            { Zproto.EAttrType.AttrHp.ToString(), new FAttrValueData(typeof(long)) },
+            { Zproto.EAttrType.AttrMaxHp.ToString(), new FAttrValueData(typeof(long)) },
+            { "AttrHpPct", new FAttrValueData(typeof(long), "AttrHp") },
+            { Zproto.EAttrType.AttrStrength.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrIntelligence.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrDexterity.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrVitality.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrHaste.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrHastePct.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrLuck.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrMastery.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrMasteryPct.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrVersatility.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrVersatilityPct.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrHit.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrBlock.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrBlockPct.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrShieldAddPct.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrAttack.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrDefense.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrMattack.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrMdefense.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrRefineAttack.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrRefineDefense.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrElementAtk.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrElementDefense.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrElementDamage.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrElementDamRes.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrElementPower.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrCrit.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrCri.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrCritHeal.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrLuckHealInc.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrLuckyStrikeProb.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrAttackSpeedPct.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrCastSpeedPct.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrChargeSpeedPct.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrExtDamInc.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrExtDamRes.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrCritDamage.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrCritDamageRes.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrLuckDamInc.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrBlockDamRes.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrDamRes.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrMdamRes.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrBossDamInc.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrBossDamRes.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrSuppressDamInc.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrSuppressDamRes.ToString(), new FAttrValueData(typeof(int)) },
+
+            { Zproto.EAttrType.AttrFireAtk.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrFireDamage.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrFireDamageReduction.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrFireDefense.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrFirePower.ToString(), new FAttrValueData(typeof(int)) },
+
+            { Zproto.EAttrType.AttrWaterAtk.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrWaterDamage.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrWaterDamageReduction.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrWaterDefense.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrWaterPower.ToString(), new FAttrValueData(typeof(int)) },
+
+            { Zproto.EAttrType.AttrWoodAtk.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrWoodDamage.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrWoodDamageReduction.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrWoodDefense.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrWoodPower.ToString(), new FAttrValueData(typeof(int)) },
+
+            { Zproto.EAttrType.AttrRockAtk.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrRockDamage.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrRockDamageReduction.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrRockDefense.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrRockPower.ToString(), new FAttrValueData(typeof(int)) },
+
+            { Zproto.EAttrType.AttrLightAtk.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrLightDamage.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrLightDamageReduction.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrLightDefense.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrLightPower.ToString(), new FAttrValueData(typeof(int)) },
+
+            { Zproto.EAttrType.AttrDarkAtk.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrDarkDamage.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrDarkDamageReduction.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrDarkDefense.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrDarkPower.ToString(), new FAttrValueData(typeof(int)) },
+
+            { Zproto.EAttrType.AttrOriginEnergy.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrMaxOriginEnergy.ToString(), new FAttrValueData(typeof(int)) },
+
+            { Zproto.EAttrType.AttrSeasonLevel.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrMonsterSeasonLevel.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrSeasonStrength.ToString(), new FAttrValueData(typeof(long)) },
+            { Zproto.EAttrType.AttrSeasonStrengthAdd.ToString(), new FAttrValueData(typeof(long)) },
+            { Zproto.EAttrType.AttrSeasonStrengthTotal.ToString(), new FAttrValueData(typeof(int)) },
+
+            { Zproto.EAttrType.AttrIsLockStunned.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrStunned.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrMaxStunned.ToString(), new FAttrValueData(typeof(int)) },
+            { "AttrStunnedPct", new FAttrValueData(typeof(int), "AttrStunned") },
+            { Zproto.EAttrType.AttrStunnedDamagePct.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrStiffTarget.ToString(), new FAttrValueData(typeof(long)) },
+            { Zproto.EAttrType.AttrStiffStageTime.ToString(), new FAttrValueData(typeof(long)) },
+            { Zproto.EAttrType.AttrStiffType.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrStiffTime.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrStiffDownTime.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrCantStiff.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrCantStiffBack.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrCantStiffDown.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrCantStiffAir.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrCantStiffFlow.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrCanBeHit.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrCanLessenHp.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrCanIntoCombat.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrCantHit.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrUnbreakableLevel.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrCantSilence.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrIsSilence.ToString(), new FAttrValueData(typeof(int)) },
+
+            { Zproto.EAttrType.AttrReviveCount.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrReviveCurProgressValue.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrReviveInterTimeConsumePct.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrReviveMaxProgressValue.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrReviveTimeConsumePct.ToString(), new FAttrValueData(typeof(int)) },
+
+            { Zproto.EAttrType.AttrPos.ToString(), new FAttrValueData(typeof(Vec3)) },
+            { Zproto.EAttrType.AttrTargetPos.ToString(), new FAttrValueData(typeof(Vec3)) },
+            { Zproto.EAttrType.AttrState.ToString(), new FAttrValueData(typeof(EActorState)) },
+            { Zproto.EAttrType.AttrShieldList.ToString(), new FAttrValueData(typeof(List<ShieldInfo>)) },
+            { Zproto.EAttrType.AttrActionTime.ToString(), new FAttrValueData(typeof(long)) },
+            { Zproto.EAttrType.AttrActionUpperTime.ToString(), new FAttrValueData(typeof(long)) },
+            { Zproto.EAttrType.AttrSkillBeginTime.ToString(), new FAttrValueData(typeof(long)) },
+            { Zproto.EAttrType.AttrFirstAttack.ToString(), new FAttrValueData(typeof(long)) },
+            { Zproto.EAttrType.AttrCombatStateTime.ToString(), new FAttrValueData(typeof(long)) },
+            { Zproto.EAttrType.AttrTargetUuid.ToString(), new FAttrValueData(typeof(long)) },
+            { Zproto.EAttrType.AttrTargetId.ToString(), new FAttrValueData(typeof(long)) },
+            { "AttrTargetName", new FAttrValueData(typeof(long), "AttrTargetId") },
+            { Zproto.EAttrType.AttrSummonerId.ToString(), new FAttrValueData(typeof(long)) },
+            { Zproto.EAttrType.AttrTopSummonerId.ToString(), new FAttrValueData(typeof(long)) },
+            //{ Zproto.EAttrType.AttrHateList.ToString(), new FAttrValueData(typeof(List<HateInfo>)) },
+            
+            { Zproto.EAttrType.AttrTeamId.ToString(), new FAttrValueData(typeof(long)) },
+            { Zproto.EAttrType.AttrStateTime.ToString(), new FAttrValueData(typeof(long)) },
+
+            { Zproto.EAttrType.AttrCdAcceleratePct.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrRushCd.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrFightResCdSpeedPct.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrSkillCd.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrSkillCdpct.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrSwitchProfessionCd.ToString(), new FAttrValueData(typeof(int)) },
+
+            { Zproto.EAttrType.AttrInspirePct.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrIgnoreDefensePct.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrIgnoreMdefensePct.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrMultipliesDamPct.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrPetAttackSpeedPct.ToString(), new FAttrValueData(typeof(int)) },
+
+            { Zproto.EAttrType.AttrShieldDamagePct.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrShieldGainPct.ToString(), new FAttrValueData(typeof(int)) },
+
+            { Zproto.EAttrType.AttrHealBanPct.ToString(), new FAttrValueData(typeof(int)) },
+            { Zproto.EAttrType.AttrHealedBanPct.ToString(), new FAttrValueData(typeof(int)) },
+
+        }.ToImmutableSortedDictionary();
 
         // TODO: This really should be split up into an Event Tracker Manager and not all in the Window class
 
@@ -302,7 +490,7 @@ namespace BPSR_ZDPS.Windows
 
         private static void EncounterManager_EncounterStart(EncounterStartEventArgs e)
         {
-            if (e.Reason != EncounterStartReason.NewObjective)
+            if (e.Reason != EncounterStartReason.NewObjective && e.Reason != EncounterStartReason.BenchmarkStart && e.Reason != EncounterStartReason.BenchmarkEnd)
             {
                 foreach (var eventContainer in EventTrackerContainers)
                 {
@@ -342,9 +530,8 @@ namespace BPSR_ZDPS.Windows
             EncounterManager.Current.BuffUpdated += Encounter_BuffUpdated;
             EncounterManager.Current.SkillActivated -= Encounter_SkillActivated;
             EncounterManager.Current.SkillActivated += Encounter_SkillActivated;
-            // Disable Attribute events until a good reason to support them is found
-            //EncounterManager.Current.AttributeUpdated -= Encounter_AttributeUpdated;
-            //EncounterManager.Current.AttributeUpdated += Encounter_AttributeUpdated;
+            EncounterManager.Current.AttributeUpdated -= Encounter_AttributeUpdated;
+            EncounterManager.Current.AttributeUpdated += Encounter_AttributeUpdated;
             EncounterManager.Current.SceneEvent -= Encounter_SceneEvent;
             EncounterManager.Current.SceneEvent += Encounter_SceneEvent;
         }
@@ -591,6 +778,17 @@ namespace BPSR_ZDPS.Windows
                                     eventData.BuffType = matched.BuffType;
                                 }
 
+                                DateTime updateTimeStamp = e.UpdateDateTime;
+                                if (e.CreationDateTime != null)
+                                {
+                                    // If the creation time is very recent (low negative) then we can just use arrival time to ensure consistent UI updates
+                                    var diff = updateTimeStamp.Subtract(e.CreationDateTime.Value).TotalSeconds;
+                                    if (diff < -5 || diff > 0)
+                                    {
+                                        updateTimeStamp = e.CreationDateTime.Value;
+                                    }
+                                }
+
                                 if (eventTracker.OverrideDuration)
                                 {
                                     eventData.Cooldown = new(eventTracker.DurationOverrideValue, 0, 0);
@@ -598,17 +796,19 @@ namespace BPSR_ZDPS.Windows
                                 else
                                 {
                                     float newDuration = MathF.Round((float)e.Duration / 1000.0f, 4);
-                                    if (eventData.Cooldown != null && eventData.Cooldown.IsCooldownStarted && newDuration != eventData.Cooldown.BaseDuration)
+                                    if (eventData.Cooldown != null && eventData.Cooldown.IsCooldownStarted)
                                     {
                                         eventData.Cooldown.IncreaseBaseDuration(newDuration, true);
+
                                         if (e.BuffEventType == EBuffEventType.BuffEventRemoveLayer)
                                         {
-                                            eventData.Cooldown.StartOrUpdate(e.UpdateDateTime, null, true);
+                                            eventData.Cooldown.StartOrUpdate(updateTimeStamp, null, true);
                                         }
                                     }
                                     else
                                     {
                                         eventData.Cooldown = new(newDuration, 0, 0);
+                                        eventData.Cooldown.StartOrUpdate(updateTimeStamp, null, true);
                                     }
                                 }
 
@@ -617,16 +817,16 @@ namespace BPSR_ZDPS.Windows
 
                                 if (e.BuffEventType == EBuffEventType.BuffEventAddTo)
                                 {
-                                    eventData.Cooldown.StartOrUpdate(e.UpdateDateTime, null, true);
+                                    eventData.Cooldown.StartOrUpdate(updateTimeStamp, null, true);
                                 }
 
 
                                 if (eventTracker.DebugLogTracker)
                                 {
-                                    AddDebugLog($"{DateTime.Now} Buff Event [{e.BuffUuid}]({e.BaseId}) {e.BuffEventType} FromUUID={e.EntityUuid} Name={eventTracker.Name} Layers={e.Layer} Duration={e.Duration} AppliedDur={eventData.Cooldown?.BaseDuration}");
+                                    AddDebugLog($"{DateTime.Now} Buff Event |{updateTimeStamp} ({Math.Round(e.UpdateDateTime.Subtract(updateTimeStamp).TotalSeconds, 4)})| [{e.BuffUuid}]({e.BaseId}) {e.BuffEventType} FromUUID={e.EntityUuid} Name={eventTracker.Name} Layers={e.Layer} Duration={e.Duration} AppliedDur={eventData.Cooldown?.BaseDuration} Consumed={eventData.Cooldown?.cooldownConsumed} Effective={eventData.Cooldown?.effectiveDuration}");
                                 }
 
-                                eventData.Cooldown.StartOrUpdate(e.UpdateDateTime);
+                                eventData.Cooldown?.StartOrUpdate(updateTimeStamp);
 
                                 if (e.BuffEventType == EBuffEventType.BuffEventAddTo)
                                 {
@@ -692,6 +892,8 @@ namespace BPSR_ZDPS.Windows
                                     {
                                         didRaidWarning = HandleRaidWarnings(rw, eventTracker, eventData, eventData.OwnerEntityUuid, null);
                                     }
+
+                                    eventData.Cooldown?.EndCooldown();
                                 }
                                 //System.Diagnostics.Debug.WriteLine($"{e.BuffEventType} ({eventData.Uuid}) {eventTracker.Name} - Dur={e.Duration}, Upd={e.UpdateDateTime}, Add={eventData.Added}, Rmv={eventData.Removed}");
                             }
@@ -708,6 +910,50 @@ namespace BPSR_ZDPS.Windows
                 if (!eventContainer.Value.IsContainerEnabled)
                 {
                     continue;
+                }
+
+                if (eventContainer.Value.TrackAllSkills && eventContainer.Value.EventTrackers.Count > 0)
+                {
+                    var trackerTemplate = eventContainer.Value.EventTrackers.First();
+                    var hasTracked = eventContainer.Value.EventTrackers.Skip(1).Where(x => x.Value.TrackedSkillId == e.SkillId).Any();
+                    if (!hasTracked)
+                    {
+                        bool shouldHandle = CheckIfShouldHandleEvent(trackerTemplate.Value, e.CasterUuid);
+                        if (shouldHandle)
+                        {
+                            var newTracker = (TrackedEventEntry)trackerTemplate.Value.Clone(++PersistentTrackerCount);
+                            newTracker.SkillEvents = new();
+                            newTracker.SkillEvents.AddRange(trackerTemplate.Value.SkillEvents);
+                            newTracker.EventData = new();
+                            newTracker.TrackedSkillId = e.SkillId;
+
+                            if (HelperMethods.DataTables.Skills.Data.TryGetValue(e.SkillId.ToString(), out var matched))
+                            {
+                                newTracker.TrackerName = $"{matched.Name} AutoTracker";
+                                newTracker.Name = matched.Name;
+                                newTracker.Desc = matched.Desc;
+
+                                string matchedIconName = matched.GetIconName();
+                                string baseDir = "Skills";
+                                if (matched.IsRoleSlot())
+                                {
+                                    baseDir = "Skills_Imagines";
+                                }
+                                string resolvedIconName = Path.Combine(baseDir, matchedIconName);
+                                if (newTracker.IconPath != resolvedIconName)
+                                {
+                                    newTracker.UpdateIconData(matchedIconName, true);
+                                }
+                            }
+                            else
+                            {
+                                newTracker.TrackerName = $"{e.SkillId} AutoTracker";
+                            }
+
+                            eventContainer.Value.EventTrackers.Add(newTracker.IdTracker, newTracker);
+                            eventContainer.Value.RecheckTrackerStates();
+                        }
+                    }
                 }
 
                 foreach (var eventTrackerKVP in eventContainer.Value.EventTrackers)
@@ -970,8 +1216,6 @@ namespace BPSR_ZDPS.Windows
 
         private static void Encounter_AttributeUpdated(object sender, AttributeUpdatedEventArgs e)
         {
-            return; // TODO: Implement
-
             foreach (var eventContainer in EventTrackerContainers)
             {
                 if (!eventContainer.Value.IsContainerEnabled)
@@ -992,9 +1236,271 @@ namespace BPSR_ZDPS.Windows
 
                     if (shouldHandle)
                     {
-                        if (e.AttributeName == eventTracker.TrackedAttributeName)
+                        string trackedName = eventTracker.TrackedAttributeName;
+                        if (!string.IsNullOrEmpty(eventTracker.TrackedAttributeNameOverride))
                         {
+                            trackedName = eventTracker.TrackedAttributeNameOverride;
+                        }
 
+                        if (e.AttributeName == trackedName)
+                        {
+                            if (e.Entity != null)
+                            {
+                                eventTracker.EventData.TryGetValue(e.EntityUuid, out var eventData);
+
+                                if (eventData == null)
+                                {
+                                    eventData = new AttributeEventData();
+                                    eventTracker.EventData.TryAdd(e.EntityUuid, eventData);
+                                }
+
+                                AttributeEventData attributeEventData = eventData as AttributeEventData;
+
+                                eventData.OwnerEntityUuid = e.EntityUuid;
+                                eventData.SourceEntityUuid = e.EntityUuid;
+                                eventData.SourceEntityName = e.Entity.Name;
+
+                                bool didRaidWarning = false;
+
+                                eventTracker.Name = eventTracker.TrackedAttributeName;
+
+                                attributeEventData.AttributeName = eventTracker.TrackedAttributeName;
+
+                                bool isGainEvent = false;
+
+                                if (AttrSupported.TryGetValue(trackedName, out var valueData))
+                                {
+                                    var attrType = valueData.Type;
+                                    if (attrType != null)
+                                    {
+                                        var converted = Convert.ChangeType(e.AttributeValue, attrType);
+                                        bool isRemoveEvent = false; // Values of '0' and empty string will be considered a fake remove event
+
+                                        if (eventTracker.TrackedAttributeName == "AttrHpPct" && e.Entity.MaxHp > 0)
+                                        {
+                                            converted = (long)(((double)e.Entity.Hp / e.Entity.MaxHp) * 10000.0);
+                                        }
+                                        else if (eventTracker.TrackedAttributeName == "AttrStunnedPct")
+                                        {
+                                            var maxStunned = e.Entity.GetAttrKV("AttrMaxStunned") as int?;
+                                            var stunned = e.Entity.GetAttrKV("AttrStunned") as int?;
+                                            if (maxStunned != null && maxStunned > 0 && stunned != null)
+                                            {
+                                                converted = (int)(((double)stunned / maxStunned) * 10000.0);
+                                            }
+                                        }
+
+                                        if (eventTracker.FormatAttributeAsPercent)
+                                        {
+                                            if (attrType == typeof(int))
+                                            {
+                                                attributeEventData.AttributeValue = $"{Math.Round((int)converted / 100.0, 2)}%";
+                                                RaidWarningTrackerData? rw = null;
+
+                                                if ((int)converted == 0)
+                                                {
+                                                    isRemoveEvent = true;
+
+                                                    if (!didRaidWarning)
+                                                    {
+                                                        rw = GetEnabledRaidWarning(eventTracker, ERaidWarningActivationType.OnRemove);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (!didRaidWarning)
+                                                    {
+                                                        rw = GetEnabledRaidWarning(eventTracker, ERaidWarningActivationType.OnGain);
+                                                    }
+                                                }
+
+                                                if (rw != null)
+                                                {
+                                                    if (rw.UseConditionValueCheck)
+                                                    {
+                                                        if (PerformRaidWarningConditionCheck<double>(Math.Round((int)converted / 100.0, 2), (double)rw.CheckConditionValue, rw.CheckConditionType))
+                                                        {
+                                                            didRaidWarning = HandleRaidWarnings(rw, eventTracker, eventData, eventData.OwnerEntityUuid, eventData.SourceEntityUuid);
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        didRaidWarning = HandleRaidWarnings(rw, eventTracker, eventData, eventData.OwnerEntityUuid, eventData.SourceEntityUuid);
+                                                    }
+                                                }
+                                            }
+                                            else if (attrType == typeof(long))
+                                            {
+                                                attributeEventData.AttributeValue = $"{Math.Round((long)converted / 100.0, 2)}%";
+                                                RaidWarningTrackerData? rw = null;
+
+                                                if ((long)converted == 0)
+                                                {
+                                                    isRemoveEvent = true;
+
+                                                    if (!didRaidWarning)
+                                                    {
+                                                        rw = GetEnabledRaidWarning(eventTracker, ERaidWarningActivationType.OnRemove);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (!didRaidWarning)
+                                                    {
+                                                        rw = GetEnabledRaidWarning(eventTracker, ERaidWarningActivationType.OnGain);
+                                                    }
+                                                }
+
+                                                if (rw != null)
+                                                {
+                                                    if (rw.UseConditionValueCheck)
+                                                    {
+                                                        if (PerformRaidWarningConditionCheck<double>(Math.Round((long)converted / 100.0, 2), (double)rw.CheckConditionValue, rw.CheckConditionType))
+                                                        {
+                                                            didRaidWarning = HandleRaidWarnings(rw, eventTracker, eventData, eventData.OwnerEntityUuid, eventData.SourceEntityUuid);
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        didRaidWarning = HandleRaidWarnings(rw, eventTracker, eventData, eventData.OwnerEntityUuid, eventData.SourceEntityUuid);
+                                                    }
+                                                }
+                                            }
+                                            else if (attrType == typeof(float))
+                                            {
+                                                attributeEventData.AttributeValue = $"{Math.Round((float)converted / 100.0, 2)}%";
+                                                if ((float)converted == 0)
+                                                {
+                                                    isRemoveEvent = true;
+                                                }
+                                            }
+                                            else if (attrType == typeof(double))
+                                            {
+                                                attributeEventData.AttributeValue = $"{Math.Round((double)converted / 100.0, 2)}%";
+                                                if ((double)converted == 0)
+                                                {
+                                                    isRemoveEvent = true;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                attributeEventData.AttributeValue = $"{converted}%";
+                                                if (converted.ToString() == "")
+                                                {
+                                                    isRemoveEvent = true;
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            string resolvedValue = converted.ToString();
+                                            int resolvedInt = 0;
+                                            long resolvedLong = 0;
+                                            if (eventTracker.TrackedAttributeName == "AttrTargetName" && attrType == typeof(long))
+                                            {
+                                                if (EncounterManager.Current.Entities.TryGetValue((long)converted, out var targetEntity))
+                                                {
+                                                    // The client does not clear Targets automatically, we'll assume a dead one should be ignored
+                                                    if (targetEntity.Hp == 0)
+                                                    {
+                                                        resolvedValue = "";
+                                                    }
+                                                    else
+                                                    {
+                                                        resolvedValue = targetEntity.Name;
+                                                    }
+                                                }
+                                            }
+                                            else if (attrType == typeof(List<ShieldInfo>))
+                                            {
+                                                List<ShieldInfo> shields = (List<ShieldInfo>)converted;
+                                                long totalShieldValue = 0;
+                                                foreach (var shield in shields)
+                                                {
+                                                    if (eventTracker.DebugLogTracker)
+                                                    {
+                                                        AddDebugLog($"{DateTime.Now} Attr Event ShieldInfo: BuffUUID={shield.Uuid} Type={shield.ShieldType} Value={shield.Value} InitVal={shield.InitialValue} MaxValue={shield.MaxValue} | TotalShieldValue={totalShieldValue + shield.Value}");
+                                                    }
+                                                    totalShieldValue += shield.Value;
+                                                }
+                                                if (eventTracker.DebugLogTracker)
+                                                {
+                                                    AddDebugLog($"{DateTime.Now} Attr Event ShieldInfo: TotalShieldValue={totalShieldValue}");
+                                                }
+
+                                                resolvedValue = $"{totalShieldValue:N0}";
+
+                                                resolvedLong = totalShieldValue;
+                                            }
+
+                                            attributeEventData.AttributeValue = resolvedValue;
+
+                                            RaidWarningTrackerData? rw = null;
+                                            if (resolvedValue == "" || resolvedValue == "0")
+                                            {
+                                                isRemoveEvent = true;
+
+                                                if (!didRaidWarning)
+                                                {
+                                                    rw = GetEnabledRaidWarning(eventTracker, ERaidWarningActivationType.OnRemove);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (!didRaidWarning)
+                                                {
+                                                    rw = GetEnabledRaidWarning(eventTracker, ERaidWarningActivationType.OnGain);
+                                                }
+                                            }
+
+                                            if (rw != null)
+                                            {
+                                                if (rw.UseConditionValueCheck)
+                                                {
+                                                    if (attrType == typeof(int))
+                                                    {
+                                                        if (PerformRaidWarningConditionCheck<int>((int)converted, (int)rw.CheckConditionValue, rw.CheckConditionType))
+                                                        {
+                                                            didRaidWarning = HandleRaidWarnings(rw, eventTracker, eventData, eventData.OwnerEntityUuid, eventData.SourceEntityUuid);
+                                                        }
+                                                    }
+                                                    else if (attrType == typeof(long))
+                                                    {
+                                                        if (PerformRaidWarningConditionCheck<long>((long)converted, (long)rw.CheckConditionValue, rw.CheckConditionType))
+                                                        {
+                                                            didRaidWarning = HandleRaidWarnings(rw, eventTracker, eventData, eventData.OwnerEntityUuid, eventData.SourceEntityUuid);
+                                                        }
+                                                    }
+                                                    else if (attrType == typeof(List<ShieldInfo>))
+                                                    {
+                                                        if (PerformRaidWarningConditionCheck<long>((long)resolvedLong, (long)rw.CheckConditionValue, rw.CheckConditionType))
+                                                        {
+                                                            didRaidWarning = HandleRaidWarnings(rw, eventTracker, eventData, eventData.OwnerEntityUuid, eventData.SourceEntityUuid);
+                                                        }
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    didRaidWarning = HandleRaidWarnings(rw, eventTracker, eventData, eventData.OwnerEntityUuid, eventData.SourceEntityUuid);
+                                                }
+                                            }
+                                        }
+
+                                        if (isRemoveEvent)
+                                        {
+                                            if (eventTracker.HideTrackerCondition == EHideTrackerCondition.HideOnRemoveEvent)
+                                            {
+                                                attributeEventData.IsRemoved = true;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            attributeEventData.IsRemoved = false;
+                                            isGainEvent = true;
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -1477,6 +1983,14 @@ namespace BPSR_ZDPS.Windows
                     }
                 }
 
+                if (windowSettings.OnlyShowContainersWhenZDPSMeterPinned && !windowSettings.IsContainerEditMode)
+                {
+                    if (Settings.Instance.WindowSettings.MainWindow.TopMost)
+                    {
+                        return;
+                    }
+                }
+
                 ImGuiP.PushOverrideID(ImGuiP.ImHashStr(LAYER));
                 foreach (var eventTrackerContainersKVP in EventTrackerContainers)
                 {
@@ -1534,7 +2048,14 @@ namespace BPSR_ZDPS.Windows
                     {
                         if (eventContainer.ContainerFixedSize != Vector2.Zero)
                         {
-                            ImGui.SetNextWindowSize(eventContainer.ContainerFixedSize, ImGuiCond.Appearing);
+                            if (eventContainer.ContainerSizeConstraint == EContainerSizeConstraint.FixedSize)
+                            {
+                                ImGui.SetNextWindowSize(eventContainer.ContainerFixedSize, ImGuiCond.Appearing);
+                            }
+                            else if (eventContainer.ContainerSizeConstraint == EContainerSizeConstraint.FixedWidth)
+                            {
+                                ImGui.SetNextWindowSize(new Vector2(eventContainer.ContainerFixedSize.X, 0), windowSettings.IsContainerEditMode ? ImGuiCond.Appearing : ImGuiCond.None);
+                            }
                         }    
                     }
 
@@ -1583,6 +2104,10 @@ namespace BPSR_ZDPS.Windows
                         if (eventContainer.ContainerSizeConstraint == EContainerSizeConstraint.FixedSize)
                         {
                             eventContainer.ContainerFixedSize = windowBaseSize;
+                        }
+                        else if (eventContainer.ContainerSizeConstraint == EContainerSizeConstraint.FixedWidth)
+                        {
+                            eventContainer.ContainerFixedSize = new Vector2(windowBaseSize.X, 0);
                         }
 
                         if (eventContainer.ModifiedWindowOpacity && eventContainer.LastSetOpacity != eventContainer.WindowOpacityValue)
@@ -1658,12 +2183,26 @@ namespace BPSR_ZDPS.Windows
                             if (windowSettings.IsContainerEditMode && windowSettings.EditModeShowPlaceholders && eventTracker.EventData.Count == 0)
                             {
                                 isAddingTempData = true;
-                                eventTracker.EventData[0] = new();
+                                if (eventTracker.TrackerType == ETrackerType.Attributes)
+                                {
+                                    eventTracker.EventData[0] = new AttributeEventData();
+                                    ((AttributeEventData)eventTracker.EventData[0]).AttributeName = eventTracker.TrackedAttributeName;
+                                    ((AttributeEventData)eventTracker.EventData[0]).AttributeValue = "TEMP";
+                                }
+                                else if (eventTracker.TrackerType == ETrackerType.Skills)
+                                {
+                                    eventTracker.EventData[0] = new SkillEventData();
+                                }
+                                else
+                                {
+                                    eventTracker.EventData[0] = new();
+                                }
                                 eventTracker.EventData[0].Cooldown = new(10.0f, 0, 0);
                                 eventTracker.EventData[0].Cooldown.StartOrUpdate(DateTime.UtcNow);
                             }
 
                             //List<long> expiredEventData = [];
+                            bool hasDisplayedTrackerData = false;
 
                             foreach (var eventDataKVP in eventTracker.EventData.AsValueEnumerable())
                             {
@@ -1674,9 +2213,25 @@ namespace BPSR_ZDPS.Windows
                                     continue;
                                 }
 
-                                if (eventTracker.HideTrackerCondition == EHideTrackerCondition.HideWhenNoDuration && (eventData.Cooldown == null || eventData.Cooldown?.BaseDuration == 0) && !windowSettings.IsContainerEditMode)
+                                if (eventTracker.TrackerType != ETrackerType.Attributes)
                                 {
-                                    continue;
+                                    if (eventTracker.HideTrackerCondition == EHideTrackerCondition.HideWhenNoDuration && (eventData.Cooldown == null || eventData.Cooldown?.BaseDuration == 0) && !windowSettings.IsContainerEditMode)
+                                    {
+                                        continue;
+                                    }
+
+                                    if (eventTracker.HideTrackerCondition == EHideTrackerCondition.HideOnRemoveEvent && (eventData.Cooldown == null || eventData.Cooldown.IsCooldownEnded) && !windowSettings.IsContainerEditMode)
+                                    {
+                                        continue;
+                                    }
+                                }
+                                else
+                                {
+                                    AttributeEventData attributeEventData = eventData as AttributeEventData;
+                                    if (attributeEventData.IsRemoved)
+                                    {
+                                        continue;
+                                    }
                                 }
 
                                 if (eventTracker.IsHidden && !windowSettings.IsContainerEditMode)
@@ -1686,7 +2241,7 @@ namespace BPSR_ZDPS.Windows
 
                                 bool hasSetSize = false;
                                 float maxWindowSize = 0;
-                                if (eventContainer.ContainerSizeConstraint == EContainerSizeConstraint.FixedSize)
+                                if (eventContainer.ContainerSizeConstraint == EContainerSizeConstraint.FixedSize || eventContainer.ContainerSizeConstraint == EContainerSizeConstraint.FixedWidth)
                                 {
                                     maxWindowSize = ImGui.GetContentRegionAvail().X;
                                 }
@@ -1713,10 +2268,13 @@ namespace BPSR_ZDPS.Windows
                                     maxWindowSize = ImGui.GetContentRegionAvail().X;
                                 }*/
 
-                                bool hasAnyShown = (eventTracker.ShowName && !eventTracker.ShowNameInsideProgressBar) || (eventTracker.ShowIcon && eventTracker.IsIconValid) || (eventTracker.ShowLayers && !eventTracker.ShowLayersInsideProgressBar) || eventTracker.ShowEntityName || (eventTracker.ShowDurationProgessBar && eventContainer.ContainerSizeConstraint == EContainerSizeConstraint.FixedSize);
+                                bool hasAnyShown = (eventTracker.ShowName && !eventTracker.ShowNameInsideProgressBar) || (eventTracker.ShowIcon && eventTracker.IsIconValid) || (eventTracker.ShowLayers && !eventTracker.ShowLayersInsideProgressBar) || eventTracker.ShowEntityName || (eventTracker.ShowDurationProgessBar);// && eventContainer.ContainerSizeConstraint == EContainerSizeConstraint.FixedSize);
                                 if (!hasAnyShown)
                                 {
-                                    continue;
+                                    if (eventTracker.HideTrackerCondition != EHideTrackerCondition.NeverHide)
+                                    {
+                                        continue;
+                                    }
                                 }
 
                                 if (eventTracker.LoadEvents.IsOwnerAlive || eventTracker.LoadEvents.IsOwnerDead)
@@ -1766,11 +2324,35 @@ namespace BPSR_ZDPS.Windows
                                     }
                                 }
 
+                                if (eventTracker.OnlyDisplayOneTrackerInstance)
+                                {
+                                    if (hasDisplayedTrackerData)
+                                    {
+                                        // We already have an instance of this tracker rendered
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        if (eventData.Cooldown != null && eventData.Cooldown.IsCooldownStarted && !eventData.Cooldown.IsFinished())
+                                        {
+                                            hasDisplayedTrackerData = true;
+                                        }
+                                    }
+                                }
+
                                 // Cache the value in case it changes before the end of the rendering, we need to ensure the push is popped
                                 bool hideTrackerBackground = eventContainer.HideTrackerBackground;
                                 if (hideTrackerBackground)
                                 {
-                                    ImGui.PushStyleColor(ImGuiCol.ChildBg, new Vector4(0, 0, 0, 0));
+                                    if (eventContainer.TrackerBackgroundOpacityValue == 0)
+                                    {
+                                        ImGui.PushStyleColor(ImGuiCol.ChildBg, new Vector4(0, 0, 0, 0));
+                                    }
+                                    else
+                                    {
+                                        var childBgColor = ImGui.GetStyle().Colors[(int)ImGuiCol.ChildBg];
+                                        ImGui.PushStyleColor(ImGuiCol.ChildBg, childBgColor * new Vector4(1, 1, 1, eventContainer.TrackerBackgroundOpacityValue * 0.01f));
+                                    }
                                 }
 
                                 ImGuiChildFlags childFlags = ImGuiChildFlags.None;
@@ -1779,8 +2361,10 @@ namespace BPSR_ZDPS.Windows
                                     childFlags = ImGuiChildFlags.Borders;
                                 }
 
-                                ImGui.BeginChild($"{eventData.OwnerEntityUuid}", new Vector2(maxWindowSize, 0), childFlags | ImGuiChildFlags.AutoResizeX | ImGuiChildFlags.AutoResizeY, ImGuiWindowFlags.NoScrollbar);
+                                var containerWindowSize = ImGui.GetWindowSize();
 
+                                ImGui.BeginChild($"{eventData.OwnerEntityUuid}", new Vector2(maxWindowSize, 0), childFlags | ImGuiChildFlags.AutoResizeX | ImGuiChildFlags.AutoResizeY, ImGuiWindowFlags.NoScrollbar);
+                                
                                 ImGui.BeginGroup();
 
                                 SkillEventData? skillEventData = null;
@@ -1789,7 +2373,10 @@ namespace BPSR_ZDPS.Windows
                                     skillEventData = eventData as SkillEventData;
                                 }
 
-                                if (eventTracker.ShowEntityName && !hasShownEntityName.Contains(eventData.OwnerEntityUuid))
+                                float farthestEndpoint = 0.0f;
+                                float farthestStartpoint = ImGui.GetCursorScreenPos().X;
+
+                                if (eventTracker.ShowEntityName && !eventTracker.ShowEntityNameInsideProgressBar && !hasShownEntityName.Contains(eventData.OwnerEntityUuid))
                                 {
                                     hasShownEntityName.Add(eventData.OwnerEntityUuid);
 
@@ -1801,15 +2388,41 @@ namespace BPSR_ZDPS.Windows
                                     {
                                         ImGui.TextUnformatted($"[{eventData.OwnerEntityUuid}]");
                                     }
+                                    var tempBR = ImGui.GetItemRectMax().X;
+                                    if (tempBR > farthestEndpoint)
+                                    {
+                                        farthestEndpoint = tempBR;
+                                        //farthestStartpoint = ImGui.GetItemRectMin().X;
+                                    }
                                 }
                                 else if (eventTracker.ShowEntityName && eventContainer.ContainerListDirection == EContainerListDirection.Right)
                                 {
                                     ImGui.NewLine();
                                 }
 
+                                if (eventTracker.ShowCasterName && eventTracker.TrackerType == ETrackerType.Buffs)
+                                {
+                                    if (!string.IsNullOrEmpty(eventData.SourceEntityName))
+                                    {
+                                        ImGui.TextUnformatted($"Caster: {eventData.SourceEntityName}");
+                                    }
+                                    else
+                                    {
+                                        ImGui.TextUnformatted($"Caster: [{eventData.SourceEntityUuid}]");
+                                    }
+                                }
+
                                 ImGui.BeginGroup();
+
+                                // Name before Icon
+                                var innerGroupStartPos = ImGui.GetCursorPos();
                                 if (eventTracker.ShowNameBeforeIcon && eventTracker.ShowName && !eventTracker.ShowNameInsideProgressBar)
                                 {
+                                    bool useCustomNameColor = eventTracker.UseCustomNameTextColor;
+                                    if (useCustomNameColor)
+                                    {
+                                        ImGui.PushStyleColor(ImGuiCol.Text, eventTracker.NameTextColor);
+                                    }
                                     ImGui.PushFont(null, eventTracker.NameSize);
                                     if (eventTracker.UseCustomName && !string.IsNullOrEmpty(eventTracker.CustomName))
                                     {
@@ -1820,20 +2433,36 @@ namespace BPSR_ZDPS.Windows
                                         ImGui.TextUnformatted(eventTracker.Name);
                                     }
                                     ImGui.PopFont();
+                                    if (useCustomNameColor)
+                                    {
+                                        ImGui.PopStyleColor();
+                                    }
 
                                     if (!eventTracker.NameNewLineBeforeIcon)
                                     {
                                         ImGui.SameLine();
                                     }
+
+                                    var tempBR = ImGui.GetItemRectMax().X;
+                                    if (tempBR > farthestEndpoint)
+                                    {
+                                        farthestEndpoint = tempBR;
+                                        //farthestStartpoint = ImGui.GetItemRectMin().X;
+                                    }
                                 }
 
+                                // Layers before Icon
                                 if (eventTracker.ShowLayersBeforeIcon && eventTracker.ShowLayers && !eventTracker.ShowLayersInsideProgressBar)
                                 {
                                     if (eventTracker.ShowName && !eventTracker.ShowNameInsideProgressBar)
                                     {
                                         ImGui.SameLine();
                                     }
-                                    ImGui.PushStyleColor(ImGuiCol.Text, Colors.Green);
+                                    bool useCustomLayersColor = eventTracker.UseCustomLayersTextColor;
+                                    if (useCustomLayersColor)
+                                    {
+                                        ImGui.PushStyleColor(ImGuiCol.Text, eventTracker.LayersTextColor);
+                                    }
                                     ImGui.PushFont(null, eventTracker.LayerSize);
                                     if (skillEventData != null)
                                     {
@@ -1853,14 +2482,25 @@ namespace BPSR_ZDPS.Windows
                                     }
 
                                     ImGui.PopFont();
-                                    ImGui.PopStyleColor();
+                                    if (useCustomLayersColor)
+                                    {
+                                        ImGui.PopStyleColor();
+                                    }
 
                                     if (!eventTracker.LayersNewLineBeforeIcon)
                                     {
                                         ImGui.SameLine();
                                     }
+
+                                    var tempBR = ImGui.GetItemRectMax().X;
+                                    if (tempBR > farthestEndpoint)
+                                    {
+                                        farthestEndpoint = tempBR;
+                                        //farthestStartpoint = ImGui.GetItemRectMin().X;
+                                    }
                                 }
 
+                                // Icon
                                 if (eventTracker.ShowIcon && eventTracker.IsIconValid && !eventTracker.ShowIconInsideProgressBar)
                                 {
                                     var tex = ImageArchive.LoadImage(eventTracker.IconPath);
@@ -1873,14 +2513,29 @@ namespace BPSR_ZDPS.Windows
                                             ImGui.SameLine();
                                         }
                                     }
+
+                                    var tempBR = ImGui.GetItemRectMax().X;
+                                    if (tempBR > farthestEndpoint)
+                                    {
+                                        farthestEndpoint = tempBR;
+                                        //farthestStartpoint = ImGui.GetItemRectMin().X;
+                                    }
                                 }
                                 else if (eventTracker.ShowIconInsideProgressBar)
                                 {
                                     ImGui.Dummy(new Vector2(0, 0));
                                 }
+
+                                // Name
                                 if (!eventTracker.ShowNameBeforeIcon && eventTracker.ShowName && !eventTracker.ShowNameInsideProgressBar)
                                 {
+                                    bool useCustomNameColor = eventTracker.UseCustomNameTextColor;
+                                    if (useCustomNameColor)
+                                    {
+                                        ImGui.PushStyleColor(ImGuiCol.Text, eventTracker.NameTextColor);
+                                    }
                                     ImGui.PushFont(null, eventTracker.NameSize);
+
                                     if (eventTracker.UseCustomName && !string.IsNullOrEmpty(eventTracker.CustomName))
                                     {
                                         ImGui.TextUnformatted(eventTracker.CustomName);
@@ -1890,14 +2545,31 @@ namespace BPSR_ZDPS.Windows
                                         ImGui.TextUnformatted(eventTracker.Name);
                                     }
                                     ImGui.PopFont();
+                                    if (useCustomNameColor)
+                                    {
+                                        ImGui.PopStyleColor();
+                                    }
+
+                                    var tempBR = ImGui.GetItemRectMax().X;
+                                    if (tempBR > farthestEndpoint)
+                                    {
+                                        farthestEndpoint = tempBR;
+                                        //farthestStartpoint = ImGui.GetItemRectMin().X;
+                                    }
                                 }
+
+                                // Layers
                                 if (!eventTracker.ShowLayersBeforeIcon && eventTracker.ShowLayers && !eventTracker.ShowLayersInsideProgressBar)
                                 {
                                     if (eventTracker.ShowName && !eventTracker.ShowNameInsideProgressBar)
                                     {
                                         ImGui.SameLine();
                                     }
-                                    ImGui.PushStyleColor(ImGuiCol.Text, Colors.Green);
+                                    bool useCustomLayersColor = eventTracker.UseCustomLayersTextColor;
+                                    if (useCustomLayersColor)
+                                    {
+                                        ImGui.PushStyleColor(ImGuiCol.Text, eventTracker.LayersTextColor);
+                                    }
                                     ImGui.PushFont(null, eventTracker.LayerSize);
                                     if (skillEventData != null)
                                     {
@@ -1917,7 +2589,56 @@ namespace BPSR_ZDPS.Windows
                                     }
                                     
                                     ImGui.PopFont();
-                                    ImGui.PopStyleColor();
+                                    if (useCustomLayersColor)
+                                    {
+                                        ImGui.PopStyleColor();
+                                    }
+
+                                    var tempBR = ImGui.GetItemRectMax().X;
+                                    if (tempBR > farthestEndpoint)
+                                    {
+                                        farthestEndpoint = tempBR;
+                                        //farthestStartpoint = ImGui.GetItemRectMin().X;
+                                    }
+                                }
+
+                                // Attribute Value
+                                if (eventTracker.TrackerType == ETrackerType.Attributes)
+                                {
+                                    if (eventTracker.ShowName && !eventTracker.ShowNameInsideProgressBar)
+                                    {
+                                        ImGui.SameLine();
+                                    }
+
+                                    bool useCustomAttributeValueColor = eventTracker.UseCustomAttributeValueTextColor;
+                                    if (useCustomAttributeValueColor)
+                                    {
+                                        ImGui.PushStyleColor(ImGuiCol.Text, eventTracker.AttributeValueTextColor);
+                                    }
+                                    ImGui.PushFont(null, eventTracker.AttributeValueSize);
+
+                                    var attrData = eventData as AttributeEventData;
+
+                                    ImGui.TextUnformatted(attrData?.AttributeValue);
+
+                                    ImGui.PopFont();
+                                    if (useCustomAttributeValueColor)
+                                    {
+                                        ImGui.PopStyleColor();
+                                    }
+
+                                    var tempBR = ImGui.GetItemRectMax().X;
+                                    if (tempBR > farthestEndpoint)
+                                    {
+                                        farthestEndpoint = tempBR;
+                                        //farthestStartpoint = ImGui.GetItemRectMin().X;
+                                    }
+                                }
+
+                                if (ImGui.GetCursorPos() == innerGroupStartPos)
+                                {
+                                    // Add a Dummy element to prevent the Group from deciding to expand forever when there's no content stored in a Group block
+                                    ImGui.Dummy(new Vector2());
                                 }
                                 ImGui.EndGroup();
                                 bool showTooltip = eventContainer.ShowCasterInTooltip || eventContainer.ShowNameInTooltip || eventContainer.ShowDescriptionInTooltip;
@@ -1926,17 +2647,42 @@ namespace BPSR_ZDPS.Windows
                                     DrawTrackerTooltip(eventContainer, eventTracker, eventData);
                                 }
 
-                                if (eventData.Cooldown != null)
+                                // Convert to endpoint to window-space
+                                if (farthestEndpoint > 0)
+                                {
+                                    var winPos = ImGui.GetWindowPos();
+                                    farthestEndpoint = farthestEndpoint - winPos.X;
+
+                                    farthestStartpoint = farthestStartpoint - winPos.X;
+                                }
+                                else
+                                {
+                                    var curPos = ImGui.GetCursorScreenPos();
+                                    var winPos = ImGui.GetWindowPos();
+                                    // We have to multiply by 3 here to account for multiple layers of offsets
+                                    farthestEndpoint = containerWindowSize.X - ((curPos.X - winPos.X) * 3);
+
+                                    farthestStartpoint = farthestStartpoint - winPos.X;
+                                }
+
+                                bool isNeverHide = eventTracker.HideTrackerCondition == EHideTrackerCondition.NeverHide;
+                                if (eventData.Cooldown != null || isNeverHide)
                                 {
                                     bool usingLayersForDuration = eventTracker.IgnoreCooldownDuration && eventTracker.UseLayersForDuration;
 
-                                    if (!eventData.Cooldown.IsFinished() || usingLayersForDuration)
+                                    if ((eventData.Cooldown != null && !eventData.Cooldown.IsFinished()) || usingLayersForDuration || isNeverHide)
                                     {
                                         // Overall progress metrics
-                                        float remainingSeconds = eventData.Cooldown.GetRemainingSeconds();
-                                        float remainingPct = 1.0f - eventData.Cooldown.GetProgressPercent();
-                                        
-                                        if (skillEventData != null && skillEventData.ChargeTimes.Count > 0)
+                                        float remainingSeconds = 0.0f;
+                                        float remainingPct = 0.0f;
+
+                                        if (eventData.Cooldown != null)
+                                        {
+                                            remainingSeconds = eventData.Cooldown.GetRemainingSeconds();
+                                            remainingPct = 1.0f - eventData.Cooldown.GetProgressPercent();
+                                        }
+
+                                        if (eventData.Cooldown != null && skillEventData != null && skillEventData.ChargeTimes.Count > 0)
                                         {
                                             DateTime? lastFinish = null;
                                             foreach (var chargeTime in skillEventData.ChargeTimes)
@@ -2006,7 +2752,7 @@ namespace BPSR_ZDPS.Windows
                                             }
                                         }
 
-                                        if (eventTracker.ShowDurationText && !eventTracker.ShowDurationTextInProgressBar)
+                                        if (eventTracker.ShowDurationText && (!eventTracker.ShowDurationTextInProgressBar || !eventTracker.ShowDurationProgessBar))
                                         {
                                             if (eventTracker.DurationTextSameLine)
                                             {
@@ -2014,7 +2760,7 @@ namespace BPSR_ZDPS.Windows
                                             }
 
                                             ImGui.PushFont(null, eventTracker.DurationTextSize);
-                                            if(usingLayersForDuration)
+                                            if (usingLayersForDuration)
                                             {
                                                 ImGui.TextUnformatted($"{remainingSeconds}");
                                             }
@@ -2022,7 +2768,8 @@ namespace BPSR_ZDPS.Windows
                                             {
                                                 if (eventTracker.UseMinutesForLongDuration && remainingSeconds > 60)
                                                 {
-                                                    ImGui.TextUnformatted($"{(int)remainingSeconds / 60}m");
+                                                    var ts = TimeSpan.FromSeconds(remainingSeconds);
+                                                    ImGui.TextUnformatted($"{ts.ToString(@"m\m\ s\s")}");
                                                 }
                                                 else
                                                 {
@@ -2030,6 +2777,20 @@ namespace BPSR_ZDPS.Windows
                                                 }
                                             }
                                             ImGui.PopFont();
+
+                                            var tempBR = ImGui.GetItemRectMax().X;
+                                            var winPos = ImGui.GetWindowPos();
+                                            tempBR = tempBR - winPos.X;// - ImGui.GetStyle().WindowPadding.X;
+                                            if (tempBR > farthestEndpoint)
+                                            {
+                                                farthestEndpoint = tempBR;
+                                                //farthestStartpoint = ImGui.GetItemRectMin().X - winPos.X - ImGui.GetStyle().WindowPadding.X;
+
+                                                if (farthestStartpoint > farthestEndpoint)
+                                                {
+                                                    farthestStartpoint = farthestStartpoint - winPos.X;
+                                                }
+                                            }
                                         }
                                         if (eventTracker.ShowDurationProgessBar)
                                         {
@@ -2045,250 +2806,342 @@ namespace BPSR_ZDPS.Windows
                                             }
 
                                             var itemRectSize = ImGui.GetItemRectSize().Y - ImGui.GetStyle().ItemSpacing.Y;
-                                            if ((eventTracker.ShowName && eventTracker.ShowNameInsideProgressBar) || (eventTracker.ShowLayers && eventTracker.ShowLayersInsideProgressBar) || (eventTracker.ShowDurationText && eventTracker.ShowDurationTextInProgressBar))
+
+                                            Vector4? barColor = null;
+                                            if (eventTracker.ColorDurationProgressBarByType)
                                             {
-                                                string displayText = "";
-                                                if (eventTracker.ShowName && eventTracker.ShowNameInsideProgressBar)
+                                                barColor = eventData.BuffTypeToColor();
+                                            }
+                                            else if (eventTracker.UseCustomColorDurationProgressBar)
+                                            {
+                                                barColor = eventTracker.CustomColorDurationProgressBar;
+                                            }
+
+                                            if (barColor != null)
+                                            {
+                                                ImGui.PushStyleColor(ImGuiCol.PlotHistogram, barColor.Value);
+                                            }
+
+                                            ImGui.PushFont(null, eventTracker.DurationProgressBarTextSize);
+
+                                            if (eventTracker.DurationProgressBarStyle == EDurationProgressBarStyle.Circle)
+                                            {
+                                                var startPos = ImGui.GetCursorPos();
+
+                                                ImGui.PushStyleColor(ImGuiCol.ModalWindowDimBg, eventTracker.DurationProgressBarCircleBackgroundColor);
+                                                if (eventTracker.ShowIcon && eventTracker.IsIconValid && eventTracker.ShowIconInsideProgressBar)
                                                 {
-                                                    if (eventTracker.UseCustomName && !string.IsNullOrEmpty(eventTracker.CustomName))
+                                                    var tex = ImageArchive.LoadImage(eventTracker.IconPath);
+                                                    // If the texture is null it will be skipped during the render process automatically
+                                                    ImGuiEx.ProgressBarArc(eventTracker.DurationProgressBarSize, 360, remainingPct * 100.0f, eventTracker.DurationProgressBarCircleThickness, tex, eventTracker.IconStretchLeftValue, eventTracker.IconStretchRightValue, eventTracker.UseDurationProgressBarCircleBackgroundFill);
+                                                    if (showTooltip)
                                                     {
-                                                        displayText = eventTracker.CustomName;
-                                                    }
-                                                    else
-                                                    {
-                                                        displayText = eventTracker.Name;
-                                                    }
-                                                }
-                                                if (eventTracker.ShowLayers && eventTracker.ShowLayersInsideProgressBar)
-                                                {
-                                                    if (displayText.Length > 0)
-                                                    {
-                                                        displayText += " ";
-                                                    }
-                                                    displayText += $"({eventData.Layers})";
-                                                }
-
-                                                if (eventTracker.ShowDurationText && eventTracker.ShowDurationTextInProgressBar)
-                                                {
-                                                    if (displayText.Length > 0)
-                                                    {
-                                                        displayText += " ";
-                                                    }
-                                                    if (usingLayersForDuration)
-                                                    {
-                                                        displayText += $"{remainingSeconds}";
-                                                    }
-                                                    else
-                                                    {
-                                                        if (eventTracker.UseMinutesForLongDuration && remainingSeconds > 60)
-                                                        {
-                                                            displayText += $"{(int)remainingSeconds / 60}m";
-                                                        }
-                                                        else
-                                                        {
-                                                            displayText += $"{remainingSeconds:F2}s";
-                                                        }
-                                                    }
-                                                }
-
-                                                Vector4? barColor = null;
-                                                if (eventTracker.ColorDurationProgressBarByType)
-                                                {
-                                                    barColor = eventData.BuffTypeToColor();
-                                                }
-
-                                                float offsetPct = MathF.Round((float)eventTracker.TextInsideProgressBarOffset / 100.0f, 4);
-                                                if (eventContainer.ContainerListDirection == EContainerListDirection.Right)
-                                                {
-                                                    if (barColor != null)
-                                                    {
-                                                        ImGui.PushStyleColor(ImGuiCol.PlotHistogram, barColor.Value);
-                                                    }
-
-                                                    ImGui.PushFont(null, eventTracker.DurationProgressBarTextSize);
-                                                    if (eventTracker.DurationProgressBarStyle == EDurationProgressBarStyle.Circle)
-                                                    {
-                                                        var startPos = ImGui.GetCursorPos();
-
-                                                        ImGui.PushStyleColor(ImGuiCol.ModalWindowDimBg, eventTracker.DurationProgressBarCircleBackgroundColor);
-                                                        if (eventTracker.ShowIcon && eventTracker.IsIconValid && eventTracker.ShowIconInsideProgressBar)
-                                                        {
-                                                            var tex = ImageArchive.LoadImage(eventTracker.IconPath);
-                                                            // If the texture is null it will be skipped during the render process automatically
-                                                            ImGuiEx.ProgressBarArc(eventTracker.DurationProgressBarSize, 360, remainingPct * 100.0f, eventTracker.DurationProgressBarCircleThickness, tex, eventTracker.UseDurationProgressBarCircleBackgroundFill);
-                                                            DrawTrackerTooltip(eventContainer, eventTracker, eventData);
-                                                        }
-                                                        else
-                                                        {
-                                                            ImGuiEx.ProgressBarArc(eventTracker.DurationProgressBarSize, 360, remainingPct * 100.0f, eventTracker.DurationProgressBarCircleThickness, null, eventTracker.UseDurationProgressBarCircleBackgroundFill);
-                                                        }
-                                                        ImGui.PopStyleColor();
-
-                                                        var endPos = ImGui.GetCursorPos();
-                                                        var tSize = new Vector2();
-                                                        if (eventTracker.UseMinutesForLongDuration && remainingSeconds > 60)
-                                                        {
-                                                            tSize = ImGui.CalcTextSize($"{(int)remainingSeconds / 60}m");
-                                                        }
-                                                        else
-                                                        {
-                                                            tSize = ImGui.CalcTextSize($"{remainingSeconds:F2}s");
-                                                        }
-                                                        
-                                                        ImGui.SetCursorPosX(startPos.X + (eventTracker.DurationProgressBarSize * 0.5f) - (tSize.X * 0.5f));
-                                                        ImGui.SetCursorPosY((startPos.Y * 0.5f) + (endPos.Y * 0.5f) - (tSize.Y * 0.5f));
-                                                        //ImGui.SetCursorPos((startPos + endPos) * 0.5f);
-                                                        bool customTextColor = eventTracker.UseCustomDurationTextColor;
-                                                        if (customTextColor)
-                                                        {
-                                                            ImGui.PushStyleColor(ImGuiCol.Text, eventTracker.DurationTextColor);
-                                                        }
-                                                        ImGui.TextUnformatted(displayText);
-                                                        if (customTextColor)
-                                                        {
-                                                            ImGui.PopFont();
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        ImGuiEx.TextAlignedProgressBar(remainingPct, displayText, offsetPct, ImGui.GetItemRectSize().X, eventTracker.DurationProgressBarSize);
-                                                    }
-                                                    ImGui.PopFont();
-
-                                                    if (barColor != null)
-                                                    {
-                                                        ImGui.PopStyleColor();
+                                                        DrawTrackerTooltip(eventContainer, eventTracker, eventData);
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    if (barColor != null)
+                                                    ImGuiEx.ProgressBarArc(eventTracker.DurationProgressBarSize, 360, remainingPct * 100.0f, eventTracker.DurationProgressBarCircleThickness, null, 0, 0, eventTracker.UseDurationProgressBarCircleBackgroundFill);
+                                                    if (showTooltip && !eventTracker.ShowIcon)
                                                     {
-                                                        ImGui.PushStyleColor(ImGuiCol.PlotHistogram, barColor.Value);
+                                                        DrawTrackerTooltip(eventContainer, eventTracker, eventData);
                                                     }
+                                                }
+                                                ImGui.PopStyleColor();
 
-                                                    ImGui.PushFont(null, eventTracker.DurationProgressBarTextSize);
-
-                                                    if (eventTracker.DurationProgressBarStyle == EDurationProgressBarStyle.Circle)
+                                                if (eventTracker.ShowDurationText && eventTracker.ShowDurationTextInProgressBar)
+                                                {
+                                                    ImGui.PushFont(HelperMethods.Fonts["Segoe-Bold"], ImGui.GetFontSize());
+                                                    string durationFormat = "";
+                                                    if (eventTracker.ShowDurationText && eventTracker.ShowDurationTextInProgressBar)
                                                     {
-                                                        var startPos = ImGui.GetCursorPos();
-
-                                                        ImGui.PushStyleColor(ImGuiCol.ModalWindowDimBg, eventTracker.DurationProgressBarCircleBackgroundColor);
-                                                        if (eventTracker.ShowIcon && eventTracker.IsIconValid && eventTracker.ShowIconInsideProgressBar)
+                                                        if (usingLayersForDuration)
                                                         {
-                                                            var tex = ImageArchive.LoadImage(eventTracker.IconPath);
-                                                            // If the texture is null it will be skipped during the render process automatically
-                                                            ImGuiEx.ProgressBarArc(eventTracker.DurationProgressBarSize, 360, remainingPct * 100.0f, eventTracker.DurationProgressBarCircleThickness, tex, eventTracker.UseDurationProgressBarCircleBackgroundFill);
-                                                            DrawTrackerTooltip(eventContainer, eventTracker, eventData);
+                                                            durationFormat += $"{Math.Floor(remainingSeconds):F0}";
                                                         }
                                                         else
                                                         {
-                                                            ImGuiEx.ProgressBarArc(eventTracker.DurationProgressBarSize, 360, remainingPct * 100.0f, eventTracker.DurationProgressBarCircleThickness, null, eventTracker.UseDurationProgressBarCircleBackgroundFill);
+                                                            if (eventTracker.UseMinutesForLongDuration && remainingSeconds > 60)
+                                                            {
+                                                                var ts = TimeSpan.FromSeconds(remainingSeconds);
+                                                                durationFormat += $"{ts.ToString(@"m\m\ s\s")}";
+                                                            }
+                                                            else
+                                                            {
+                                                                durationFormat += $"{remainingSeconds:F2}s";
+                                                            }
                                                         }
+                                                    }
+
+                                                    var endPos = ImGui.GetCursorPos();
+                                                    var textSize = ImGui.CalcTextSize(durationFormat);
+
+                                                    ImGui.SetCursorPosX(startPos.X + (eventTracker.DurationProgressBarSize * 0.50f) - (textSize.X * 0.50f));
+                                                    ImGui.SetCursorPosY(((startPos.Y + endPos.Y) * 0.50f) - (textSize.Y * 0.50f) - ImGui.GetStyle().FramePadding.Y);
+
+                                                    bool customTextColor = eventTracker.UseCustomDurationTextColor;
+                                                    if (customTextColor)
+                                                    {
+                                                        ImGui.PushStyleColor(ImGuiCol.Text, eventTracker.DurationTextColor);
+                                                    }
+                                                    ImGui.TextUnformatted(durationFormat);
+                                                    if (customTextColor)
+                                                    {
                                                         ImGui.PopStyleColor();
-
-                                                        var endPos = ImGui.GetCursorPos();
-                                                        var tSize = new Vector2();
-                                                        if (eventTracker.UseMinutesForLongDuration && remainingSeconds > 60)
-                                                        {
-                                                            tSize = ImGui.CalcTextSize($"{(int)remainingSeconds / 60}m");
-                                                        }
-                                                        else
-                                                        {
-                                                            tSize = ImGui.CalcTextSize($"{remainingSeconds:F2}s");
-                                                        }
-
-                                                        ImGui.SetCursorPosX(startPos.X + (eventTracker.DurationProgressBarSize * 0.5f) - (tSize.X * 0.5f));
-                                                        ImGui.SetCursorPosY((startPos.Y * 0.5f) + (endPos.Y * 0.5f) - (tSize.Y * 0.5f));
-                                                        //ImGui.SetCursorPos((startPos + endPos) * 0.5f);
-                                                        bool customTextColor = eventTracker.UseCustomDurationTextColor;
-                                                        if (customTextColor)
-                                                        {
-                                                            ImGui.PushStyleColor(ImGuiCol.Text, eventTracker.DurationTextColor);
-                                                        }
-                                                        ImGui.TextUnformatted(displayText);
-                                                        if (customTextColor)
-                                                        {
-                                                            ImGui.PopStyleColor();
-                                                        }
                                                     }
-                                                    else
-                                                    {
-                                                        ImGuiEx.TextAlignedProgressBar(remainingPct, displayText, offsetPct, ImGui.GetContentRegionAvail().X, eventTracker.DurationProgressBarSize);
-                                                    }
-                                                    
                                                     ImGui.PopFont();
-
-                                                    if (barColor != null)
-                                                    {
-                                                        ImGui.PopStyleColor();
-                                                    }
                                                 }
                                             }
                                             else
                                             {
-                                                Vector4? barColor = null;
-                                                if (eventTracker.ColorDurationProgressBarByType)
+                                                // The Progress Bar should never be shorter than this size
+                                                // TODO: It may be worth exposing this as a user setting
+                                                float minWidth = 8.0f;
+
+                                                //var itemRectSize2 = ImGui.GetItemRectSize();
+                                                //var windowSize = ImGui.GetWindowSize();
+                                                var contentAvail = ImGui.GetContentRegionAvail();
+
+                                                var style = ImGui.GetStyle();
+
+                                                float itemSpacingX = style.ItemSpacing.X;
+
+                                                float padding = itemSpacingX + style.WindowPadding.X + style.FramePadding.X;
+                                                float availWidth = containerWindowSize.X - padding;
+
+                                                float sX = availWidth;
+                                                if (contentAvail.X < availWidth)
                                                 {
-                                                    barColor = eventData.BuffTypeToColor();
+                                                    sX = contentAvail.X;
                                                 }
 
-                                                if (barColor != null)
+                                                if (sX < minWidth)
                                                 {
-                                                    ImGui.PushStyleColor(ImGuiCol.PlotHistogram, barColor.Value);
+                                                    sX = minWidth;
                                                 }
 
-                                                if (eventContainer.ContainerListDirection == EContainerListDirection.Right)
+                                                // Get the horizontal mid-point that is reused to realign the elements
+                                                float horizontalOffset = eventTracker.TextInsideProgressBarOffset / 100.0f;
+                                                float calcWidth = 0.0f;
+
+                                                string nameFormat = "";
+                                                string layersFormat = "";
+                                                string durationFormat = "";
+                                                string entityNameFormat = "";
+
+                                                if (eventTracker.ShowName && eventTracker.ShowNameInsideProgressBar)
                                                 {
-                                                    ImGui.PushFont(null, eventTracker.DurationProgressBarTextSize);
-                                                    if (eventTracker.DurationProgressBarStyle == EDurationProgressBarStyle.Circle)
+                                                    if (eventTracker.UseCustomName && !string.IsNullOrEmpty(eventTracker.CustomName))
                                                     {
-                                                        if (eventTracker.ShowIcon && eventTracker.IsIconValid && eventTracker.ShowIconInsideProgressBar)
-                                                        {
-                                                            var tex = ImageArchive.LoadImage(eventTracker.IconPath);
-                                                            // If the texture is null it will be skipped during the render process automatically
-                                                            ImGuiEx.ProgressBarArc(eventTracker.DurationProgressBarSize, 360, remainingPct * 100.0f, eventTracker.DurationProgressBarCircleThickness, tex);
-                                                            DrawTrackerTooltip(eventContainer, eventTracker, eventData);
-                                                        }
-                                                        else
-                                                        {
-                                                            ImGuiEx.ProgressBarArc(eventTracker.DurationProgressBarSize, 360, remainingPct * 100.0f, eventTracker.DurationProgressBarCircleThickness);
-                                                        }
+                                                        nameFormat = eventTracker.CustomName;
                                                     }
                                                     else
                                                     {
-                                                        ImGui.ProgressBar(remainingPct, new Vector2(ImGui.GetItemRectSize().X, eventTracker.DurationProgressBarSize), "##BuffDurationProgressBar");
+                                                        nameFormat = eventTracker.Name;
                                                     }
-                                                    ImGui.PopFont();
                                                 }
-                                                else
+
+                                                if (eventTracker.ShowLayers && eventTracker.ShowLayersInsideProgressBar)
                                                 {
-                                                    ImGui.PushFont(null, eventTracker.DurationProgressBarTextSize);
-                                                    if (eventTracker.DurationProgressBarStyle == EDurationProgressBarStyle.Circle)
+                                                    if (nameFormat.Length > 0)
                                                     {
-                                                        if (eventTracker.ShowIcon && eventTracker.IsIconValid && eventTracker.ShowIconInsideProgressBar)
-                                                        {
-                                                            var tex = ImageArchive.LoadImage(eventTracker.IconPath);
-                                                            // If the texture is null it will be skipped during the render process automatically
-                                                            ImGuiEx.ProgressBarArc(eventTracker.DurationProgressBarSize, 360, remainingPct * 100.0f, eventTracker.DurationProgressBarCircleThickness, tex);
-                                                            DrawTrackerTooltip(eventContainer, eventTracker, eventData);
-                                                        }
-                                                        else
-                                                        {
-                                                            ImGuiEx.ProgressBarArc(eventTracker.DurationProgressBarSize, 360, remainingPct * 100.0f, eventTracker.DurationProgressBarCircleThickness);
-                                                        }
+                                                        layersFormat = " ";
+                                                    }
+                                                    layersFormat += $"({eventData.Layers})";
+                                                }
+
+                                                if (eventTracker.ShowDurationText && eventTracker.ShowDurationTextInProgressBar)
+                                                {
+                                                    if (nameFormat.Length > 0 || layersFormat.Length > 0)
+                                                    {
+                                                        durationFormat += " ";
+                                                    }
+                                                    if (usingLayersForDuration)
+                                                    {
+                                                        durationFormat += $"{Math.Floor(remainingSeconds):F0}";
                                                     }
                                                     else
                                                     {
-                                                        ImGui.ProgressBar(remainingPct, new Vector2(-1, eventTracker.DurationProgressBarSize), "##BuffDurationProgressBar");
+                                                        if (eventTracker.UseMinutesForLongDuration && remainingSeconds > 60)
+                                                        {
+                                                            var ts = TimeSpan.FromSeconds(remainingSeconds);
+                                                            durationFormat += $"{ts.ToString(@"m\m\ s\s")}";
+                                                        }
+                                                        else
+                                                        {
+                                                            durationFormat += $"{remainingSeconds:F2}s";
+                                                        }
                                                     }
-                                                    ImGui.PopFont();
                                                 }
 
-                                                if (barColor != null)
+                                                if (eventTracker.ShowEntityName && eventTracker.ShowEntityNameInsideProgressBar)
                                                 {
-                                                    ImGui.PopStyleColor();
+                                                    string entityNameValue = "";
+                                                    if (EntityCache.Instance.Cache.Lines.TryGetValue(eventData.OwnerEntityUuid, out var cached))
+                                                    {
+                                                        entityNameValue = cached.Name;
+                                                    }
+                                                    else
+                                                    {
+                                                        entityNameValue = $"[{eventData.OwnerEntityUuid}]";
+                                                    }
+
+                                                    entityNameFormat = entityNameValue;
+                                                    if (nameFormat.Length > 0 || layersFormat.Length > 0 || durationFormat.Length > 0)
+                                                    {
+                                                        entityNameFormat = $"{entityNameFormat}: ";
+                                                    }
                                                 }
+
+                                                if (eventTracker.ShowIcon && eventTracker.IsIconValid && eventTracker.ShowIconInsideProgressBar)
+                                                {
+                                                    calcWidth += eventTracker.IconSize + 0;
+                                                }
+
+                                                if (!string.IsNullOrEmpty(nameFormat))
+                                                {
+                                                    calcWidth += ImGui.CalcTextSize(nameFormat).X + (calcWidth > 0 ? itemSpacingX : 0);
+                                                }
+
+                                                if (!string.IsNullOrEmpty(layersFormat))
+                                                {
+                                                    calcWidth += ImGui.CalcTextSize(layersFormat).X + (calcWidth > 0 ? itemSpacingX : 0);
+                                                }
+
+                                                if (!string.IsNullOrEmpty(durationFormat))
+                                                {
+                                                    calcWidth += ImGui.CalcTextSize(durationFormat).X + (calcWidth > 0 ? itemSpacingX : 0);
+                                                }
+
+                                                if (!string.IsNullOrEmpty(entityNameFormat))
+                                                {
+                                                    calcWidth += ImGui.CalcTextSize(entityNameFormat).X + (calcWidth > 0 ? itemSpacingX : 0);
+                                                }
+
+                                                float farthestWidth = farthestEndpoint - farthestStartpoint;
+
+                                                if (!eventTracker.DurationProgressBarSameLine)
+                                                {
+                                                    if (farthestWidth > calcWidth)
+                                                    {
+                                                        if (farthestWidth > sX || eventContainer.ContainerListDirection == EContainerListDirection.Right)
+                                                        {
+                                                            sX = farthestWidth;
+                                                        }
+                                                    }
+                                                    else// if (eventContainer.ContainerListDirection == EContainerListDirection.Right)
+                                                    {
+                                                        //sX = calcWidth;
+                                                    }
+                                                }
+                                                else if (eventContainer.ContainerListDirection == EContainerListDirection.Right)
+                                                {
+                                                    sX = calcWidth;
+                                                }
+
+                                                var startProgPos = ImGui.GetCursorPos();
+
+                                                ImGui.ProgressBar(remainingPct, new Vector2(sX, eventTracker.DurationProgressBarSize), "##BuffDurationProgressBar");
+                                                var endProgPos = ImGui.GetCursorPos();
+                                                ImGui.SetCursorPos(startProgPos);
+                                                float verticalOffset = 0.5f;
+                                                float mid = (endProgPos.Y + startProgPos.Y) * verticalOffset;
+
+                                                float hMid = Math.Clamp(startProgPos.X + ((sX - calcWidth) * horizontalOffset), endProgPos.X, float.MaxValue);
+                                                ImGui.SetCursorPosX(hMid);
+
+                                                // Once the mid point is found, need to get the half-height of the elements to draw and subtract it to center them on it
+                                                ImGui.SetCursorPosY(mid);
+
+                                                // Icon
+                                                if (eventTracker.ShowIcon && eventTracker.IsIconValid && eventTracker.ShowIconInsideProgressBar)
+                                                {
+                                                    var tex = ImageArchive.LoadImage(eventTracker.IconPath);
+                                                    if (tex != null)
+                                                    {
+                                                        ImGui.SetCursorPosY(mid - (eventTracker.IconSize * 0.5f));
+                                                        ImGui.Image(tex.Value, new Vector2(eventTracker.IconSize, eventTracker.IconSize), new Vector2(0, 0), new Vector2(1, 1));
+
+                                                        if (showTooltip)
+                                                        {
+                                                            DrawTrackerTooltip(eventContainer, eventTracker, eventData);
+                                                        }
+
+                                                        ImGui.SameLine();
+                                                    }
+                                                }
+
+                                                // Entity Name
+                                                if (!string.IsNullOrEmpty(entityNameFormat))
+                                                {
+                                                    ImGui.SetCursorPosY(mid - (eventTracker.DurationProgressBarTextSize * 0.5f));
+                                                    ImGui.TextUnformatted(entityNameFormat);
+
+                                                    ImGui.SameLine();
+                                                }
+
+                                                // Name
+                                                if (!string.IsNullOrEmpty(nameFormat))
+                                                {
+                                                    ImGui.SetCursorPosY(mid - (eventTracker.DurationProgressBarTextSize * 0.5f));
+                                                    bool nameColor = eventTracker.UseCustomNameTextColor;
+                                                    if (nameColor)
+                                                    {
+                                                        ImGui.PushStyleColor(ImGuiCol.Text, eventTracker.NameTextColor);
+                                                    }
+                                                    ImGui.TextUnformatted(nameFormat);
+                                                    if (nameColor)
+                                                    {
+                                                        ImGui.PopStyleColor();
+                                                    }
+
+                                                    ImGui.SameLine();
+                                                }
+
+                                                // Layers
+                                                if (!string.IsNullOrEmpty(layersFormat))
+                                                {
+                                                    ImGui.SetCursorPosY(mid - (eventTracker.DurationProgressBarTextSize * 0.5f));
+                                                    bool layersColor = eventTracker.UseCustomLayersTextColor;
+                                                    if (layersColor)
+                                                    {
+                                                        ImGui.PushStyleColor(ImGuiCol.Text, eventTracker.LayersTextColor);
+                                                    }
+                                                    ImGui.TextUnformatted(layersFormat);
+                                                    if (layersColor)
+                                                    {
+                                                        ImGui.PopStyleColor();
+                                                    }
+
+                                                    ImGui.SameLine();
+                                                }
+
+                                                // Duration
+                                                if (!string.IsNullOrEmpty(durationFormat))
+                                                {
+                                                    ImGui.SetCursorPosY(mid - (eventTracker.DurationProgressBarTextSize * 0.5f));
+                                                    bool durationColor = eventTracker.UseCustomDurationTextColor;
+                                                    if (durationColor)
+                                                    {
+                                                        ImGui.PushStyleColor(ImGuiCol.Text, eventTracker.DurationTextColor);
+                                                    }
+                                                    ImGui.TextUnformatted(durationFormat);
+                                                    if (durationColor)
+                                                    {
+                                                        ImGui.PopStyleColor();
+                                                    }
+                                                }
+
+                                                // Reset cursor position and push a Dummy element to satisfy ImGui requirements when SetCursorPos creates a bounds change
+                                                // This also allows calculations in horizontal mode to function correctly after doing a SetCursorPos call
+                                                ImGui.SetCursorPos(endProgPos);
+                                                ImGui.Dummy(new Vector2(0, 0));
+                                            }
+                                            ImGui.PopFont();
+
+                                            if (barColor != null)
+                                            {
+                                                ImGui.PopStyleColor();
                                             }
                                         }
                                     }
@@ -2311,6 +3164,13 @@ namespace BPSR_ZDPS.Windows
                                             }
 
                                             eventData.Cooldown = null;
+                                        }
+                                        else
+                                        {
+                                            if (eventData.Cooldown != null && eventData.Cooldown.IsCooldownEnded)
+                                            {
+                                                eventData.Cooldown = null;
+                                            }
                                         }
                                     }
                                 }
@@ -3257,6 +4117,9 @@ namespace BPSR_ZDPS.Windows
                 SaveContainersToFile();
                 SaveContainerPresetsToFile();
                 SaveTrackerPresetsToFile();
+
+                // Always disable Edit Mode when the window is closed
+                windowSettings.IsContainerEditMode = false;
             }
 
             ImGui.PopID();
@@ -3334,6 +4197,7 @@ namespace BPSR_ZDPS.Windows
                     ImGui.Checkbox("Show Edit Mode Placeholders", ref windowSettings.EditModeShowPlaceholders);
                     ImGui.SetItemTooltip("Attempts to add Placeholder entries for Trackers while in Edit Mode to help with visualizing them.");
 
+                    ImGui.BeginDisabled(windowSettings.OnlyShowContainersWhenZDPSMeterPinned);
                     ImGui.Checkbox("Hide Containers When Game Not Focused", ref windowSettings.HideContainersWhenGameNotFocused);
                     ImGui.SetItemTooltip("Automatically hides all Containers when the game isn't in focus regardless of Container and Tracker settings.");
                     ImGui.Indent();
@@ -3342,6 +4206,11 @@ namespace BPSR_ZDPS.Windows
                     ImGui.SetItemTooltip("Having a ZDPS window in focus will prevent the Containers from being automatically hidden due to the game no longer being in focus.");
                     ImGui.EndDisabled();
                     ImGui.Unindent();
+                    ImGui.EndDisabled();
+                    ImGui.BeginDisabled(windowSettings.HideContainersWhenGameNotFocused);
+                    ImGui.Checkbox("Only Show Containers When ZDPS Meter Pinned", ref windowSettings.OnlyShowContainersWhenZDPSMeterPinned);
+                    ImGui.SetItemTooltip("Containers will only be visible when the ZDPS Meter window is actively pinned as top most.\nThis is not compatible with the other Container Hiding settings.\nDoes not apply while in Edit Mode.");
+                    ImGui.EndDisabled();
 
                     ImGui.Checkbox("Containers Always Ignore Input (Excluding Edit Mode)", ref windowSettings.AlwaysIgnoreInputs);
                     ImGui.SetItemTooltip("All input/mouse events will be ignored for Containers unless in Edit Mode.\nOtherwise, 'Pinned Window Clickthrough' (Mouse Passthrough) must be toggled on via Hotkey Keybind in Settings.");
@@ -3497,80 +4366,164 @@ namespace BPSR_ZDPS.Windows
                     }
                     ImGui.SetItemTooltip("User defines width and height and anything outside is clipped");
 
+                    if (ImGui.Selectable($"{EContainerSizeConstraint.FixedWidth.ToString()}"))
+                    {
+                        ActiveTrackerContainer.ContainerSizeConstraint = EContainerSizeConstraint.FixedWidth;
+                        ActiveTrackerContainer.EventWindowSizes = new();
+                    }
+                    ImGui.SetItemTooltip("User defines width anything outside is clipped, while height automatically adjusts");
+
                     ImGui.EndCombo();
                 }
 
                 ImGui.SeparatorText("Layout Visuals");
-                //ImGui.Indent();
-                ImGui.BeginDisabled(ActiveTrackerContainer.ModifiedWindowOpacity);
-                ImGui.Checkbox("Transparent Background ", ref ActiveTrackerContainer.TransparentBackground);
-                ImGui.EndDisabled();
 
-                ImGui.SameLine();
-
-                ImGui.BeginDisabled(ActiveTrackerContainer.TransparentBackground);
-                ImGui.Checkbox("Window Opacity", ref ActiveTrackerContainer.ModifiedWindowOpacity);
-                if (ActiveTrackerContainer.ModifiedWindowOpacity)
+                if (ImGui.BeginTable("##LayoutVisualsTable", 2, ImGuiTableFlags.None))
                 {
-                    ImGui.Indent();
-                    ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
-                    ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
-                    ImGui.SetNextItemWidth(-1);
-                    ImGui.SameLine();
-                    ImGui.SliderInt("##Opacity", ref ActiveTrackerContainer.WindowOpacityValue, 20, 100, ImGuiSliderFlags.AlwaysClamp);
-                    ImGui.PopStyleColor(2);
-                    ImGui.Unindent();
+                    ImGui.TableSetupColumn("##ColLeft", ImGuiTableColumnFlags.WidthStretch | ImGuiTableColumnFlags.DefaultHide | ImGuiTableColumnFlags.NoResize, 1, 0);
+                    ImGui.TableSetupColumn("##ColRight", ImGuiTableColumnFlags.WidthStretch | ImGuiTableColumnFlags.DefaultHide | ImGuiTableColumnFlags.NoResize, 1, 0);
+
+                    ImGui.TableNextColumn();
+
+                    ImGui.BeginDisabled(ActiveTrackerContainer.ModifiedWindowOpacity);
+                    ImGui.Checkbox("Transparent Background ", ref ActiveTrackerContainer.TransparentBackground);
+                    ImGui.EndDisabled();
+
+                    ImGui.TableNextColumn();
+
+                    ImGui.BeginDisabled(ActiveTrackerContainer.TransparentBackground);
+                    ImGui.Checkbox("Window Opacity", ref ActiveTrackerContainer.ModifiedWindowOpacity);
+                    if (ActiveTrackerContainer.ModifiedWindowOpacity)
+                    {
+                        ImGui.Indent();
+                        ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
+                        ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
+                        ImGui.SetNextItemWidth(-1);
+                        ImGui.SameLine();
+                        ImGui.SliderInt("##Opacity", ref ActiveTrackerContainer.WindowOpacityValue, 20, 100, ImGuiSliderFlags.AlwaysClamp);
+                        ImGui.PopStyleColor(2);
+                        ImGui.Unindent();
+                    }
+                    ImGui.EndDisabled();
+
+                    ImGui.TableNextColumn();
+
+                    ImGui.Checkbox("Hide Tracker Background", ref ActiveTrackerContainer.HideTrackerBackground);
+                    ImGui.SetItemTooltip("Removes the background coloring for Trackers.\nWorks well when combined with Transparent Background.");
+                    if (ActiveTrackerContainer.HideTrackerBackground)
+                    {
+                        ImGui.Indent();
+                        ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
+                        ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
+                        ImGui.SetNextItemWidth(-1);
+                        ImGui.SameLine();
+                        ImGui.SliderInt("##TrackerBackgroundOpacity", ref ActiveTrackerContainer.TrackerBackgroundOpacityValue, 0, 100, ImGuiSliderFlags.AlwaysClamp);
+                        ImGui.PopStyleColor(2);
+                        ImGui.Unindent();
+                    }
+
+                    ImGui.TableNextColumn();
+
+                    ImGui.Checkbox("Hide Tracker Borders", ref ActiveTrackerContainer.HideTrackerBorders);
+                    ImGui.SetItemTooltip("Removes the borders around Trackers.\nWorks well when combined with Transparent Background.");
+
+                    ImGui.EndTable();
                 }
-                ImGui.EndDisabled();
-
-                ImGui.Checkbox("Hide Tracker Background", ref ActiveTrackerContainer.HideTrackerBackground);
-                ImGui.SetItemTooltip("Removes the background coloring for Trackers.\nWorks well when combined with Transparent Background.");
-
-                ImGui.SameLine();
-
-                ImGui.Checkbox("Hide Tracker Borders", ref ActiveTrackerContainer.HideTrackerBorders);
-                ImGui.SetItemTooltip("Removes the borders around Trackers.\nWorks well when combined with Transparent Background.");
-
-                //ImGui.Unindent();
 
                 ImGui.SeparatorText("Tooltips");
-                //ImGui.Indent();
-                ImGui.Checkbox("Show Caster", ref ActiveTrackerContainer.ShowCasterInTooltip);
-                ImGui.SameLine();
-                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + 32);
-                ImGui.Checkbox("Show Duration               ", ref ActiveTrackerContainer.ShowDurationInTooltip);
-                ImGui.SameLine();
-                ImGui.Checkbox("Show Name     ", ref ActiveTrackerContainer.ShowNameInTooltip);
-                ImGui.Checkbox("Show Description", ref ActiveTrackerContainer.ShowDescriptionInTooltip);
-                ImGui.SameLine();
-                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + 2);
-                ImGui.Checkbox("Trim Long Descriptions", ref ActiveTrackerContainer.TrimLongDescriptionTooltips);
-                ImGui.SetItemTooltip("Descriptions are limited to 120 characters with this is Enabled.");
-                //ImGui.Unindent(); 
 
-                ImGui.SeparatorText("Special");
-                ImGui.BeginDisabled(ActiveTrackerContainer.ContainerLayoutStyle == EContainerLayoutStyle.SingleItem);
-                //ImGui.Indent();
-                if (ImGui.Checkbox("Track All Buffs##ContainerTrackAllBuffs", ref ActiveTrackerContainer.TrackAllBuffs))
+                if (ImGui.BeginTable("##TooltipsTable", 3, ImGuiTableFlags.SizingFixedFit))
                 {
-                    if (ActiveTrackerContainer.TrackAllBuffs && ActiveTrackerContainer.EventTrackers.Count == 0)
-                    {
-                        ActiveTrackedEventEntry = new TrackedEventEntry(++PersistentTrackerCount);
-                        ActiveTrackedEventEntry.TrackerName = $"All Buffs Tracker";
-                        ActiveTrackerContainer.EventTrackers.Add(ActiveTrackedEventEntry.IdTracker, ActiveTrackedEventEntry);
-                        ActiveTrackedEventEntryIdx = ActiveTrackerContainer.EventTrackers.Count - 1;
-                        ActiveTrackedEventEntry.IsEnabled = true;
-                        ActiveTrackerContainer.RecheckTrackerStates();
-                    }
+                    ImGui.TableSetupColumn("##ColLeft", ImGuiTableColumnFlags.DefaultHide | ImGuiTableColumnFlags.NoResize);
+                    ImGui.TableSetupColumn("##ColCenter", ImGuiTableColumnFlags.DefaultHide | ImGuiTableColumnFlags.NoResize);
+                    ImGui.TableSetupColumn("##ColRight", ImGuiTableColumnFlags.DefaultHide | ImGuiTableColumnFlags.NoResize);
+
+                    ImGui.TableNextColumn();
+
+                    ImGui.Checkbox("Show Caster", ref ActiveTrackerContainer.ShowCasterInTooltip);
+                    ImGui.TableNextColumn();
+
+                    ImGui.Checkbox("Show Duration", ref ActiveTrackerContainer.ShowDurationInTooltip);
+                    ImGui.TableNextColumn();
+
+                    ImGui.Checkbox("Show Name", ref ActiveTrackerContainer.ShowNameInTooltip);
+                    ImGui.TableNextColumn();
+
+                    ImGui.Checkbox("Show Description", ref ActiveTrackerContainer.ShowDescriptionInTooltip);
+                    ImGui.TableNextColumn();
+
+                    ImGui.Checkbox("Trim Long Descriptions", ref ActiveTrackerContainer.TrimLongDescriptionTooltips);
+                    ImGui.SetItemTooltip("Descriptions are limited to 120 characters with this is Enabled.");
+                    ImGui.TableNextColumn();
+
+                    ImGui.TableNextRow();
+
+                    ImGui.EndTable();
                 }
-                ImGui.EndDisabled();
-                ImGui.BeginDisabled();
-                ImGui.Indent();
-                ImGui.TextWrapped("If this is Enabled, the First Tracker in this Container will be used for the settings of all Buffs that get automatically tracked.");
-                ImGui.TextWrapped("Any Buff selected within the Tracker will be ignored. Additionally, the Tracker Type MUST be set to Buff.");
-                ImGui.Unindent();
-                ImGui.Unindent();
-                ImGui.EndDisabled();
+
+                if (ImGui.CollapsingHeader("Special", ImGuiTreeNodeFlags.DefaultOpen))
+                {
+                    ImGui.Indent();
+
+                    ImGui.BeginDisabled(ActiveTrackerContainer.ContainerLayoutStyle == EContainerLayoutStyle.SingleItem || ActiveTrackerContainer.TrackAllSkills);
+                    if (ImGui.Checkbox("Track All Buffs##ContainerTrackAllBuffs", ref ActiveTrackerContainer.TrackAllBuffs))
+                    {
+                        if (ActiveTrackerContainer.TrackAllBuffs && ActiveTrackerContainer.EventTrackers.Count == 0)
+                        {
+                            ActiveTrackedEventEntry = new TrackedEventEntry(++PersistentTrackerCount);
+                            ActiveTrackedEventEntry.TrackerName = $"All Buffs Tracker";
+                            ActiveTrackerContainer.EventTrackers.Add(ActiveTrackedEventEntry.IdTracker, ActiveTrackedEventEntry);
+                            ActiveTrackedEventEntryIdx = ActiveTrackerContainer.EventTrackers.Count - 1;
+                            ActiveTrackedEventEntry.IsEnabled = true;
+                            ActiveTrackerContainer.RecheckTrackerStates();
+                        }
+                    }
+                    if (ActiveTrackerContainer.TrackAllSkills)
+                    {
+                        ImGui.SameLine();
+                        ImGui.PushStyleColor(ImGuiCol.Text, Colors.Red);
+                        ImGui.TextWrapped("[Track All Skills] is Enabled");
+                        ImGui.PopStyleColor();
+                    }
+                    ImGui.EndDisabled();
+                    ImGui.BeginDisabled();
+                    ImGui.Indent();
+                    ImGui.TextWrapped("If this is Enabled, the First Tracker in this Container will be used for the settings of all Buffs that get automatically tracked.");
+                    ImGui.TextWrapped("Any Buff selected within the Tracker will be ignored. Additionally, the Tracker Type MUST be set to Buff.");
+                    ImGui.Unindent();
+                    ImGui.EndDisabled();
+
+                    ImGui.BeginDisabled(ActiveTrackerContainer.ContainerLayoutStyle == EContainerLayoutStyle.SingleItem || ActiveTrackerContainer.TrackAllBuffs);
+                    if (ImGui.Checkbox("Track All Skills##ContainerTrackAllSkills", ref ActiveTrackerContainer.TrackAllSkills))
+                    {
+                        if (ActiveTrackerContainer.TrackAllSkills && ActiveTrackerContainer.EventTrackers.Count == 0)
+                        {
+                            ActiveTrackedEventEntry = new TrackedEventEntry(++PersistentTrackerCount);
+                            ActiveTrackedEventEntry.TrackerName = $"All Skills Tracker";
+                            ActiveTrackedEventEntry.TrackerType = ETrackerType.Skills;
+                            ActiveTrackerContainer.EventTrackers.Add(ActiveTrackedEventEntry.IdTracker, ActiveTrackedEventEntry);
+                            ActiveTrackedEventEntryIdx = ActiveTrackerContainer.EventTrackers.Count - 1;
+                            ActiveTrackedEventEntry.IsEnabled = true;
+                            ActiveTrackerContainer.RecheckTrackerStates();
+                        }
+                    }
+                    if (ActiveTrackerContainer.TrackAllBuffs)
+                    {
+                        ImGui.SameLine();
+                        ImGui.PushStyleColor(ImGuiCol.Text, Colors.Red);
+                        ImGui.TextWrapped("[Track All Buffs] is Enabled");
+                        ImGui.PopStyleColor();
+                    }
+                    ImGui.EndDisabled();
+                    ImGui.BeginDisabled();
+                    ImGui.Indent();
+                    ImGui.TextWrapped("If this is Enabled, the First Tracker in this Container will be used for the settings of all Skills that get automatically tracked.");
+                    ImGui.TextWrapped("Any Skill selected within the Tracker will be ignored. Additionally, the Tracker Type MUST be set to Skill.");
+                    ImGui.Unindent();
+                    ImGui.EndDisabled();
+
+                    ImGui.Unindent();
+                }
 
                 if (ImGui.CollapsingHeader("Extra Container Settings"))
                 {
@@ -3628,7 +4581,7 @@ namespace BPSR_ZDPS.Windows
             if (ImGui.BeginListBox("##TrackersListbox", new Vector2(ImGui.GetContentRegionAvail().X, 140)))
             {
                 int idx = 0;
-                foreach (var eventTracker in ActiveTrackerContainer.EventTrackers)
+                foreach (var eventTracker in ActiveTrackerContainer.EventTrackers.AsValueEnumerable())
                 {
                     bool isSelected = ActiveTrackedEventEntryIdx == idx;
                     ImGuiSelectableFlags highlight = isSelected ? ImGuiSelectableFlags.Highlight : ImGuiSelectableFlags.None;
@@ -3654,7 +4607,7 @@ namespace BPSR_ZDPS.Windows
                         {
                             dropAction = "Copying";
                         }
-                        ImGui.TextUnformatted($"{dropAction} Tracker '{eventTracker.Value.Name}'{(!string.IsNullOrEmpty(DragDropTargetName) ? $" to '{DragDropTargetName}'" : "")}");
+                        ImGui.TextUnformatted($"{dropAction} Tracker '{eventTracker.Value.TrackerName}'{(!string.IsNullOrEmpty(DragDropTargetName) ? $" to '{DragDropTargetName}'" : "")}");
 
                         ImGui.EndDragDropSource();
                     }
@@ -3680,6 +4633,13 @@ namespace BPSR_ZDPS.Windows
 
                         ImGui.TextUnformatted($"Who To Track: {eventTracker.Value.TrackedEntityType}");
 
+                        if (eventTracker.Value.DebugLogTracker)
+                        {
+                            ImGui.PushStyleColor(ImGuiCol.Text, Colors.Red);
+                            ImGui.TextUnformatted("Debug Tracker: Enabled");
+                            ImGui.PopStyleColor();
+                        }
+
                         ImGui.EndTooltip();
                     }
                     if (ImGui.BeginPopupContextItem())
@@ -3693,6 +4653,31 @@ namespace BPSR_ZDPS.Windows
                         ImGui.SetItemTooltip($"Copies Tracker '{eventTracker.Value.Name}' like a Preset to the clipboard.");
 
                         ImGui.EndPopup();
+                    }
+
+                    if (eventTracker.Value.DebugLogTracker)
+                    {
+                        ImGui.SameLine();
+                        ImGui.PushStyleColor(ImGuiCol.Text, Colors.DarkGreen);
+                        ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
+                        ImGui.TextUnformatted($"{FASIcons.Bug}");
+                        ImGui.PopFont();
+                        ImGui.PopStyleColor();
+                    }
+
+                    if (idx == 0 && ActiveTrackerContainer.TrackAllBuffs && eventTracker.Value.TrackerType != ETrackerType.Buffs)
+                    {
+                        ImGui.SameLine();
+                        ImGui.PushStyleColor(ImGuiCol.Text, Colors.Red);
+                        ImGui.TextUnformatted("[Incorrect Tracker Type For 'Track All Buffs']");
+                        ImGui.PopStyleColor();
+                    }
+                    else if (idx == 0 && ActiveTrackerContainer.TrackAllSkills && eventTracker.Value.TrackerType != ETrackerType.Skills)
+                    {
+                        ImGui.SameLine();
+                        ImGui.PushStyleColor(ImGuiCol.Text, Colors.Red);
+                        ImGui.TextUnformatted("[Incorrect Tracker Type For 'Track All Skills']");
+                        ImGui.PopStyleColor();
                     }
 
                     idx++;
@@ -3810,12 +4795,6 @@ namespace BPSR_ZDPS.Windows
             {
                 foreach (var trackerType in System.Enum.GetValues<ETrackerType>())
                 {
-                    // Disable Attribute types for now, there hasn't been a good reason to actually support them
-                    if (trackerType == ETrackerType.Attributes)
-                    {
-                        continue;
-                    }
-
                     bool isSelected = ActiveTrackedEventEntry.TrackerType == trackerType;
 
                     if (ImGui.Selectable($"{trackerType.ToString()}", isSelected))
@@ -3868,6 +4847,20 @@ namespace BPSR_ZDPS.Windows
                     ImGui.Separator();
 
                     ImGui.Checkbox("Debug Tracker", ref ActiveTrackedEventEntry.DebugLogTracker);
+                    if (ImGui.BeginPopupContextItem(ImGuiPopupFlags.MouseButtonRight))
+                    {
+                        if (ImGui.MenuItem("Apply To Other Trackers"))
+                        {
+                            foreach (var tracker in ActiveTrackerContainer.EventTrackers)
+                            {
+                                if (tracker.Value.IdTracker != ActiveTrackedEventEntry.IdTracker)
+                                {
+                                    tracker.Value.DebugLogTracker = ActiveTrackedEventEntry.DebugLogTracker;
+                                }
+                            }
+                        }
+                        ImGui.EndPopup();
+                    }
 
                     ImGui.Separator();
 
@@ -3889,9 +4882,10 @@ namespace BPSR_ZDPS.Windows
             ImGui.TextUnformatted("Filter: ");
             ImGui.SameLine();
             ImGui.Checkbox("(Search Descriptions)", ref BuffFilterIncludeDescriptions);
+            ImGui.SetItemTooltip("Search the Description text of Buffs instead of only their Names.");
             ImGui.SameLine();
             ImGui.SetNextItemWidth(-1);
-            if (ImGui.InputText("##BuffFilterText", ref BuffFilterText, 128))
+            if (ImGui.InputTextWithHint("##BuffFilterText", "Name or ID", ref BuffFilterText, 128))
             {
                 if (BuffFilterText.Length > 0)
                 {
@@ -3905,9 +4899,24 @@ namespace BPSR_ZDPS.Windows
                     BuffFilterMatches = null;
                 }
             }
+
+            if (BuffFilterMatches == null || BuffFilterText.Length == 0)
+            {
+                if (ActiveTrackedEventEntry != null && ActiveTrackedEventEntry.TrackedBuffId > 0)
+                {
+                    string trackedBuffId = ActiveTrackedEventEntry.TrackedBuffId.ToString();
+                    var foundBuff = HelperMethods.DataTables.Buffs.Data.AsValueEnumerable().Where(x => x.Key == trackedBuffId).FirstOrDefault();
+                    // Validate the result before using it for the edge case where it doesn't actually exist in our table for some reason
+                    if (!string.IsNullOrEmpty(foundBuff.Key))
+                    {
+                        BuffFilterMatches = [foundBuff];
+                    }
+                }
+            }
+
             if (ImGui.BeginListBox("##BuffsListBox", new Vector2(ImGui.GetContentRegionAvail().X, 140)))
             {
-                if (BuffFilterText.Length > 0 && BuffFilterMatches != null && BuffFilterMatches.Any())
+                if (BuffFilterMatches != null && BuffFilterMatches.Any())
                 {
                     int buffIdx = 0;
                     foreach (var buff in BuffFilterMatches)
@@ -3974,6 +4983,7 @@ namespace BPSR_ZDPS.Windows
                                     ImGui.TextUnformatted($"[{fmt} ]");
                                 }
                             }
+                            ImGui.TextUnformatted($"RemoveOnSceneChange: {buff.Value.DeleteChangeScene}");
 
                             ImGui.EndTooltip();
                         }
@@ -4045,6 +5055,27 @@ namespace BPSR_ZDPS.Windows
                             ActiveTrackedEventEntry.BuffEvents.Remove(trackedBuffEvent);
                         }
                     }
+                    if (ImGui.BeginPopupContextItem())
+                    {
+                        ImGui.BeginDisabled(ActiveTrackedEventEntry.BuffEvents.Count > 1);
+                        if (ImGui.MenuItem("Select All Events"))
+                        {
+                            ActiveTrackedEventEntry.BuffEvents.Clear();
+                            ActiveTrackedEventEntry.BuffEvents.AddRange(eventsList);
+                        }
+                        ImGui.SetItemTooltip($"Selects all listed events.\nWill not select Advanced Mode events if not currently in Advanced ('View All Events') Mode.");
+                        ImGui.EndDisabled();
+
+                        ImGui.BeginDisabled(ActiveTrackedEventEntry.BuffEvents.Count == 0);
+                        if (ImGui.MenuItem("Deselect All Events"))
+                        {
+                            ActiveTrackedEventEntry.BuffEvents.Clear();
+                        }
+                        ImGui.SetItemTooltip($"Deselects all events.\nIf events in Advanced Mode were selected they will be removed even if not in Advanced ('View All Events') Mode.");
+                        ImGui.EndDisabled();
+
+                        ImGui.EndPopup();
+                    }
                 }
                 ImGui.EndListBox();
             }
@@ -4092,9 +5123,10 @@ namespace BPSR_ZDPS.Windows
             ImGui.TextUnformatted("Filter: ");
             ImGui.SameLine();
             ImGui.Checkbox("(Search Descriptions)", ref SkillFilterIncludeDescriptions);
+            ImGui.SetItemTooltip("Search the Description text of Skills instead of only their Names.");
             ImGui.SameLine();
             ImGui.SetNextItemWidth(-1);
-            if (ImGui.InputText("##SkillFilterText", ref SkillFilterText, 128))
+            if (ImGui.InputTextWithHint("##SkillFilterText", "Name or ID", ref SkillFilterText, 128))
             {
                 if (SkillFilterText.Length > 0)
                 {
@@ -4108,9 +5140,23 @@ namespace BPSR_ZDPS.Windows
                     SkillFilterMatches = null;
                 }
             }
+
+            if (SkillFilterMatches == null || SkillFilterText.Length == 0)
+            {
+                if (ActiveTrackedEventEntry != null && ActiveTrackedEventEntry.TrackedSkillId > 0)
+                {
+                    string trackedSkillId = ActiveTrackedEventEntry.TrackedSkillId.ToString();
+                    var foundSkill = HelperMethods.DataTables.Skills.Data.AsValueEnumerable().Where(x => x.Key == trackedSkillId).FirstOrDefault();
+                    if (!string.IsNullOrEmpty(foundSkill.Key))
+                    {
+                        SkillFilterMatches = [ foundSkill ];
+                    }
+                }
+            }
+
             if (ImGui.BeginListBox("##SkillsListBox", new Vector2(ImGui.GetContentRegionAvail().X, 140)))
             {
-                if (SkillFilterText.Length > 0 && SkillFilterMatches != null && SkillFilterMatches.Any())
+                if (SkillFilterMatches != null && SkillFilterMatches.Any())
                 {
                     int skillIdx = 0;
                     foreach (var skill in SkillFilterMatches)
@@ -4146,6 +5192,17 @@ namespace BPSR_ZDPS.Windows
                             ImGui.TextUnformatted($"Icon: {skill.Value.Icon}");
                             ImGui.TextUnformatted($"Charges: {skill.Value.MaxEnergyChargeNum}");
                             ImGui.TextUnformatted($"Charge CD: {skill.Value.EnergyChargeTime}");
+                            ImGui.TextUnformatted($"Can Be Silence: {skill.Value.CanBeSilence}");
+                            ImGui.TextUnformatted($"Cant Stiff: {skill.Value.CantStiff}");
+                            ImGui.TextUnformatted($"Skill Talk: {skill.Value.SkillTalk}");
+                            ImGui.TextUnformatted($"Talk Time: {skill.Value.SkillTalkTime}");
+                            if (skill.Value.SingOrGuideTime != null && skill.Value.SingOrGuideTime.Count > 1)
+                            {
+                                if (skill.Value.SingOrGuideTime[0].Count > 1 && skill.Value.SingOrGuideTime[1].Count > 1)
+                                {
+                                    ImGui.TextUnformatted($"Cast Time: {skill.Value.SingOrGuideTime[1][0]}");
+                                }
+                            }
                             //ImGui.TextUnformatted(JsonConvert.SerializeObject(skill.Value, Formatting.Indented));
                             ImGui.EndTooltip();
                         }
@@ -4282,15 +5339,41 @@ namespace BPSR_ZDPS.Windows
 
         private static void DrawAttributeTrackerOptions()
         {
-            if (ImGui.BeginListBox("##AttributesListBox", new Vector2(ImGui.GetContentRegionAvail().X, 140)))
+            ImGui.TextUnformatted("Select Attribute To Track:");
+            ImGui.AlignTextToFramePadding();
+            ImGui.TextUnformatted("Filter: ");
+            ImGui.SameLine();
+            ImGui.SetNextItemWidth(-1);
+            if (ImGui.InputTextWithHint("##AttributeFilterText", "Name", ref AttributeFilterText, 128))
             {
-                foreach (var attribute in System.Enum.GetValues<Zproto.EAttrType>())
+                if (AttributeFilterText.Length > 0)
                 {
-                    bool isSelected = ActiveTrackedEventEntry.TrackedAttributeName == attribute.ToString();
+                    AttributeFilterMatches = AttrSupported.Where(x => x.Key.Contains(AttributeFilterText, StringComparison.OrdinalIgnoreCase) ).ToArray();
+                }
+                else
+                {
+                    AttributeFilterMatches = null;
+                }
+            }
 
-                    if (ImGui.Selectable($"{attribute}", isSelected, ImGuiSelectableFlags.SpanAllColumns))
+            if (AttributeFilterMatches == null)
+            {
+                AttributeFilterMatches = AttrSupported.ToArray();
+            }
+
+            if (ImGui.BeginListBox("##AttributesListBox", new Vector2(ImGui.GetContentRegionAvail().X, 180)))
+            {
+                foreach (var attribute in AttributeFilterMatches)
+                {
+                    bool isSelected = ActiveTrackedEventEntry.TrackedAttributeName == attribute.Key;
+                    var highlight = isSelected ? ImGuiSelectableFlags.Highlight : ImGuiSelectableFlags.None;
+
+                    if (ImGui.Selectable($"{attribute.Key}", isSelected, ImGuiSelectableFlags.SpanAllColumns | highlight))
                     {
-                        ActiveTrackedEventEntry.TrackedAttributeName = attribute.ToString();
+                        ActiveTrackedEventEntry.TrackedAttributeName = attribute.Key;
+                        ActiveTrackedEventEntry.TrackedAttributeNameOverride = attribute.Value.OverrideName;
+
+                        ActiveTrackedEventEntry.Name = attribute.Key;
                     }
                 }
                 ImGui.EndListBox();
@@ -4299,6 +5382,10 @@ namespace BPSR_ZDPS.Windows
             // TODO: Allow selecting a Left Side and Right Side Attribute
             // These can then be used for creating a progress bar
             // If only a single one is selected (Left Side) it is used to just display that value
+
+            ImGui.NewLine();
+
+            DrawWhoToTrack();
         }
 
         private static void DrawDisplayFormatOptions()
@@ -4313,6 +5400,10 @@ namespace BPSR_ZDPS.Windows
                     if (tracker.Value.IdTracker != ActiveTrackedEventEntry.IdTracker)
                     {
                         tracker.Value.ShowEntityName = ActiveTrackedEventEntry.ShowEntityName;
+                        if (ActiveTrackedEventEntry.TrackerType == ETrackerType.Buffs && tracker.Value.TrackerType == ETrackerType.Buffs)
+                        {
+                            tracker.Value.ShowCasterName = ActiveTrackedEventEntry.ShowCasterName;
+                        }
                         tracker.Value.ShowIcon = ActiveTrackedEventEntry.ShowIcon;
                         tracker.Value.IconSize = ActiveTrackedEventEntry.IconSize;
                         tracker.Value.ShowName = ActiveTrackedEventEntry.ShowName;
@@ -4343,6 +5434,10 @@ namespace BPSR_ZDPS.Windows
                         tracker.Value.TextInsideProgressBarOffset = ActiveTrackedEventEntry.TextInsideProgressBarOffset;
                         tracker.Value.ColorDurationProgressBarByType = ActiveTrackedEventEntry.ColorDurationProgressBarByType;
                         tracker.Value.ShowDurationEnded = ActiveTrackedEventEntry.ShowDurationEnded;
+                        if (ActiveTrackedEventEntry.TrackerType == ETrackerType.Attributes && tracker.Value.TrackerType == ETrackerType.Attributes)
+                        {
+                            tracker.Value.FormatAttributeAsPercent = ActiveTrackedEventEntry.FormatAttributeAsPercent;
+                        }
                         tracker.Value.HideTrackerCondition = ActiveTrackedEventEntry.HideTrackerCondition;
 
                         //tracker.Value.RaidWarningTrackerDatas = new();
@@ -4353,6 +5448,14 @@ namespace BPSR_ZDPS.Windows
             ImGui.SetItemTooltip("This will apply all current 'Display Format' settings to all other Trackers in this Container.\nNote: Does NOT include Custom Name, Custom Icon, or Raid Warning values.");
 
             ImGui.Checkbox("Show Entity Name", ref ActiveTrackedEventEntry.ShowEntityName);
+
+            if (ActiveTrackedEventEntry.TrackerType == ETrackerType.Buffs)
+            {
+                ImGui.Checkbox("Show Caster Name", ref ActiveTrackedEventEntry.ShowCasterName);
+            }
+
+            ImGui.SeparatorText("Icon");
+
             ImGui.Checkbox("Show Icon", ref ActiveTrackedEventEntry.ShowIcon);
             if (ActiveTrackedEventEntry.ShowIcon)
             {
@@ -4363,7 +5466,7 @@ namespace BPSR_ZDPS.Windows
                 ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
                 ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
                 ImGui.SetNextItemWidth(-1);
-                ImGui.SliderInt("##IconSize", ref ActiveTrackedEventEntry.IconSize, 16, 64);
+                ImGui.SliderInt("##IconSize", ref ActiveTrackedEventEntry.IconSize, 16, 96);
                 ImGui.PopStyleColor(2);
                 ImGui.Unindent();
 
@@ -4387,6 +5490,9 @@ namespace BPSR_ZDPS.Windows
                 }
                 ImGui.Unindent();
             }
+
+            ImGui.SeparatorText("Name");
+
             ImGui.Checkbox("Show Name", ref ActiveTrackedEventEntry.ShowName);
             if (ActiveTrackedEventEntry.ShowName)
             {
@@ -4398,7 +5504,7 @@ namespace BPSR_ZDPS.Windows
                 ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
                 ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
                 ImGui.SetNextItemWidth(-1);
-                ImGui.SliderInt("##NameSize", ref ActiveTrackedEventEntry.NameSize, 16, 64);
+                ImGui.SliderInt("##NameSize", ref ActiveTrackedEventEntry.NameSize, 16, 96);
                 ImGui.PopStyleColor(2);
 
                 ImGui.Checkbox("Use Custom Name", ref ActiveTrackedEventEntry.UseCustomName);
@@ -4417,122 +5523,85 @@ namespace BPSR_ZDPS.Windows
                     ImGui.Unindent();
                 }
 
-                ImGui.Unindent();
-            }
-
-            ImGui.Checkbox("Show Layers", ref ActiveTrackedEventEntry.ShowLayers);
-            if (ActiveTrackedEventEntry.ShowLayers)
-            {
-                ImGui.Indent();
-
-                ImGui.AlignTextToFramePadding();
-                ImGui.TextUnformatted("Layers Size:");
+                ImGui.Checkbox("Use Custom Name Text Color##UseCustomNameTextColor", ref ActiveTrackedEventEntry.UseCustomNameTextColor);
+                ImGui.SetItemTooltip("Changes the color of Name Text.");
                 ImGui.SameLine();
-                ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
-                ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
-                ImGui.SetNextItemWidth(-1);
-                ImGui.SliderInt("##LayersSize", ref ActiveTrackedEventEntry.LayerSize, 16, 64);
-                ImGui.PopStyleColor(2);
-
-                ImGui.Checkbox("Show Layers Before Icon##ShowLayersBeforeIcon", ref ActiveTrackedEventEntry.ShowLayersBeforeIcon);
-                if (ActiveTrackedEventEntry.ShowLayersBeforeIcon)
+                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
+                if (ImGui.Button($"{FASIcons.CheckDouble}##ApplyAllCustomNameTextColorBtn"))
                 {
-                    ImGui.Indent();
-                    ImGui.Checkbox("New Line Before Icon##LayersNewLineBeforeIcon", ref ActiveTrackedEventEntry.LayersNewLineBeforeIcon);
-                    ImGui.Unindent();
-                }
-
-                ImGui.Unindent();
-            }
-
-            ImGui.Checkbox("Show Duration Text", ref ActiveTrackedEventEntry.ShowDurationText);
-            if (ActiveTrackedEventEntry.ShowDurationText)
-            {
-                ImGui.Indent();
-
-                ImGui.AlignTextToFramePadding();
-                ImGui.TextUnformatted("Duration Text Size:");
-                ImGui.SameLine();
-                ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
-                ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
-                ImGui.SetNextItemWidth(-1);
-                ImGui.SliderInt("##DurationTextSize", ref ActiveTrackedEventEntry.DurationTextSize, 16, 64);
-                ImGui.PopStyleColor(2);
-
-                ImGui.Checkbox("Same Line##DurationTextSameLine", ref ActiveTrackedEventEntry.DurationTextSameLine);
-                ImGui.SetItemTooltip("Displays Duration Text on the same line as the previous displayed option for this Tracker.");
-
-                ImGui.Checkbox("Use Minutes Format For Long Durations##UseMinutesForLongDuration", ref ActiveTrackedEventEntry.UseMinutesForLongDuration);
-                ImGui.SetItemTooltip("Displays the Duration as minutes instead of seconds when more than 60 seconds remain.");
-
-                ImGui.Checkbox("Use Custom Duration Text Color##UseCustomDurationTextColor", ref ActiveTrackedEventEntry.UseCustomDurationTextColor);
-                ImGui.SetItemTooltip("Changes the color of Duration Text when NOT combined with other elements.");
-
-                if (ActiveTrackedEventEntry.UseCustomDurationTextColor)
-                {
-                    ImGui.Indent();
-
-                    ImGui.ColorEdit4("##DurationTextColorPicker", ref ActiveTrackedEventEntry.DurationTextColor);
-
-                    ImGui.Unindent();
-                }
-
-                ImGui.Unindent();
-            }
-
-            ImGui.Checkbox("Show Duration Progress Bar", ref ActiveTrackedEventEntry.ShowDurationProgessBar);
-            if (ActiveTrackedEventEntry.ShowDurationProgessBar)
-            {
-                ImGui.Indent();
-
-                ImGui.AlignTextToFramePadding();
-                ImGui.TextUnformatted("Duration Progress Bar Style:");
-                ImGui.SameLine();
-                ImGui.SetNextItemWidth(-1);
-                if (ImGui.BeginCombo("##DurationProgressBarStyle", ActiveTrackedEventEntry.DurationProgressBarStyle.ToString(), ImGuiComboFlags.None))
-                {
-                    int idx = 0;
-                    foreach (var progressBarStyle in System.Enum.GetValues<EDurationProgressBarStyle>())
+                    foreach (var tracker in ActiveTrackerContainer.EventTrackers)
                     {
-                        bool isSelected = ActiveTrackedEventEntry.DurationProgressBarStyle == progressBarStyle;
-
-                        if (ImGui.Selectable($"{progressBarStyle.ToString()}", isSelected))
+                        if (tracker.Value.IdTracker != ActiveTrackedEventEntry.IdTracker)
                         {
-                            ActiveTrackedEventEntry.DurationProgressBarStyle = progressBarStyle;
+                            tracker.Value.UseCustomNameTextColor = ActiveTrackedEventEntry.UseCustomNameTextColor;
+                            tracker.Value.NameTextColor = ActiveTrackedEventEntry.NameTextColor;
                         }
-
-                        if (isSelected)
-                        {
-                            ImGui.SetItemDefaultFocus();
-                        }
-
-                        idx++;
                     }
-                    ImGui.EndCombo();
                 }
-                ImGui.SetItemTooltip("Note: Circle Style does not support placing anything Inside it other than the Icon.");
+                ImGui.PopFont();
+                ImGui.SetItemTooltip("Apply To All Other Trackers In Container.");
 
-                if (ActiveTrackedEventEntry.DurationProgressBarStyle == EDurationProgressBarStyle.Circle)
+                if (ActiveTrackedEventEntry.UseCustomNameTextColor)
+                {
+                    ImGui.Indent();
+
+                    ImGui.ColorEdit4("##NameTextColorPicker", ref ActiveTrackedEventEntry.NameTextColor);
+
+                    ImGui.Unindent();
+                }
+
+                ImGui.Unindent();
+            }
+
+            if (ActiveTrackedEventEntry.TrackerType != ETrackerType.Attributes)
+            {
+                ImGui.SeparatorText("Layers");
+
+                ImGui.Checkbox("Show Layers", ref ActiveTrackedEventEntry.ShowLayers);
+                if (ActiveTrackedEventEntry.ShowLayers)
                 {
                     ImGui.Indent();
 
                     ImGui.AlignTextToFramePadding();
-                    ImGui.TextUnformatted("Circle Progress Bar Thickness:");
+                    ImGui.TextUnformatted("Layers Size:");
                     ImGui.SameLine();
                     ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
                     ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
                     ImGui.SetNextItemWidth(-1);
-                    ImGui.SliderInt("##DurationProgressBarCircleThickness", ref ActiveTrackedEventEntry.DurationProgressBarCircleThickness, 1, 24);
+                    ImGui.SliderInt("##LayersSize", ref ActiveTrackedEventEntry.LayerSize, 16, 96);
                     ImGui.PopStyleColor(2);
 
-                    ImGui.Checkbox("Apply Overlay To Circle Fill##UseDurationProgressBarCircleBackgroundFill", ref ActiveTrackedEventEntry.UseDurationProgressBarCircleBackgroundFill);
-                    ImGui.SetItemTooltip("Adds a dimmed overlay to the center of the circle, potentially making it easier to read text in it.");
+                    ImGui.Checkbox("Show Layers Before Icon##ShowLayersBeforeIcon", ref ActiveTrackedEventEntry.ShowLayersBeforeIcon);
+                    if (ActiveTrackedEventEntry.ShowLayersBeforeIcon)
+                    {
+                        ImGui.Indent();
+                        ImGui.Checkbox("New Line Before Icon##LayersNewLineBeforeIcon", ref ActiveTrackedEventEntry.LayersNewLineBeforeIcon);
+                        ImGui.Unindent();
+                    }
 
-                    if (ActiveTrackedEventEntry.UseDurationProgressBarCircleBackgroundFill)
+                    ImGui.Checkbox("Use Custom Layers Text Color##UseCustomLayersTextColor", ref ActiveTrackedEventEntry.UseCustomLayersTextColor);
+                    ImGui.SetItemTooltip("Changes the color of Layers Text.");
+                    ImGui.SameLine();
+                    ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
+                    if (ImGui.Button($"{FASIcons.CheckDouble}##ApplyAllCustomLayersTextColorBtn"))
+                    {
+                        foreach (var tracker in ActiveTrackerContainer.EventTrackers)
+                        {
+                            if (tracker.Value.IdTracker != ActiveTrackedEventEntry.IdTracker)
+                            {
+                                tracker.Value.UseCustomLayersTextColor = ActiveTrackedEventEntry.UseCustomLayersTextColor;
+                                tracker.Value.LayersTextColor = ActiveTrackedEventEntry.LayersTextColor;
+                            }
+                        }
+                    }
+                    ImGui.PopFont();
+                    ImGui.SetItemTooltip("Apply To All Other Trackers In Container.");
+
+                    if (ActiveTrackedEventEntry.UseCustomLayersTextColor)
                     {
                         ImGui.Indent();
 
-                        ImGui.ColorEdit4("##DurationProgressBarCircleBackgroundColorPicker", ref ActiveTrackedEventEntry.DurationProgressBarCircleBackgroundColor);
+                        ImGui.ColorEdit4("##LayersTextColorPicker", ref ActiveTrackedEventEntry.LayersTextColor);
 
                         ImGui.Unindent();
                     }
@@ -4540,69 +5609,297 @@ namespace BPSR_ZDPS.Windows
                     ImGui.Unindent();
                 }
 
-                ImGui.AlignTextToFramePadding();
-                ImGui.TextUnformatted("Duration Progress Bar Size:");
-                ImGui.SameLine();
-                ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
-                ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
-                ImGui.SetNextItemWidth(-1);
-                ImGui.SliderInt("##DurationProgressBarSize", ref ActiveTrackedEventEntry.DurationProgressBarSize, 16, 64);
-                ImGui.PopStyleColor(2);
+                ImGui.SeparatorText("Duration Text");
 
-                ImGui.AlignTextToFramePadding();
-                ImGui.TextUnformatted("Duration Progress Bar Text Size:");
-                ImGui.SameLine();
-                ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
-                ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
-                ImGui.SetNextItemWidth(-1);
-                ImGui.SliderInt("##DurationProgressBarTextSize", ref ActiveTrackedEventEntry.DurationProgressBarTextSize, 16, 64);
-                ImGui.PopStyleColor(2);
-
-                ImGui.Checkbox("Same Line##DurationProgressBarSameLine", ref ActiveTrackedEventEntry.DurationProgressBarSameLine);
-                ImGui.SetItemTooltip("Note: Requires [Layout Size Constraint = 'FixedSize'] to work correctly.\nDisplays Duration Progress Bar on the same line as the previous displayed option for this Tracker.");
-
-                if (ActiveTrackedEventEntry.DurationProgressBarSameLine)
+                ImGui.Checkbox("Show Duration Text", ref ActiveTrackedEventEntry.ShowDurationText);
+                if (ActiveTrackedEventEntry.ShowDurationText)
                 {
                     ImGui.Indent();
+
                     ImGui.AlignTextToFramePadding();
-                    ImGui.TextUnformatted("Duration Progress Bar Vertical Offset:");
+                    ImGui.TextUnformatted("Duration Text Size:");
                     ImGui.SameLine();
                     ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
                     ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
                     ImGui.SetNextItemWidth(-1);
-                    ImGui.SliderInt("##DurationProgressBarVerticalOffset", ref ActiveTrackedEventEntry.DurationProgressBarVerticalOffset, 0, 100);
+                    ImGui.SliderInt("##DurationTextSize", ref ActiveTrackedEventEntry.DurationTextSize, 16, 96);
                     ImGui.PopStyleColor(2);
+
+                    ImGui.Checkbox("Same Line##DurationTextSameLine", ref ActiveTrackedEventEntry.DurationTextSameLine);
+                    ImGui.SetItemTooltip("Displays Duration Text on the same line as the previous displayed option for this Tracker.");
+
+                    ImGui.Checkbox("Use Minutes Format For Long Durations##UseMinutesForLongDuration", ref ActiveTrackedEventEntry.UseMinutesForLongDuration);
+                    ImGui.SetItemTooltip("Displays the Duration as minutes instead of seconds when more than 60 seconds remain.");
+
+                    ImGui.Checkbox("Use Custom Duration Text Color##UseCustomDurationTextColor", ref ActiveTrackedEventEntry.UseCustomDurationTextColor);
+                    ImGui.SetItemTooltip("Changes the color of Duration Text when NOT combined with other elements.");
+                    ImGui.SameLine();
+                    ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
+                    if (ImGui.Button($"{FASIcons.CheckDouble}##ApplyAllCustomDurationTextColorBtn"))
+                    {
+                        foreach (var tracker in ActiveTrackerContainer.EventTrackers)
+                        {
+                            if (tracker.Value.IdTracker != ActiveTrackedEventEntry.IdTracker)
+                            {
+                                tracker.Value.UseCustomDurationTextColor = ActiveTrackedEventEntry.UseCustomDurationTextColor;
+                                tracker.Value.DurationTextColor = ActiveTrackedEventEntry.DurationTextColor;
+                            }
+                        }
+                    }
+                    ImGui.PopFont();
+                    ImGui.SetItemTooltip("Apply To All Other Trackers In Container.");
+
+                    if (ActiveTrackedEventEntry.UseCustomDurationTextColor)
+                    {
+                        ImGui.Indent();
+
+                        ImGui.ColorEdit4("##DurationTextColorPicker", ref ActiveTrackedEventEntry.DurationTextColor);
+
+                        ImGui.Unindent();
+                    }
+
                     ImGui.Unindent();
                 }
 
-                ImGui.Checkbox("Icon Inside Progress Bar##ShowIconInsideProgressBar", ref ActiveTrackedEventEntry.ShowIconInsideProgressBar);
-                ImGui.SetItemTooltip("Note: Only applies if 'Show Icon' is also Enabled.\nRequires Duration Progress Bar Style = Circle.");
+                ImGui.SeparatorText("Duration Progress Bar");
 
-                ImGui.Checkbox("Name Inside Progress Bar##ShowNameInsideProgressBar", ref ActiveTrackedEventEntry.ShowNameInsideProgressBar);
-                ImGui.SetItemTooltip("Note: Only applies if 'Show Name' is also Enabled.");
+                ImGui.Checkbox("Show Duration Progress Bar", ref ActiveTrackedEventEntry.ShowDurationProgessBar);
+                if (ActiveTrackedEventEntry.ShowDurationProgessBar)
+                {
+                    ImGui.Indent();
 
-                ImGui.Checkbox("Layers Inside Progress Bar##ShowLayersInsideProgressBar", ref ActiveTrackedEventEntry.ShowLayersInsideProgressBar);
-                ImGui.SetItemTooltip("Note: Only applies if 'Show Layers' is also Enabled. Will be automatically attached to end of Name.");
+                    ImGui.AlignTextToFramePadding();
+                    ImGui.TextUnformatted("Duration Progress Bar Style:");
+                    ImGui.SameLine();
+                    ImGui.SetNextItemWidth(-1);
+                    if (ImGui.BeginCombo("##DurationProgressBarStyle", ActiveTrackedEventEntry.DurationProgressBarStyle.ToString(), ImGuiComboFlags.None))
+                    {
+                        int idx = 0;
+                        foreach (var progressBarStyle in System.Enum.GetValues<EDurationProgressBarStyle>())
+                        {
+                            bool isSelected = ActiveTrackedEventEntry.DurationProgressBarStyle == progressBarStyle;
 
-                ImGui.Checkbox("Duration Text Inside Progress Bar##ShowDurationTextInProgressBar", ref ActiveTrackedEventEntry.ShowDurationTextInProgressBar);
+                            if (ImGui.Selectable($"{progressBarStyle.ToString()}", isSelected))
+                            {
+                                ActiveTrackedEventEntry.DurationProgressBarStyle = progressBarStyle;
+                            }
+
+                            if (isSelected)
+                            {
+                                ImGui.SetItemDefaultFocus();
+                            }
+
+                            idx++;
+                        }
+                        ImGui.EndCombo();
+                    }
+                    ImGui.SetItemTooltip("Note: Circle Style does not support placing anything Inside it other than the Icon.");
+
+                    if (ActiveTrackedEventEntry.DurationProgressBarStyle == EDurationProgressBarStyle.Circle)
+                    {
+                        ImGui.Indent();
+
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.TextUnformatted("Circle Progress Bar Thickness:");
+                        ImGui.SameLine();
+                        ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
+                        ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
+                        ImGui.SetNextItemWidth(-1);
+                        ImGui.SliderInt("##DurationProgressBarCircleThickness", ref ActiveTrackedEventEntry.DurationProgressBarCircleThickness, 1, 24);
+                        ImGui.PopStyleColor(2);
+
+                        ImGui.Checkbox("Apply Overlay To Circle Fill##UseDurationProgressBarCircleBackgroundFill", ref ActiveTrackedEventEntry.UseDurationProgressBarCircleBackgroundFill);
+                        ImGui.SetItemTooltip("Adds a dimmed overlay to the center of the circle, potentially making it easier to read text in it.");
+
+                        if (ActiveTrackedEventEntry.UseDurationProgressBarCircleBackgroundFill)
+                        {
+                            ImGui.Indent();
+
+                            ImGui.ColorEdit4("##DurationProgressBarCircleBackgroundColorPicker", ref ActiveTrackedEventEntry.DurationProgressBarCircleBackgroundColor);
+
+                            ImGui.Unindent();
+                        }
+
+                        ImGui.Unindent();
+                    }
+
+                    ImGui.Checkbox("Use Custom Color Duration Progress Bar##UseCustomColorDurationProgressBar", ref ActiveTrackedEventEntry.UseCustomColorDurationProgressBar);
+
+                    ImGui.SameLine();
+                    ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
+                    if (ImGui.Button($"{FASIcons.CheckDouble}##ApplyAllCustomColorDurationProgressBarBtn"))
+                    {
+                        foreach (var tracker in ActiveTrackerContainer.EventTrackers)
+                        {
+                            if (tracker.Value.IdTracker != ActiveTrackedEventEntry.IdTracker)
+                            {
+                                tracker.Value.UseCustomColorDurationProgressBar = ActiveTrackedEventEntry.UseCustomColorDurationProgressBar;
+                                tracker.Value.CustomColorDurationProgressBar = ActiveTrackedEventEntry.CustomColorDurationProgressBar;
+                            }
+                        }
+                    }
+                    ImGui.PopFont();
+                    ImGui.SetItemTooltip("Apply To All Other Trackers In Container.");
+
+                    if (ActiveTrackedEventEntry.UseCustomColorDurationProgressBar)
+                    {
+                        ImGui.Indent();
+                        ImGui.ColorEdit4("##CustomColorDurationProgressBarPicker", ref ActiveTrackedEventEntry.CustomColorDurationProgressBar);
+                        ImGui.Unindent();
+                    }
+
+                    ImGui.AlignTextToFramePadding();
+                    ImGui.TextUnformatted("Duration Progress Bar Size:");
+                    ImGui.SameLine();
+                    ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
+                    ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
+                    ImGui.SetNextItemWidth(-1);
+                    ImGui.SliderInt("##DurationProgressBarSize", ref ActiveTrackedEventEntry.DurationProgressBarSize, 16, 96);
+                    ImGui.PopStyleColor(2);
+
+                    ImGui.AlignTextToFramePadding();
+                    ImGui.TextUnformatted("Duration Progress Bar Text Size:");
+                    ImGui.SameLine();
+                    ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
+                    ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
+                    ImGui.SetNextItemWidth(-1);
+                    ImGui.SliderInt("##DurationProgressBarTextSize", ref ActiveTrackedEventEntry.DurationProgressBarTextSize, 16, 96);
+                    ImGui.PopStyleColor(2);
+
+                    ImGui.Checkbox("Same Line##DurationProgressBarSameLine", ref ActiveTrackedEventEntry.DurationProgressBarSameLine);
+                    ImGui.SetItemTooltip("Note: Requires [Layout Size Constraint = 'FixedSize'] to work correctly.\nDisplays Duration Progress Bar on the same line as the previous displayed option for this Tracker.");
+
+                    if (ActiveTrackedEventEntry.DurationProgressBarSameLine)
+                    {
+                        ImGui.Indent();
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.TextUnformatted("Duration Progress Bar Vertical Offset:");
+                        ImGui.SameLine();
+                        ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
+                        ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
+                        ImGui.SetNextItemWidth(-1);
+                        ImGui.SliderInt("##DurationProgressBarVerticalOffset", ref ActiveTrackedEventEntry.DurationProgressBarVerticalOffset, 0, 100);
+                        ImGui.PopStyleColor(2);
+                        ImGui.Unindent();
+                    }
+
+                    ImGui.Checkbox("Icon Inside Progress Bar##ShowIconInsideProgressBar", ref ActiveTrackedEventEntry.ShowIconInsideProgressBar);
+
+                    if (ActiveTrackedEventEntry.ShowIconInsideProgressBar && ActiveTrackedEventEntry.DurationProgressBarStyle == EDurationProgressBarStyle.Circle)
+                    {
+                        ImGui.SameLine();
+                        ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
+                        if (ImGui.Button($"{FASIcons.CheckDouble}##ApplyAllIconStretchValuesBtn"))
+                        {
+                            foreach (var tracker in ActiveTrackerContainer.EventTrackers)
+                            {
+                                if (tracker.Value.IdTracker != ActiveTrackedEventEntry.IdTracker)
+                                {
+                                    tracker.Value.IconStretchLeftValue = ActiveTrackedEventEntry.IconStretchLeftValue;
+                                    tracker.Value.IconStretchRightValue = ActiveTrackedEventEntry.IconStretchRightValue;
+                                }
+                            }
+                        }
+                        ImGui.PopFont();
+                        ImGui.SetItemTooltip("Apply Both Stretch Left and Right Values To All Other Trackers In Container.");
+
+                        ImGui.Indent();
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.TextUnformatted("Icon Stretch Left:");
+                        ImGui.SameLine();
+                        ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
+                        ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
+                        ImGui.SetNextItemWidth(-1);
+                        ImGui.SliderInt("##IconStretchLeftValue", ref ActiveTrackedEventEntry.IconStretchLeftValue, -10, 20);
+                        ImGui.PopStyleColor(2);
+                        ImGui.SetItemTooltip("Recommended Value 0 when using a Circular Icon. 8 when a Default Game Rectangle Icon.");
+
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.TextUnformatted("Icon Stretch Right:");
+                        ImGui.SameLine();
+                        ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
+                        ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
+                        ImGui.SetNextItemWidth(-1);
+                        ImGui.SliderInt("##IconStretchRightValue", ref ActiveTrackedEventEntry.IconStretchRightValue, -10, 20);
+                        ImGui.PopStyleColor(2);
+                        ImGui.SetItemTooltip("Recommended Value 0 when using a Circular Icon. -6 when a Default Game Rectangle Icon.");
+
+                        ImGui.Unindent();
+                    }
+
+                    ImGui.Checkbox("Entity Name Inside Progress Bar##ShowEntityNameInsideProgressBar", ref ActiveTrackedEventEntry.ShowEntityNameInsideProgressBar);
+                    ImGui.SetItemTooltip("Note: Only applies if 'Show Entity Name' is also Enabled.");
+
+                    ImGui.Checkbox("Name Inside Progress Bar##ShowNameInsideProgressBar", ref ActiveTrackedEventEntry.ShowNameInsideProgressBar);
+                    ImGui.SetItemTooltip("Note: Only applies if 'Show Name' is also Enabled.");
+
+                    ImGui.Checkbox("Layers Inside Progress Bar##ShowLayersInsideProgressBar", ref ActiveTrackedEventEntry.ShowLayersInsideProgressBar);
+                    ImGui.SetItemTooltip("Note: Only applies if 'Show Layers' is also Enabled. Will be automatically attached to end of Name.");
+
+                    ImGui.Checkbox("Duration Text Inside Progress Bar##ShowDurationTextInProgressBar", ref ActiveTrackedEventEntry.ShowDurationTextInProgressBar);
+
+                    ImGui.AlignTextToFramePadding();
+                    ImGui.TextUnformatted("Inside Text Offset:");
+                    ImGui.SameLine();
+                    ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
+                    ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
+                    ImGui.SetNextItemWidth(-1);
+                    ImGui.SliderInt("##TextInsideProgressBarOffset", ref ActiveTrackedEventEntry.TextInsideProgressBarOffset, 0, 100, ImGuiSliderFlags.AlwaysClamp);
+                    ImGui.PopStyleColor(2);
+                    ImGui.SetItemTooltip("0 = Left, 50 = Center, 100 = Right");
+
+                    ImGui.Checkbox("Color Bar By Type", ref ActiveTrackedEventEntry.ColorDurationProgressBarByType);
+                    ImGui.SetItemTooltip("Changes the Duration Progress Bar color to be based on the entry type (Ex: Positive Buffs are Green, Debuffs are Red).");
+
+                    ImGui.Unindent();
+
+                }
+            }
+            else
+            {
+                ImGui.SeparatorText("Attribute Value");
+
+                ImGui.Checkbox("Format As Percent", ref ActiveTrackedEventEntry.FormatAttributeAsPercent);
+                ImGui.SetItemTooltip("Changes the value displayed to be a Percent if supported.");
 
                 ImGui.AlignTextToFramePadding();
-                ImGui.TextUnformatted("Inside Text Offset:");
+                ImGui.TextUnformatted("Value Size:");
                 ImGui.SameLine();
                 ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, ImGui.GetColorU32(ImGuiCol.FrameBgHovered, 0.55f));
                 ImGui.PushStyleColor(ImGuiCol.FrameBgActive, ImGui.GetColorU32(ImGuiCol.FrameBgActive, 0.55f));
                 ImGui.SetNextItemWidth(-1);
-                ImGui.SliderInt("##TextInsideProgressBarOffset", ref ActiveTrackedEventEntry.TextInsideProgressBarOffset, 0, 100, ImGuiSliderFlags.AlwaysClamp);
+                ImGui.SliderInt("##AttributeValueSize", ref ActiveTrackedEventEntry.AttributeValueSize, 16, 96);
                 ImGui.PopStyleColor(2);
-                ImGui.SetItemTooltip("0 = Left, 50 = Center, 100 = Right");
 
-                ImGui.Checkbox("Color Bar By Type", ref ActiveTrackedEventEntry.ColorDurationProgressBarByType);
-                ImGui.SetItemTooltip("Changes the Duration Progress Bar color to be based on the entry type (Ex: Positive Buffs are Green, Debuffs are Red).");
+                ImGui.Checkbox("Use Custom Value Text Color##UseCustomAttributeValueTextColor", ref ActiveTrackedEventEntry.UseCustomAttributeValueTextColor);
+                ImGui.SetItemTooltip("Changes the color of Attribute Value Text.");
+                ImGui.SameLine();
+                ImGui.PushFont(HelperMethods.Fonts["FASIcons"], ImGui.GetFontSize());
+                if (ImGui.Button($"{FASIcons.CheckDouble}##ApplyAllCustomAttributeValueTextColorBtn"))
+                {
+                    foreach (var tracker in ActiveTrackerContainer.EventTrackers)
+                    {
+                        if (tracker.Value.IdTracker != ActiveTrackedEventEntry.IdTracker && tracker.Value.TrackerType == ETrackerType.Attributes)
+                        {
+                            tracker.Value.UseCustomAttributeValueTextColor = ActiveTrackedEventEntry.UseCustomAttributeValueTextColor;
+                            tracker.Value.AttributeValueTextColor = ActiveTrackedEventEntry.AttributeValueTextColor;
+                        }
+                    }
+                }
+                ImGui.PopFont();
+                ImGui.SetItemTooltip("Apply To All Other Trackers In Container.");
 
-                ImGui.Unindent();
+                if (ActiveTrackedEventEntry.UseCustomAttributeValueTextColor)
+                {
+                    ImGui.Indent();
 
+                    ImGui.ColorEdit4("##AttributeValueTextColorPicker", ref ActiveTrackedEventEntry.AttributeValueTextColor);
+
+                    ImGui.Unindent();
+                }
             }
-            // TODO: Give option to place Progress Bar on new line or to side of text/icon - if on side then must also be in fixed-width window layout
+
+            ImGui.SeparatorText("Conditions");
 
             ImGui.Checkbox("Show 'Duration Ended' When No Remaining Duration", ref ActiveTrackedEventEntry.ShowDurationEnded);
             ImGui.SetItemTooltip("Progress Bars are always hidden when there is no remaining duration. This only impacts Text.");
@@ -4657,6 +5954,9 @@ namespace BPSR_ZDPS.Windows
                 }
                 ImGui.Unindent();
             }
+
+            ImGui.Checkbox("Only Display One Tracker Instance", ref ActiveTrackedEventEntry.OnlyDisplayOneTrackerInstance);
+            ImGui.SetItemTooltip("Limits the display of instances for this Tracker to only one at a time.\nIMPORTANT: This may still result in triggers for each instance!");
 
             ImGui.SeparatorText("Raid Warnings");
             ImGui.TextUnformatted("Raid Warning Messages can be displayed during certain events.");
@@ -4836,8 +6136,11 @@ namespace BPSR_ZDPS.Windows
             {
                 // TODO: Show input box for entering Target data
                 ImGui.TextUnformatted("Target UID or Name [Requires UUID Currently - In Debug Tab of Entity Inspector]:");
-                int definedUuid = (int)ActiveTrackedEventEntry.DefinedEntityTargetUuid;
-                ImGui.InputInt("##TargetUUIDInput", ref definedUuid, ImGuiInputTextFlags.CharsDecimal);
+                long definedUuid = ActiveTrackedEventEntry.DefinedEntityTargetUuid;
+                unsafe
+                {
+                    ImGui.InputScalar("##TargetUUIDInput", ImGuiDataType.S64, &definedUuid);
+                }
                 ActiveTrackedEventEntry.DefinedEntityTargetUuid = definedUuid;
             }
             if (ActiveTrackedEventEntry.TrackedEntityType == ETrackedEntityType.Everyone)
@@ -5089,15 +6392,15 @@ namespace BPSR_ZDPS.Windows
             ImGui.SeparatorText("Extra Options");
             ImGui.Checkbox("Keep On Scene Change", ref ActiveTrackedEventEntry.LoadEvents.KeepOnSceneChange);
             ImGui.SetItemTooltip("The Tracker will persist through Scene (Map) changes.\nNote: Encounter events like wipes will still remove it.");
-            HandleApplyToOthersContextMenu((tracker) => { tracker.LoadEvents.IsOwnerDead = ActiveTrackedEventEntry.LoadEvents.IsOwnerDead; });
+            HandleApplyToOthersContextMenu((tracker) => { tracker.LoadEvents.KeepOnSceneChange = ActiveTrackedEventEntry.LoadEvents.KeepOnSceneChange; });
 
             ImGui.Checkbox("Keep On Wipe", ref ActiveTrackedEventEntry.LoadEvents.KeepOnWipe);
             ImGui.SetItemTooltip("The Tracker will persist through wipes.");
-            HandleApplyToOthersContextMenu((tracker) => { tracker.LoadEvents.IsOwnerDead = ActiveTrackedEventEntry.LoadEvents.IsOwnerDead; });
+            HandleApplyToOthersContextMenu((tracker) => { tracker.LoadEvents.KeepOnWipe = ActiveTrackedEventEntry.LoadEvents.KeepOnWipe; });
 
             ImGui.Checkbox("Keep On Restart", ref ActiveTrackedEventEntry.LoadEvents.KeepOnRestart);
             ImGui.SetItemTooltip("The Tracker will persist through Restart events. These are typically when a Raid Boss is killed.");
-            HandleApplyToOthersContextMenu((tracker) => { tracker.LoadEvents.IsOwnerDead = ActiveTrackedEventEntry.LoadEvents.IsOwnerDead; });
+            HandleApplyToOthersContextMenu((tracker) => { tracker.LoadEvents.KeepOnRestart = ActiveTrackedEventEntry.LoadEvents.KeepOnRestart; });
         }
 
         public static void ToggleForceHideAllContainers(bool newState)
@@ -5137,6 +6440,7 @@ namespace BPSR_ZDPS.Windows
                 PresetTrackersList.Add(CreateNewBasicBuffEventEntry("Tatta Heart of Flames", 2110061));
                 PresetTrackersList.Add(CreateNewBasicBuffEventEntry("Tatta Exhausted Flame Devour", 2110055));
                 PresetTrackersList.Add(CreateNewBasicBuffEventEntry("Wound (Heal Blocked)", 510571));
+                PresetTrackersList.Add(CreateNewBasicBuffEventEntry("Wound (Heal Blocked) (DoD)", 883113));
                 PresetTrackersList.Add(CreateNewBasicBuffEventEntry("Boarrier Wound (Heal Blocked)", 2110026));
 
                 PresetTrackersList.Add(CreateNewBasicBuffEventEntry("Life Wave", 2302421));
@@ -5161,7 +6465,7 @@ namespace BPSR_ZDPS.Windows
                 {
                     IsEnabled = true,
                     ActivationType = ERaidWarningActivationType.OnGain,
-                    MessageFormat = "Tankbuster on {OwnerEntityTarget}!",
+                    MessageFormat = "Tankbuster on {OwnerEntityName}!",
                     PlaySound = true,
                 });
                 PresetTrackersList.Add(newShadowbreakStrike);
@@ -5422,13 +6726,20 @@ namespace BPSR_ZDPS.Windows
                 newWoundTracker.ShowNameInsideProgressBar = true;
                 newWoundTracker.ShowDurationTextInProgressBar = true;
                 groupDebuffsContainer.EventTrackers.Add(2, newWoundTracker);
+                var newWoundDoDTracker = CreateNewBasicBuffEventEntry("Wound (Heal Blocked) (DoD)", 883113);
+                newWoundDoDTracker.TrackedEntityType = ETrackedEntityType.Everyone;
+                newWoundDoDTracker.ShowEntityName = true;
+                newWoundDoDTracker.DurationProgressBarSameLine = true;
+                newWoundDoDTracker.ShowNameInsideProgressBar = true;
+                newWoundDoDTracker.ShowDurationTextInProgressBar = true;
+                groupDebuffsContainer.EventTrackers.Add(3, newWoundDoDTracker);
                 var newExhaustedFlameDevour = CreateNewBasicBuffEventEntry("Tatta Exhausted Flame Devour", 2110055);
                 newExhaustedFlameDevour.TrackedEntityType = ETrackedEntityType.Everyone;
                 newExhaustedFlameDevour.ShowEntityName = true;
                 newExhaustedFlameDevour.DurationProgressBarSameLine = true;
                 newExhaustedFlameDevour.ShowNameInsideProgressBar = true;
                 newExhaustedFlameDevour.ShowDurationTextInProgressBar = true;
-                groupDebuffsContainer.EventTrackers.Add(3, newExhaustedFlameDevour);
+                groupDebuffsContainer.EventTrackers.Add(4, newExhaustedFlameDevour);
 
                 PresetContainersList.Add(groupDebuffsContainer);
             }
@@ -5632,7 +6943,8 @@ namespace BPSR_ZDPS.Windows
     public enum EContainerSizeConstraint
     {
         AutoSize = 0,
-        FixedSize = 1
+        FixedSize = 1,
+        FixedWidth = 2, // Height is AutoSize
     }
 
     public class TrackerContainer
@@ -5675,11 +6987,13 @@ namespace BPSR_ZDPS.Windows
         public bool TrimLongDescriptionTooltips = true;
 
         public bool TrackAllBuffs = false;
+        public bool TrackAllSkills = false;
 
         [JsonProperty]
         public bool HasEnabledTrackers { get; private set; } = false;
 
         public bool HideTrackerBackground = false;
+        public int TrackerBackgroundOpacityValue = 0;
         public bool HideTrackerBorders = false;
 
         public void RecheckTrackerStates()
@@ -5798,22 +7112,30 @@ namespace BPSR_ZDPS.Windows
         public int OverrideTrackedIdValue = 0;
 
         public string TrackedAttributeName = "";
+        public string TrackedAttributeNameOverride = "";
+        public bool FormatAttributeAsPercent = false;
 
         public bool LimitToOneTrackerInstance = false;
+        public bool OnlyDisplayOneTrackerInstance = false;
 
         public bool ShowIcon = false;
         public string OriginalIconPath = "";
         public bool UseCustomIcon = false;
         public string CustomIconPath = "";
         public bool ShowEntityName = false;
+        public bool ShowCasterName = false;
         public bool ShowName = false;
         public bool UseCustomName = false;
         public string CustomName = "";
         public bool ShowNameBeforeIcon = false;
         public bool NameNewLineBeforeIcon = false;
+        public bool UseCustomNameTextColor = false;
+        public Vector4 NameTextColor = new Vector4(1, 1, 1, 1);
         public bool ShowLayers = false;
         public bool ShowLayersBeforeIcon = false;
         public bool LayersNewLineBeforeIcon = false;
+        public bool UseCustomLayersTextColor = false;
+        public Vector4 LayersTextColor = new Vector4(1, 1, 1, 1);
         public bool ShowDurationText = false;
         public bool DurationTextSameLine = false;
         public bool UseMinutesForLongDuration = false;
@@ -5821,6 +7143,9 @@ namespace BPSR_ZDPS.Windows
         public Vector4 DurationTextColor = new Vector4(1, 1, 1, 1);
         public bool ShowDurationProgessBar = false;
         public bool ShowIconInsideProgressBar = false;
+        public int IconStretchLeftValue = 0;
+        public int IconStretchRightValue = 0;
+        public bool ShowEntityNameInsideProgressBar = false;
         public bool ShowNameInsideProgressBar = false;
         public int TextInsideProgressBarOffset = 0;
         public bool ShowLayersInsideProgressBar = false;
@@ -5828,6 +7153,12 @@ namespace BPSR_ZDPS.Windows
         public int DurationProgressBarVerticalOffset = 0;
         public bool ShowDurationTextInProgressBar = false;
         public bool ColorDurationProgressBarByType = false;
+
+        public bool UseCustomAttributeValueTextColor = false;
+        public Vector4 AttributeValueTextColor = new Vector4(1, 1, 1, 1);
+
+        public bool UseCustomColorDurationProgressBar = false;
+        public Vector4 CustomColorDurationProgressBar = ImGui.ColorConvertU32ToFloat4(ImGui.GetColorU32(ImGuiCol.PlotHistogram));
 
         public EDurationProgressBarStyle DurationProgressBarStyle = EDurationProgressBarStyle.Line;
         public bool UseDurationProgressBarCircleBackgroundFill = false;
@@ -5840,10 +7171,11 @@ namespace BPSR_ZDPS.Windows
         public int DurationProgressBarSize = 18;
         public int DurationProgressBarTextSize = 18;
         public int DurationProgressBarCircleThickness = 5;
+        public int AttributeValueSize = 18;
 
         public bool ShowDurationEnded = false;
-        public bool HideIfNoDuration = false;
-        public EHideTrackerCondition HideTrackerCondition = EHideTrackerCondition.NeverHide;
+        //public bool HideIfNoDuration = false;
+        public EHideTrackerCondition HideTrackerCondition = EHideTrackerCondition.HideOnRemoveEvent;
         public Zproto.EBuffEventType? HideOnSpecificBuffEventValue = null;
 
         public bool OverrideDuration = false;
@@ -5957,11 +7289,23 @@ namespace BPSR_ZDPS.Windows
             // If we ever need to perform a clone we are breaking the original source type
             // This can be manually restored in the rare case we didn't want to break it
             cloned.SourceLocationType = ESourceLocationType.Manual;
+
+            cloned.LoadEvents = (LoadEvent)LoadEvents.Clone();
+
+            cloned.BuffEvents = new(BuffEvents);
+
+            cloned.SkillEvents = new(SkillEvents);
+
+            cloned.RaidWarningTrackerDatas = new();
+            foreach (var rw in RaidWarningTrackerDatas)
+            {
+                cloned.RaidWarningTrackerDatas.Add((RaidWarningTrackerData)rw.Clone());
+            }
             return cloned;
         }
     }
 
-    public class RaidWarningTrackerData
+    public class RaidWarningTrackerData : ICloneable
     {
         public bool IsEnabled = false;
         public ERaidWarningActivationType ActivationType = ERaidWarningActivationType.OnGain;
@@ -5971,6 +7315,12 @@ namespace BPSR_ZDPS.Windows
         public string MessageFormat = "";
         public bool PlaySound = false;
         public string CustomSoundPath = "";
+
+        public object Clone()
+        {
+            var cloned = this.MemberwiseClone();
+            return cloned;
+        }
     }
 
     public enum ERaidWarningActivationType
@@ -5990,7 +7340,7 @@ namespace BPSR_ZDPS.Windows
         GreaterThanOrEqualTo = 4
     }
 
-    public class LoadEvent
+    public class LoadEvent : ICloneable
     {
         public bool InCombat = false;
         public bool NotInCombat = false;
@@ -6016,6 +7366,19 @@ namespace BPSR_ZDPS.Windows
 
         [JsonProperty]
         public List<int> SceneIdValues { get; private set; } = new();
+
+        public object Clone()
+        {
+            var cloned = (LoadEvent)this.MemberwiseClone();
+
+            cloned.RoleType = new(RoleType);
+            cloned.Profession = new(Profession);
+            cloned.SubProfession = new(SubProfession);
+
+            cloned.SceneIds = new(SceneIds);
+
+            return cloned;
+        }
 
         public void UpdateSceneIdValuesFromString()
         {
@@ -6166,6 +7529,13 @@ namespace BPSR_ZDPS.Windows
         public EventCooldownData? Cooldown;
     }
 
+    public class AttributeEventData : EventData
+    {
+        public string AttributeName = "";
+        public string AttributeValue = "";
+        public bool IsRemoved = false;
+    }
+
     public class EventCooldownData
     {
         public DateTime? Added { get; private set; }
@@ -6181,8 +7551,8 @@ namespace BPSR_ZDPS.Windows
         public bool IsCooldownStarted { get; private set; } = false;
         public bool IsCooldownEnded { get; private set; } = false;
 
-        private float effectiveDuration = 0;
-        private float cooldownConsumed = 0;
+        public float effectiveDuration { get; private set; } = 0;
+        public float cooldownConsumed { get; private set; } = 0;
         private DateTime updated;
 
         public EventCooldownData(float duration, float percentReduction, float flatReduction)
@@ -6333,11 +7703,13 @@ namespace BPSR_ZDPS.Windows
 
     public class EventTrackerWindowSettings : WindowSettingsBase
     {
-        public bool IsContainerEditMode = true;
+        [JsonIgnore]
+        public bool IsContainerEditMode = false;
         public bool EditModeShowPlaceholders = false;
 
         public bool HideContainersWhenGameNotFocused = false;
         public bool KeepContainersWhenZDPSFocused = false;
+        public bool OnlyShowContainersWhenZDPSMeterPinned = false;
 
         public bool AlwaysIgnoreInputs = false;
         public bool ShowForceHideContainersBtnOnMainWindow = false;

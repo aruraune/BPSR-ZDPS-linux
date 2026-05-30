@@ -198,4 +198,37 @@ public class User32
         }
         return SetWindowLongPtr64(hWnd, nIndex, dwNewLong);
     }
+
+    //[DllImport("wpcap.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern IntPtr pcap_lib_version();
+
+    public static string GetNpcapVersionString()
+    {
+        try
+        {
+            IntPtr ptr = pcap_lib_version();
+            string versionStr = Marshal.PtrToStringAnsi(ptr);
+            return versionStr;
+        }
+        catch (Exception ex)
+        {
+            return "";
+        }
+    }
+
+    public static Version GetNpcapVersion()
+    {
+        string str = GetNpcapVersionString();
+        if (!string.IsNullOrEmpty(str))
+        {
+            var match = System.Text.RegularExpressions.Regex.Match(str, @"\w+ version (\d+(?:\.\d+)+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                Version.TryParse(match.Groups[1].Value, out var version);
+                return version;
+            }
+
+        }
+        return new Version();
+    }
 }

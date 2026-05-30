@@ -693,6 +693,9 @@ namespace BPSR_ZDPS
                     case EAttrType.AttrName:
                         EncounterManager.Current.SetAttrKV(uuid, attrIdName, isNoValue ? "" : reader.ReadString().TrimEnd());
                         break;
+                    case EAttrType.AttrHatedName:
+                        EncounterManager.Current.SetAttrKV(uuid, attrIdName, isNoValue ? "" : reader.ReadString().TrimEnd());
+                        break;
                     case EAttrType.AttrSkillId:
                         EncounterManager.Current.SetAttrKV(uuid, attrIdName, isNoValue ? 0 : reader.ReadInt32());
                         break;
@@ -730,6 +733,24 @@ namespace BPSR_ZDPS
                         EncounterManager.Current.SetAttrKV(uuid, attrIdName, isNoValue ? new Vec3() : Vec3.Parser.ParseFrom(reader));
                         break;
                     case EAttrType.AttrTargetPos:
+                        EncounterManager.Current.SetAttrKV(uuid, attrIdName, isNoValue ? new Vec3() : Vec3.Parser.ParseFrom(reader));
+                        break;
+                    case EAttrType.AttrFinalTargetPos:
+                        EncounterManager.Current.SetAttrKV(uuid, attrIdName, isNoValue ? new Vec3() : Vec3.Parser.ParseFrom(reader));
+                        break;
+                    case EAttrType.AttrDmgTargetPos:
+                        EncounterManager.Current.SetAttrKV(uuid, attrIdName, isNoValue ? new Vec3() : Vec3.Parser.ParseFrom(reader));
+                        break;
+                    case EAttrType.AttrBulletTargetPos:
+                        EncounterManager.Current.SetAttrKV(uuid, attrIdName, isNoValue ? new Vec3() : Vec3.Parser.ParseFrom(reader));
+                        break;
+                    case EAttrType.AttrSummonerPos:
+                        EncounterManager.Current.SetAttrKV(uuid, attrIdName, isNoValue ? new Vec3() : Vec3.Parser.ParseFrom(reader));
+                        break;
+                    case EAttrType.AttrTargetPartPos:
+                        EncounterManager.Current.SetAttrKV(uuid, attrIdName, isNoValue ? new Vec3() : Vec3.Parser.ParseFrom(reader));
+                        break;
+                    case EAttrType.AttrParadeLeaderPos:
                         EncounterManager.Current.SetAttrKV(uuid, attrIdName, isNoValue ? new Vec3() : Vec3.Parser.ParseFrom(reader));
                         break;
                     case EAttrType.AttrState:
@@ -1028,6 +1049,9 @@ namespace BPSR_ZDPS
                 return;
             }
 
+            // Store the original time in case it gets overwritten during buff processing, we'll restore it afterwards
+            var originalArrivalTime = extraData.ArrivalTime;
+
             long buffBasedShieldBreakValue = 0;
             
             List<int> EventHandledBuffs = new();
@@ -1055,20 +1079,34 @@ namespace BPSR_ZDPS
                             if (logicEffect.EffectType == EBuffEffectLogicPbType.BuffEffectAddBuff)
                             {
                                 var buffInfo = BuffInfo.Parser.ParseFrom(reader);
+                                DateTime? creationTime = null;
+                                if (buffInfo.CreateTime > 0)
+                                {
+                                    DateTimeOffset dto = DateTimeOffset.FromUnixTimeMilliseconds(buffInfo.CreateTime);
+                                    
+                                    creationTime = dto.UtcDateTime;
+                                }
                                 //System.Diagnostics.Debug.WriteLine($"({buffEffect.Type}) buffEffect[{buffIdx}].logicEffect[{logicIdx}] (Type:{logicEffect.EffectType}) = (BuffUUID:{buffEffect.BuffUuid}){buffInfo}");
-                                EncounterManager.Current.NotifyBuffEvent(targetUuid, buffEffect.Type, buffEffect.BuffUuid, buffInfo.BaseId, buffInfo.Level, buffInfo.FireUuid, buffInfo.Layer, buffInfo.Duration, buffInfo.FightSourceInfo.SourceConfigId, extraData);
+                                EncounterManager.Current.NotifyBuffEvent(targetUuid, buffEffect.Type, buffEffect.BuffUuid, buffInfo.BaseId, buffInfo.Level, buffInfo.FireUuid, buffInfo.Layer, buffInfo.Duration, buffInfo.FightSourceInfo.SourceConfigId, creationTime, extraData);
                             }
                             else if (logicEffect.EffectType == EBuffEffectLogicPbType.BuffEffectBuffChange)
                             {
                                 // Layer, Duration, CreateTime
                                 var changeInfo = BuffChange.Parser.ParseFrom(reader);
+                                DateTime? creationTime = null;
+                                if (changeInfo.CreateTime > 0)
+                                {
+                                    DateTimeOffset dto = DateTimeOffset.FromUnixTimeMilliseconds(changeInfo.CreateTime);
+
+                                    creationTime = dto.UtcDateTime;
+                                }
                                 //System.Diagnostics.Debug.WriteLine($"({buffEffect.Type}) buffEffect[{buffIdx}].logicEffect[{logicIdx}] (Type:{logicEffect.EffectType}) = (BuffUUID:{buffEffect.BuffUuid}){changeInfo}");
-                                EncounterManager.Current.NotifyBuffEvent(targetUuid, buffEffect.Type, buffEffect.BuffUuid, 0, 0, 0, changeInfo.Layer, (int)changeInfo.Duration, 0, extraData);
+                                EncounterManager.Current.NotifyBuffEvent(targetUuid, buffEffect.Type, buffEffect.BuffUuid, 0, 0, 0, changeInfo.Layer, (int)changeInfo.Duration, 0, creationTime, extraData);
                             }
                             else if (logicEffect.EffectType == null)
                             {
                                 //System.Diagnostics.Debug.WriteLine($"Unhandled Logic Effect {buffEffect}");
-                                EncounterManager.Current.NotifyBuffEvent(targetUuid, buffEffect.Type, buffEffect.BuffUuid, 0, 0, 0, 0, 0, 0, extraData);
+                                EncounterManager.Current.NotifyBuffEvent(targetUuid, buffEffect.Type, buffEffect.BuffUuid, 0, 0, 0, 0, 0, 0, null, extraData);
                             }
                         }
                     }
@@ -1078,7 +1116,7 @@ namespace BPSR_ZDPS
                         //System.Diagnostics.Debug.WriteLine($"No Logic Effect {buffEffect}");
                         if (!LogicHandledBuffs.Contains(buffEffect.BuffUuid))
                         {
-                            EncounterManager.Current.NotifyBuffEvent(targetUuid, buffEffect.Type, buffEffect.BuffUuid, 0, 0, 0, 0, 0, 0, extraData);
+                            EncounterManager.Current.NotifyBuffEvent(targetUuid, buffEffect.Type, buffEffect.BuffUuid, 0, 0, 0, 0, 0, 0, null, extraData);
                         }
                     }
 
@@ -1110,6 +1148,8 @@ namespace BPSR_ZDPS
                     }
                 }
             }
+
+            extraData.ArrivalTime = originalArrivalTime;
 
             var skillEffect = delta.SkillEffects;
             
@@ -1439,7 +1479,7 @@ namespace BPSR_ZDPS
                     {
                         if ((ulong)item.Key == equip.Value.ItemUuid)
                         {
-                            playerEquips.Add(new EquipNine() { EquipId = item.Value.ConfigId, Slot = equip.Value.EquipSlot });
+                            playerEquips.Add(new EquipNine() { EquipID = item.Value.ConfigId, Slot = equip.Value.EquipSlot });
                             break;
                         }
                     }
@@ -1465,7 +1505,8 @@ namespace BPSR_ZDPS
                 }
 
                 var buf = dirty.VData.Buffer.ToByteArray();
-                var ser = new BPSR_ZDPSLib.Blobs.CharSerialize(new BlobReader(buf));
+                bool isStreamSafe = dirty.VData.StreamType == EStreamType.StreamTypeDeltaDirtySafe;
+                var ser = new BPSR_ZDPSLib.Blobs.CharSerialize(new BlobReader(buf, isStreamSafe));
 
                 if (ser.CharBaseInfo != null)
                 {
@@ -1839,7 +1880,8 @@ namespace BPSR_ZDPS
 
             var buf = dirty.VData.Buffer.ToByteArray();
 
-            var dun = new BPSR_ZDPSLib.Blobs.DungeonDirtyData(new BlobReader(buf));
+            bool isStreamSafe = dirty.VData.StreamType == EStreamType.StreamTypeDeltaDirtySafe;
+            var dun = new BPSR_ZDPSLib.Blobs.DungeonDirtyData(new BlobReader(buf, isStreamSafe));
 
             if (dun?.PlayerList != null && dun?.PlayerList.PlayerInfos.Count > 0)
             {

@@ -12,6 +12,7 @@ public class Settings
     private static string SETTINGS_FILE_NAME = "Settings.json";
 
     public int Version { get; set; } = 0;
+    public string Language { get; set; } = "en";
     public string NetCaptureDeviceName { get; set; } = "";
     public bool NormalizeMeterContributions { get; set; } = true;
     public bool UseShortWidthNumberFormatting { get; set; } = true;
@@ -35,6 +36,7 @@ public class Settings
     public bool AllowGamepadNavigationInputInZDPS { get; set; } = false;
     public bool KeepPastEncounterInMeterUntilNextDamage { get; set; } = false;
     public bool ShowChannelLineNumberInStatus { get; set; } = false;
+    public bool ShowCallWipeForEncounterOnMainWindow { get; set; } = false;
     public bool UseDatabaseForEncounterHistory { get; set; } = true;
     public int DatabaseRetentionPolicyDays { get; set; } = 0;
     public bool SkipSavingEncountersWithNoCombatData { get; set; } = false;
@@ -153,6 +155,7 @@ public enum EGameCapturePreference
     XDG,
     HaoPlaySeaSteam,
     XDGSteam,
+    WeGame,
     Custom = 200
 }
 

@@ -15,6 +15,7 @@ namespace BPSR_ZDPS.Windows
         public const string LAYER = "SettingsWindowLayer";
         public static string TITLE_ID = "###SettingsWindow";
 
+        static string Language;
         static int PreviousSelectedNetworkDeviceIdx = -1;
         static int SelectedNetworkDeviceIdx = -1;
         static bool normalizeMeterContributions;
@@ -38,6 +39,7 @@ namespace BPSR_ZDPS.Windows
         static bool allowGamepadNavigationInputInZDPS;
         static bool keepPastEncounterInMeterUntilNextDamage;
         static bool showChannelLineNumberInStatus;
+        static bool showCallWipeForEncounterOnMainWindow;
         static bool useDatabaseForEncounterHistory;
         static int databaseRetentionPolicyDays;
         static bool skipSavingEncountersWithNoCombatData;
@@ -116,6 +118,8 @@ namespace BPSR_ZDPS.Windows
         static float fpsUpdateTracker = 0.0f;
         static double currentFps = 0.0;
 
+        static Version npcapVersion = new();
+
         public static void Open()
         {
             RunOnceDelayed = 0;
@@ -157,6 +161,8 @@ namespace BPSR_ZDPS.Windows
             HotKeyManager.UnregisterAllHotKeys();
 
             RecalculateRefreshRates();
+
+            npcapVersion = User32.GetNpcapVersion();
 
             ImGui.PopID();
         }
@@ -215,7 +221,60 @@ namespace BPSR_ZDPS.Windows
                         var contentRegionAvail = ImGui.GetContentRegionAvail();
                         ImGui.BeginChild("##GeneralTabContent", new Vector2(contentRegionAvail.X, contentRegionAvail.Y - 56), ImGuiChildFlags.Borders);
 
+                        ImGui.SeparatorText("Localization (Coming Soon)");
+
+                        ImGui.BeginDisabled();
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.TextUnformatted("Language: ");
+                        ImGui.SameLine();
+                        ImGui.SetNextItemWidth(150);
+                        if (ImGui.BeginCombo("##LanguageCombo", System.Globalization.CultureInfo.GetCultureInfo(Language).EnglishName))
+                        {
+                            if (ImGui.Selectable("English (EN)"))
+                            {
+                                Language = "en";
+                            }
+
+                            if (ImGui.Selectable("Chinese (ZH)"))
+                            {
+                                Language = "zh";
+                            }
+
+                            if (ImGui.Selectable("Japanese (JA)"))
+                            {
+                                Language = "ja";
+                            }
+
+                            ImGui.EndCombo();
+                        }
+
+                        ImGui.EndDisabled();
+
                         ImGui.SeparatorText("Network Device");
+
+                        if (npcapVersion == new Version())
+                        {
+                            ImGui.PushStyleColor(ImGuiCol.ChildBg, Colors.Red_Transparent);
+                            ImGui.BeginChild($"##VeryOutOfDateNpcapVersion", new Vector2(0, 0), ImGuiChildFlags.AutoResizeY | ImGuiChildFlags.Borders);
+                            ImGui.PushFont(HelperMethods.Fonts["Segoe-Bold"], ImGui.GetFontSize());
+                            ImGui.TextUnformatted("ERROR:");
+                            ImGui.PopFont();
+                            ImGui.TextWrapped($"Npcap version is EXTREMELY OUT OF DATE. Please update your Npcap install immediately.");
+                            ImGui.EndChild();
+                            ImGui.PopStyleColor();
+                        }
+                        else if (npcapVersion < new Version(1, 86))
+                        {
+                            ImGui.PushStyleColor(ImGuiCol.ChildBg, Colors.Goldenrod_Transparent);
+                            ImGui.BeginChild($"##OutOfDateNpcapVersion", new Vector2(0, 0), ImGuiChildFlags.AutoResizeY | ImGuiChildFlags.Borders);
+                            ImGui.PushFont(HelperMethods.Fonts["Segoe-Bold"], ImGui.GetFontSize());
+                            ImGui.TextUnformatted("WARNING:");
+                            ImGui.PopFont();
+                            ImGui.TextWrapped($"Npcap version ({npcapVersion}) is below 1.86. It is strongly recommended to update to this version, or higher, to avoid problems.");
+                            ImGui.EndChild();
+                            ImGui.PopStyleColor();
+                        }
+
                         ImGui.Text("Select the network device to read from:");
 
                         ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
@@ -299,6 +358,10 @@ namespace BPSR_ZDPS.Windows
                             else if (ImGui.Selectable("XDG Steam"))
                             {
                                 GameCapturePreference = EGameCapturePreference.XDGSteam;
+                            }
+                            else if (ImGui.Selectable("WeGame"))
+                            {
+                                GameCapturePreference = EGameCapturePreference.WeGame;
                             }
                             else if (ImGui.Selectable("Custom"))
                             {
@@ -757,6 +820,16 @@ namespace BPSR_ZDPS.Windows
                         ImGui.Indent();
                         ImGui.BeginDisabled(true);
                         ImGui.TextWrapped("When enabled, shows the current Channel Line number in the Status bar of the Main Window.");
+                        ImGui.EndDisabled();
+                        ImGui.Unindent();
+
+                        ImGui.AlignTextToFramePadding();
+                        ImGui.Text("Show 'Call Wipe' For Encounter On Main Window: ");
+                        ImGui.SameLine();
+                        ImGui.Checkbox("##ShowCallWipeForEncounterOnMainWindow", ref showCallWipeForEncounterOnMainWindow);
+                        ImGui.Indent();
+                        ImGui.BeginDisabled(true);
+                        ImGui.TextWrapped("When enabled, adds a button (Skull Icon) to the title bar of the Main Window to 'Call Wipe' for the current Encounter and end it immediately.");
                         ImGui.EndDisabled();
                         ImGui.Unindent();
 
@@ -1640,6 +1713,8 @@ namespace BPSR_ZDPS.Windows
 
         private static void Load()
         {
+            Language = Settings.Instance.Language;
+
             normalizeMeterContributions = Settings.Instance.NormalizeMeterContributions;
             useShortWidthNumberFormatting = Settings.Instance.UseShortWidthNumberFormatting;
             showClassIconsInMeters = Settings.Instance.ShowClassIconsInMeters;
@@ -1661,6 +1736,7 @@ namespace BPSR_ZDPS.Windows
             allowGamepadNavigationInputInZDPS = Settings.Instance.AllowGamepadNavigationInputInZDPS;
             keepPastEncounterInMeterUntilNextDamage = Settings.Instance.KeepPastEncounterInMeterUntilNextDamage;
             showChannelLineNumberInStatus = Settings.Instance.ShowChannelLineNumberInStatus;
+            showCallWipeForEncounterOnMainWindow = Settings.Instance.ShowCallWipeForEncounterOnMainWindow;
 
             useDatabaseForEncounterHistory = Settings.Instance.UseDatabaseForEncounterHistory;
             databaseRetentionPolicyDays = Settings.Instance.DatabaseRetentionPolicyDays;
@@ -1754,6 +1830,14 @@ namespace BPSR_ZDPS.Windows
                 AppState.WasEncounterSavingPaused = false;
             }
 
+            if (Settings.Instance.Language != Language)
+            {
+                Settings.Instance.Language = Language;
+                AppState.LoadAppStringsTable();
+                AppState.LoadSkillOverridesTable();
+                AppState.LoadBuffOverridesTable();
+            }
+
             Settings.Instance.NormalizeMeterContributions = normalizeMeterContributions;
             Settings.Instance.UseShortWidthNumberFormatting = useShortWidthNumberFormatting;
             Settings.Instance.ShowClassIconsInMeters = showClassIconsInMeters;
@@ -1775,6 +1859,7 @@ namespace BPSR_ZDPS.Windows
             Settings.Instance.AllowGamepadNavigationInputInZDPS = allowGamepadNavigationInputInZDPS;
             Settings.Instance.KeepPastEncounterInMeterUntilNextDamage = keepPastEncounterInMeterUntilNextDamage;
             Settings.Instance.ShowChannelLineNumberInStatus = showChannelLineNumberInStatus;
+            Settings.Instance.ShowCallWipeForEncounterOnMainWindow = showCallWipeForEncounterOnMainWindow;
 
             Settings.Instance.UseDatabaseForEncounterHistory = useDatabaseForEncounterHistory;
             Settings.Instance.DatabaseRetentionPolicyDays = databaseRetentionPolicyDays;
